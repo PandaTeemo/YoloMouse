@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="YoloMouse" Language="1033" Version="0.1.0.0" Manufacturer="HaPpY" UpgradeCode="69ce184e-a676-4169-a124-e1ee073bd0e6">
+
+    <Package Id="*" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="YoloMouse" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="CursorComponents" />
+      <ComponentGroupRef Id="SaveComponents" />
+      <ComponentRef Id="ApplicationShortcut" />
+    </Feature>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="APPLICATIONROOTDIRECTORY" Name="YoloMouse">
+          <Directory Id="CURSORDIR" Name="Cursors"/>
+          <Directory Id="SAVEDIR" Name="Save"/>
+        </Directory>
+        <Directory Id="ProgramMenuFolder">
+          <Directory Id="ApplicationProgramsFolder" Name="YoloMouse"/>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <ComponentGroup Id="ProductComponents" Directory="APPLICATIONROOTDIRECTORY">
+      <Component Guid="{B77158E0-4FC0-4323-975B-D3C3766D081E}">
+        <File Id="YoloMouseExe" Source="$(var.YoloMouse.Loader.TargetPath)" KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Guid="{196DF733-044D-43D2-A79C-E230B10633F1}">
+        <File Source="$(var.YoloMouse.Dll32.TargetPath)" KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Id="SettingsIni" Guid="{445DA01E-1460-4A6D-A9D1-E2B07F503AD3}">
+        <RemoveFile Id="SettingsIni" On="uninstall" Name="Settings.ini" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="CursorComponents" Directory="CURSORDIR">
+      <Component Guid="{1D6D80B8-11DB-4C88-AA9E-C27E1F49988D}">
+        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\1.cur" KeyPath="yes" />
+      </Component>
+      <Component Guid="{FAAD9365-8AF8-4A8F-B8B4-C1C0F62EC3B4}">
+        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\2.cur" KeyPath="yes" />
+      </Component>
+      <Component Guid="{5E6BDD2B-A54B-4283-9C6D-09AA02E9CEA7}">
+        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\3.cur" KeyPath="yes" />
+      </Component>
+      <Component Guid="{E80F1A08-AC43-43CB-889F-524E482B24F0}">
+        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\4.cur" KeyPath="yes" />
+      </Component>
+      <Component Guid="{928FB06A-0FE2-4BDD-B5B5-06803494841A}">
+        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\5.cur" KeyPath="yes" />
+      </Component>
+      <Component Guid="{BA7893DE-7FCB-4DAB-8251-0DA80848D9B6}">
+        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\6.cur" KeyPath="yes" />
+      </Component>
+      <Component Guid="{1EA6CEA3-4691-4BC1-97C2-236F0598014A}">
+        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\7.cur" KeyPath="yes" />
+      </Component>
+      <Component Guid="{A7EC4576-479F-46BC-9C86-25647AA8146B}">
+        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\8.cur" KeyPath="yes" />
+      </Component>
+      <Component Guid="{27F16ABC-305F-42CE-ABC6-1C29234A4507}">
+        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\9.cur" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="SaveComponents" Directory="SAVEDIR">
+      <Component Id="SaveFiles" Guid="{CC9204DD-6B03-4D65-9D84-162236F32186}" KeyPath="yes">
+        <RemoveFile Id="SaveFiles" On="uninstall" Name="*.*" />
+      </Component>
+    </ComponentGroup>
+
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="{00797B6E-D869-4803-99DE-A050B383653E}">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+          Name="YoloMouse"
+          Description="Brighten that hidden cursor in your game"
+          Target="[#YoloMouseExe]"
+          WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\YoloMouse" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+      </Component>
+    </DirectoryRef>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="APPLICATIONROOTDIRECTORY" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch YoloMouse" />
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+    <Property Id="WixShellExecTarget" Value="[#YoloMouseExe]" />
+    <CustomAction Id="LaunchApplication" BinaryKey="WixCA" DllEntry="WixShellExec" Impersonate="yes" />
+
+    <UI>
+      <UIRef Id="WixUI_InstallDir"/>
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+    </UI>
+
+  </Product>
+</Wix>

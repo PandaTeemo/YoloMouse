@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Container">
+      <UniqueIdentifier>{14930a11-cc65-421f-b682-1c3b2a245ce9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Support">
+      <UniqueIdentifier>{9693d96b-7004-4880-8b8e-1227a6fe4ea8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{98144057-0147-4952-b438-f0d784a7617c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\Core\Constants.hpp" />
+    <ClInclude Include="..\..\source\Core\Macros.hpp" />
+    <ClInclude Include="..\..\source\Core\Root.hpp" />
+    <ClInclude Include="..\..\source\Core\Types.hpp" />
+    <ClInclude Include="..\..\source\Core\Windows\InputMonitor.hpp">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Windows\SharedMemory.hpp">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Windows\ShellUi.hpp">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Windows\SystemMonitor.hpp">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Windows\SystemTools.hpp">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Support\Debug.hpp">
+      <Filter>Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Support\Enum.hpp">
+      <Filter>Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Support\Settings.hpp">
+      <Filter>Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Support\Singleton.hpp">
+      <Filter>Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Support\Tools.hpp">
+      <Filter>Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Container\Array.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Container\String.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\Core\Root.cpp" />
+    <ClCompile Include="..\..\source\Core\Windows\InputMonitor.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Windows\ShellUi.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Windows\SystemMonitor.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Windows\SystemTools.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Support\Debug.cpp">
+      <Filter>Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Support\Settings.cpp">
+      <Filter>Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Support\Tools.cpp">
+      <Filter>Support</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
