@@ -87,7 +87,7 @@ namespace YoloMouse
         _input_monitor.SetListener(this);
 
         // for each cursor key
-        for( Id id = SETTING_CURSORKEY_1; id <= SETTING_CURSORKEY_RESET; id++ )
+        for( Id id = SETTING_CURSORKEY_1; id <= SETTING_CURSORKEY_LARGE; id++ )
         {
             // create combo
             _input_monitor.CreateCombo(id, _settings.Get(id));
@@ -109,8 +109,11 @@ namespace YoloMouse
     void App::_StartOptions()
     {
         // enable autostart
-        if(_settings.GetBoolean(SETTING_AUTOSTART))
+        if( _settings.GetBoolean(SETTING_AUTOSTART) )
             _OptionAutoStart(true);
+
+        // set cursor size
+        _OptionCursorSize(_settings.GetNumber(SETTING_CURSORSIZE));
     }
 
     void App::_StartSettings()
@@ -148,13 +151,20 @@ namespace YoloMouse
         // if showmenu enabled
         if( _settings.GetBoolean(SETTING_SHOWMENU) )
         {
+            // get cursor size setting
+            Long size = _settings.GetNumber(SETTING_CURSORSIZE);
+
             // add menu
             _ui.AddMenu();
 
             // add menu options
-            _ui.AddMenuOption(MENU_OPTION_AUTOSTART, APP_MENU_STRINGS[MENU_OPTION_AUTOSTART], _settings.GetBoolean(SETTING_AUTOSTART));
-            _ui.AddMenuOption(MENU_OPTION_SHOWMENU,  APP_MENU_STRINGS[MENU_OPTION_SHOWMENU],  true);
-            //_ui.AddMenuOption(MENU_OPTION_HELP,      APP_MENU_STRINGS[MENU_OPTION_HELP],  false);
+            _ui.AddMenuBreak();
+            _ui.AddMenuOption(MENU_OPTION_AUTOSTART,    APP_MENU_STRINGS[MENU_OPTION_AUTOSTART],   _settings.GetBoolean(SETTING_AUTOSTART));
+            _ui.AddMenuOption(MENU_OPTION_SHOWMENU,     APP_MENU_STRINGS[MENU_OPTION_SHOWMENU],    true);
+            _ui.AddMenuBreak();
+            _ui.AddMenuOption(MENU_OPTION_SIZE_SMALL,   APP_MENU_STRINGS[MENU_OPTION_SIZE_SMALL],  size == CURSOR_SIZE_SMALL);
+            _ui.AddMenuOption(MENU_OPTION_SIZE_MEDIUM,  APP_MENU_STRINGS[MENU_OPTION_SIZE_MEDIUM], size == CURSOR_SIZE_MEDIUM);
+            _ui.AddMenuOption(MENU_OPTION_SIZE_LARGE,   APP_MENU_STRINGS[MENU_OPTION_SIZE_LARGE],  size == CURSOR_SIZE_LARGE);
         }
 
         // register events
@@ -241,6 +251,31 @@ namespace YoloMouse
         return true;
     }
 
+    Bool App::_OptionCursorSize( ULong size )
+    {
+        // check
+        if( size >= CURSOR_SIZE_COUNT )
+            return false;
+
+        // update cursor size
+        _settings.SetNumber(SETTING_CURSORSIZE, size);
+        _state.SetCursorSize(static_cast<CursorSize>(size));
+
+        // get target window
+        HWND hwnd = Loader::GetActiveTarget();
+        if( hwnd )
+        {
+            // require target is loaded
+            if(_loader.IsLoaded(hwnd))
+            {
+                // notify target to refresh
+                _loader.NotifyRefresh(hwnd);
+            }
+        }
+
+        return true;
+    }
+
     //-------------------------------------------------------------------------
     Bool App::_ReplaceCursor( Index cursor_index )
     {
@@ -254,7 +289,7 @@ namespace YoloMouse
             return false;
 
         // notify target
-        _loader.NotifyUpdate(hwnd, cursor_index);
+        _loader.NotifyAssign(hwnd, cursor_index);
 
         return true;
     }
@@ -268,6 +303,9 @@ namespace YoloMouse
         // reset cursor
         else if( combo_id == SETTING_CURSORKEY_RESET )
             _ReplaceCursor(INVALID_INDEX);
+        // change size
+        else if( combo_id >= SETTING_CURSORKEY_SMALL && combo_id <= SETTING_CURSORKEY_LARGE )
+            _OptionCursorSize(combo_id - SETTING_CURSORKEY_SMALL);
     }
 
     //-------------------------------------------------------------------------
@@ -283,8 +321,13 @@ namespace YoloMouse
 
     void App::OnWindowFocus( HWND hwnd )
     {
-        // if not already loaded
-        if( !_loader.IsLoaded(hwnd) )
+        // if already loaded
+        if( _loader.IsLoaded(hwnd) )
+        {
+            // notify target to refresh
+            _loader.NotifyRefresh(hwnd);
+        }
+        else
         {
             // load target if configured for yolomouse
             if( _loader.IsConfigured(hwnd) )
@@ -293,7 +336,7 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool App::OnMenuOption( Id id, Bool& enabled )
+    Bool App::OnMenuOption( Id id, Bool enabled )
     {
         switch(id)
         {
@@ -301,7 +344,7 @@ namespace YoloMouse
         case MENU_OPTION_AUTOSTART:
             // toggle auto start
             if(_OptionAutoStart(!enabled))
-                enabled = !enabled;
+                _ui.SetMenuOption(id, !enabled);
             return true;
 
         // show menu
@@ -309,16 +352,19 @@ namespace YoloMouse
             if(enabled)
             {
                 _OptionHideMenu();
-                enabled = false;
+                _ui.SetMenuOption(id, false);
             }
             return true;
 
-        /*
-        // show help
-        case MENU_OPTION_HELP:
-            ShellExecute(NULL, "open", APP_HELP_PATH, NULL, NULL, SW_SHOWNORMAL);
+        // cursor size
+        case MENU_OPTION_SIZE_SMALL:
+        case MENU_OPTION_SIZE_MEDIUM:
+        case MENU_OPTION_SIZE_LARGE:
+            _OptionCursorSize(id - MENU_OPTION_SIZE_SMALL);
+            _ui.SetMenuOption(MENU_OPTION_SIZE_SMALL, id == MENU_OPTION_SIZE_SMALL);
+            _ui.SetMenuOption(MENU_OPTION_SIZE_MEDIUM, id == MENU_OPTION_SIZE_MEDIUM);
+            _ui.SetMenuOption(MENU_OPTION_SIZE_LARGE, id == MENU_OPTION_SIZE_LARGE);
             return true;
-        */
 
         default:
             return false;

@@ -45,6 +45,7 @@ namespace YoloMouse
         Bool Unload( HWND hwnd );
 
         /**/
-        void NotifyUpdate( HWND hwnd, Index cursor_index );
+        void NotifyAssign( HWND hwnd, Index cursor_index );
+        void NotifyRefresh( HWND hwnd );
     };
 }

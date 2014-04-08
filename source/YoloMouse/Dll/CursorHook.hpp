@@ -33,9 +33,10 @@ namespace YoloMouse
         /**/
         static void Assign( HWND hwnd, Index cursor_index );
 
-    private:
-        static void _RefreshCursor( HWND hwnd );
+        /**/
+        static void Refresh( HWND hwnd );
 
+    private:
         /**/
         static Bool _OnSetCursorAssign( HCURSOR hcursor, Index cursor_index );
         static Bool _OnSetCursorChange( HCURSOR hcursor );

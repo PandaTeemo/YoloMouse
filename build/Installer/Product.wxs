@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="YoloMouse" Language="1033" Version="0.1.0.0" Manufacturer="HaPpY" UpgradeCode="69ce184e-a676-4169-a124-e1ee073bd0e6">
+  <Product Id="*" Name="YoloMouse" Language="1033" Version="0.2.0.0" Manufacturer="HaPpY" UpgradeCode="69ce184e-a676-4169-a124-e1ee073bd0e6">
 
     <Package Id="*" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
@@ -8,7 +8,9 @@
 
     <Feature Id="ProductFeature" Title="YoloMouse" Level="1">
       <ComponentGroupRef Id="ProductComponents" />
-      <ComponentGroupRef Id="CursorComponents" />
+      <ComponentGroupRef Id="CursorSmallComponents" />
+      <ComponentGroupRef Id="CursorMediumComponents" />
+      <ComponentGroupRef Id="CursorLargeComponents" />
       <ComponentGroupRef Id="SaveComponents" />
       <ComponentRef Id="ApplicationShortcut" />
     </Feature>
@@ -16,8 +18,12 @@
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
         <Directory Id="APPLICATIONROOTDIRECTORY" Name="YoloMouse">
-          <Directory Id="CURSORDIR" Name="Cursors"/>
-          <Directory Id="SAVEDIR" Name="Save"/>
+          <Directory Id="CURSORDIR" Name="Cursors">
+            <Directory Id="CURSORSMALLDIR"  Name="Small" />
+            <Directory Id="CURSORMEDIUMDIR" Name="Medium" />
+            <Directory Id="CURSORLARGEDIR"  Name="Large" />
+          </Directory>
+        <Directory Id="SAVEDIR" Name="Save"/>
         </Directory>
         <Directory Id="ProgramMenuFolder">
           <Directory Id="ApplicationProgramsFolder" Name="YoloMouse"/>
@@ -37,33 +43,93 @@
       </Component>
     </ComponentGroup>
 
-    <ComponentGroup Id="CursorComponents" Directory="CURSORDIR">
-      <Component Guid="{1D6D80B8-11DB-4C88-AA9E-C27E1F49988D}">
-        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\1.cur" KeyPath="yes" />
+    <ComponentGroup Id="CursorSmallComponents" Directory="CURSORSMALLDIR">
+      <Component Id="SmallCursor1" Guid="{95E83A97-FB20-417A-B1DB-46C2A8336189}">
+        <File Id="SmallCursor1" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Small\1.cur" KeyPath="yes" />
       </Component>
-      <Component Guid="{FAAD9365-8AF8-4A8F-B8B4-C1C0F62EC3B4}">
-        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\2.cur" KeyPath="yes" />
+      <Component Id="SmallCursor2" Guid="{1E242DD7-8DBE-4F06-8336-6DB6F3900749}">
+        <File Id="SmallCursor2" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Small\2.cur" KeyPath="yes" />
       </Component>
-      <Component Guid="{5E6BDD2B-A54B-4283-9C6D-09AA02E9CEA7}">
-        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\3.cur" KeyPath="yes" />
+      <Component Id="SmallCursor3" Guid="{8E965DC8-A409-4214-9F40-1F7B0A5DF0FD}">
+        <File Id="SmallCursor3" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Small\3.cur" KeyPath="yes" />
       </Component>
-      <Component Guid="{E80F1A08-AC43-43CB-889F-524E482B24F0}">
-        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\4.cur" KeyPath="yes" />
+      <Component Id="SmallCursor4" Guid="{940113DE-7783-4D08-A8FB-3A62FCF3E92E}">
+        <File Id="SmallCursor4" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Small\4.cur" KeyPath="yes" />
       </Component>
-      <Component Guid="{928FB06A-0FE2-4BDD-B5B5-06803494841A}">
-        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\5.cur" KeyPath="yes" />
+      <Component Id="SmallCursor5" Guid="{C21901C9-4454-47D7-BF98-0566CCB97AB7}">
+        <File Id="SmallCursor5" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Small\5.cur" KeyPath="yes" />
       </Component>
-      <Component Guid="{BA7893DE-7FCB-4DAB-8251-0DA80848D9B6}">
-        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\6.cur" KeyPath="yes" />
+      <Component Id="SmallCursor6" Guid="{5D8CF04F-946C-4BB7-885C-3072167920F2}">
+        <File Id="SmallCursor6" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Small\6.cur" KeyPath="yes" />
       </Component>
-      <Component Guid="{1EA6CEA3-4691-4BC1-97C2-236F0598014A}">
-        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\7.cur" KeyPath="yes" />
+      <Component Id="SmallCursor7" Guid="{D071CC02-9C04-426E-BD5D-A60C08D25812}">
+        <File Id="SmallCursor7" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Small\7.cur" KeyPath="yes" />
       </Component>
-      <Component Guid="{A7EC4576-479F-46BC-9C86-25647AA8146B}">
-        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\8.cur" KeyPath="yes" />
+      <Component Id="SmallCursor8" Guid="{C59A4D79-5C51-4E0C-9A58-0627A05AA6E1}">
+        <File Id="SmallCursor8" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Small\8.cur" KeyPath="yes" />
       </Component>
-      <Component Guid="{27F16ABC-305F-42CE-ABC6-1C29234A4507}">
-        <File Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\9.cur" KeyPath="yes" />
+      <Component Id="SmallCursor9" Guid="{A2145AD1-E3EF-4BEE-B906-2C18FAC536B8}">
+        <File Id="SmallCursor9" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Small\9.cur" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="CursorMediumComponents" Directory="CURSORMEDIUMDIR">
+      <Component Id="MediumCursor1" Guid="{29D3A490-F781-4094-A669-69B07C0620F8}">
+        <File Id="MediumCursor1" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Medium\1.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="MediumCursor2" Guid="{347F3152-ED06-4EAF-9EEB-40B92AD3E5D9}">
+        <File Id="MediumCursor2" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Medium\2.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="MediumCursor3" Guid="{A271E3F7-CCCC-457E-BA6E-DD5091D05BCF}">
+        <File Id="MediumCursor3" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Medium\3.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="MediumCursor4" Guid="{90D3C190-B44A-4FA1-B240-939BA7A5C666}">
+        <File Id="MediumCursor4" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Medium\4.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="MediumCursor5" Guid="{1D6A501E-17F9-495C-8FAA-203238AD9CC7}">
+        <File Id="MediumCursor5" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Medium\5.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="MediumCursor6" Guid="{720BEEAA-C389-4743-8C8D-F7A3A03DA2B3}">
+        <File Id="MediumCursor6" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Medium\6.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="MediumCursor7" Guid="{266AA8C7-B535-4689-952B-5708091218DE}">
+        <File Id="MediumCursor7" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Medium\7.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="MediumCursor8" Guid="{FE56E4D1-2024-4766-91FD-6FBB78F1A22F}">
+        <File Id="MediumCursor8" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Medium\8.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="MediumCursor9" Guid="{518D1733-E3C5-4FDB-8907-207555203179}">
+        <File Id="MediumCursor9" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Medium\9.cur" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="CursorLargeComponents" Directory="CURSORLARGEDIR">
+      <Component Id="LargeCursor1" Guid="{C845792E-1C41-4B31-8E45-6D921A9A9B64}">
+        <File Id="LargeCursor1" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Large\1.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="LargeCursor2" Guid="{14D80564-CA7E-4C0A-A594-8D157781F69C}">
+        <File Id="LargeCursor2" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Large\2.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="LargeCursor3" Guid="{D035139B-689C-47B7-A803-EE8B1EB63951}">
+        <File Id="LargeCursor3" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Large\3.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="LargeCursor4" Guid="{1FDE2583-7326-43D9-AFB8-BD793761CA26}">
+        <File Id="LargeCursor4" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Large\4.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="LargeCursor5" Guid="{87C6C06F-5D58-4E7B-BB12-8AFACC4F278C}">
+        <File Id="LargeCursor5" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Large\5.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="LargeCursor6" Guid="{0B319B5D-8F1B-400A-9F01-8A576B74D4B2}">
+        <File Id="LargeCursor6" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Large\6.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="LargeCursor7" Guid="{AD43910F-FE7E-4D09-95EF-79E5B5E05F03}">
+        <File Id="LargeCursor7" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Large\7.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="LargeCursor8" Guid="{F33C061F-D9CC-40E2-9062-E3D99EEF23ED}">
+        <File Id="LargeCursor8" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Large\8.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="LargeCursor9" Guid="{A73A5907-5CC6-4F4C-9727-2D5F4694B0DE}">
+        <File Id="LargeCursor9" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Large\9.cur" KeyPath="yes" />
       </Component>
     </ComponentGroup>
 
@@ -77,7 +143,7 @@
       <Component Id="ApplicationShortcut" Guid="{00797B6E-D869-4803-99DE-A050B383653E}">
         <Shortcut Id="ApplicationStartMenuShortcut"
           Name="YoloMouse"
-          Description="Brighten that hidden cursor in your game"
+          Description="Shine those dull game cursors"
           Target="[#YoloMouseExe]"
           WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
         <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>

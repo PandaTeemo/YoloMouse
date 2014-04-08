@@ -12,13 +12,15 @@ namespace YoloMouse
     {
     private:
         /**/
-        typedef FlatArray<HCURSOR, SHAREDSTATE_CURSOR_LIMIT> SharedTable;
+        typedef FlatArray<HCURSOR, SHARED_CURSOR_LIMIT>     CursorArray;
+        typedef FlatArray<CursorArray, CURSOR_SIZE_COUNT>   CursorTable;
 
         /**/
         struct Root
         {
             Char        path[STRING_PATH_SIZE];
-            SharedTable cursors;
+            CursorTable cursors;
+            CursorSize  size;
         };
 
     private:
@@ -36,9 +38,11 @@ namespace YoloMouse
         /**/
         const Char* GetPath() const;
         HCURSOR     GetCursor( Index cursor_index );
+        CursorSize  GetCursorSize() const;
 
         /**/
         void SetPath( const Char* path );
+        void SetCursorSize( CursorSize size );
 
         /**/
         Index FindCursor( HCURSOR hcursor );

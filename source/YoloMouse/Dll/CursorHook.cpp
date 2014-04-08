@@ -41,7 +41,7 @@ namespace YoloMouse
                         _bindings.Load(_target_id);
 
                         // refresh cursor
-                        _RefreshCursor(hwnd);
+                        Refresh(hwnd);
                     }
                 }
             }
@@ -76,12 +76,11 @@ namespace YoloMouse
         _assign_ready = true;
 
         // refresh cursor
-        _RefreshCursor(hwnd);
+        Refresh(hwnd);
     }
 
-    // private
     //-------------------------------------------------------------------------
-    void CursorHook::_RefreshCursor( HWND hwnd )
+    void CursorHook::Refresh( HWND hwnd )
     {
         // get refresh cursor
         HCURSOR refresh_cursor = _last_cursor;
@@ -96,6 +95,10 @@ namespace YoloMouse
             if( _state.FindCursor(refresh_cursor) != INVALID_INDEX )
                 refresh_cursor = NULL;
         }
+
+        // reset last cursor
+        else
+            _last_cursor = NULL;
             
         // set current cursor to force update
         SetCursor(refresh_cursor);
@@ -104,6 +107,7 @@ namespace YoloMouse
         PostMessage(hwnd, WM_SETCURSOR, (WPARAM)hwnd, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
     }
 
+    // private
     //-------------------------------------------------------------------------
     Bool CursorHook::_OnSetCursorAssign( HCURSOR hcursor, Index cursor_index )
     {

@@ -19,7 +19,7 @@ namespace YoloMouse
 
     private:
         /**/
-        typedef FlatArray<Mapping, CURSORBINDINGS_MAP_LIMIT> MapTable;
+        typedef FlatArray<Mapping, CURSOR_MAPPING_LIMIT> MapTable;
         typedef MapTable::Iterator MapIterator;
 
     private:

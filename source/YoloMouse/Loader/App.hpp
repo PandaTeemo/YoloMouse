@@ -58,6 +58,7 @@ namespace YoloMouse
         /**/
         Bool _OptionAutoStart( Bool enable );
         Bool _OptionHideMenu();
+        Bool _OptionCursorSize( ULong size );
 
         /**/
         Bool _ReplaceCursor( Index cursor_index );
@@ -71,6 +72,6 @@ namespace YoloMouse
         void OnWindowFocus( HWND hwnd );
 
         /**/
-        Bool OnMenuOption( Id id, Bool& enabled );
+        Bool OnMenuOption( Id id, Bool enabled );
     };
 }

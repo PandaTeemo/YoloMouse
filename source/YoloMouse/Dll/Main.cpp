@@ -17,6 +17,10 @@ OnHookProc(int nCode, WPARAM wParam, LPARAM lParam)
     case YoloMouse::WMYOLOMOUSE_ASSIGN:
         YoloMouse::CursorHook::Assign(m.hwnd, (Core::Index)m.wParam);
         return 0;
+
+    case YoloMouse::WMYOLOMOUSE_REFRESH:
+        YoloMouse::CursorHook::Refresh(m.hwnd);
+        return 0;
     }
 
     return CallNextHookEx(NULL, nCode, wParam, lParam);

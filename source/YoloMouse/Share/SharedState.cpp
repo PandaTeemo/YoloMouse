@@ -27,6 +27,7 @@ namespace YoloMouse
             // reset state
             _memory->path[0] = 0;
             _memory->cursors.Zero();
+            _memory->size = CURSOR_SIZE_MEDIUM;
 
             // load cursors
             _LoadCursors();
@@ -59,7 +60,12 @@ namespace YoloMouse
 
     HCURSOR SharedState::GetCursor( Index cursor_index )
     {
-        return _memory->cursors[cursor_index];
+        return _memory->cursors[_memory->size][cursor_index];
+    }
+
+    CursorSize SharedState::GetCursorSize() const
+    {
+        return _memory->size;
     }
 
     //-------------------------------------------------------------------------
@@ -68,10 +74,15 @@ namespace YoloMouse
         strcpy_s(_memory->path, sizeof(_memory->path), path);
     }
 
+    void SharedState::SetCursorSize( CursorSize size )
+    {
+        _memory->size = size;
+    }
+
     //-------------------------------------------------------------------------
     Index SharedState::FindCursor( HCURSOR hcursor )
     {
-        SharedTable& cursors = _memory->cursors;
+        CursorArray& cursors = _memory->cursors[_memory->size];
 
         // for each cursor
         for( Index i = 0; i < cursors.GetCount(); ++i )
@@ -85,23 +96,27 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     void SharedState::_LoadCursors()
     {
-        SharedTable& cursors = _memory->cursors;
-
-        // for each potential cursor index
-        for( Index cursor_index = 0; cursor_index < cursors.GetCount(); ++cursor_index )
+        // for each size
+        for( Index size_index = 0; size_index < CURSOR_SIZE_COUNT; size_index++ )
         {
-            Char    path[STRING_PATH_SIZE];
-            UINT    loadimage_flags = LR_LOADFROMFILE|LR_SHARED;
+            CursorArray& cursors = _memory->cursors[size_index];
 
-            // make cursor path
-            sprintf_s(path, sizeof(path), "%s/%u.cur", PATH_CURSORS, cursor_index + 1);
+            // for each potential cursor index
+            for( Index cursor_index = 0; cursor_index < cursors.GetCount(); ++cursor_index )
+            {
+                Char    path[STRING_PATH_SIZE];
+                UINT    loadimage_flags = LR_LOADFROMFILE|LR_SHARED;
 
-            // windows versions older than vista require size confirmed to 32x32
-            if( SystemTools::GetOsVersion() < OSVERSION_WINVISTA )
-                loadimage_flags |= LR_DEFAULTSIZE;
+                // make cursor path
+                sprintf_s(path, sizeof(path), "%s/%s/%u.cur", PATH_CURSORS, PATH_CURSORS_SIZE[size_index], cursor_index + 1);
 
-            // load shared cursor
-            cursors[cursor_index] = (HCURSOR)LoadImage(NULL, path, IMAGE_CURSOR, 0, 0, loadimage_flags);
+                // windows versions older than vista require size confirmed to 32x32
+                if( SystemTools::GetOsVersion() < OSVERSION_WINVISTA )
+                    loadimage_flags |= LR_DEFAULTSIZE;
+
+                // load shared cursor
+                cursors[cursor_index] = (HCURSOR)LoadImage(NULL, path, IMAGE_CURSOR, 0, 0, loadimage_flags);
+            }
         }
     }
 

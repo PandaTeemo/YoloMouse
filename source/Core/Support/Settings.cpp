@@ -75,6 +75,12 @@ namespace Core
         return string.GetCount() && string[0] == '1';
     }
 
+    Long Settings::GetNumber( Id id ) const
+    {
+        String string = Get(id);
+        return atoi(string.GetMemory());
+    }
+
     const Settings::KeyValueCollection& Settings::GetCollection() const
     {
         return _keyvalues;
@@ -89,6 +95,13 @@ namespace Core
     void Settings::SetBoolean( Id id, Bool boolean )
     {
         return _keyvalues[id].value.CopyZ(boolean ? "1" : "0");
+    }
+
+    void Settings::SetNumber( Id id, Long number )
+    {
+        Char buffer[STRING_SHORT_SIZE];
+        _itoa_s(number, buffer, sizeof(STRING_SHORT_SIZE), 10);
+        return _keyvalues[id].value.CopyZ(buffer);
     }
 
     //-------------------------------------------------------------------------

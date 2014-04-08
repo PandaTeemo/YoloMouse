@@ -129,13 +129,7 @@ namespace Core
 
                 // if callback handled
                 if((*l)->OnMenuOption(wid - ID_USER, enabled))
-                {
-                    // update info
-                    mi.fState = enabled ? MFS_CHECKED : MFS_UNCHECKED;
-                    SetMenuItemInfo(_menu, wid, FALSE, &mi);
-
                     return true;
-                }
             }
         }
 
@@ -216,7 +210,10 @@ namespace Core
         // add exit option
         InsertMenu( _menu, 0, MF_BYPOSITION | MF_STRING, ID_EXIT, "E&xit" );
         SetMenuDefaultItem( _menu, ID_EXIT, FALSE );
+    }
 
+    void ShellUi::AddMenuBreak()
+    {
         // add separator
         InsertMenu( _menu, 0, MF_BYPOSITION | MF_SEPARATOR, ID_SEPARATOR, NULL );
     }
@@ -251,6 +248,19 @@ namespace Core
     void ShellUi::SetName( const String& name )
     {
         _name = name;
+    }
+
+    void ShellUi::SetMenuOption( Id id, Bool enabled )
+    {
+        MENUITEMINFO mi;
+
+        // init
+        mi.cbSize = sizeof(mi);
+        mi.fMask = MIIM_STATE;
+        mi.fState = enabled ? MFS_CHECKED : MFS_UNCHECKED;
+
+        // update option state
+        SetMenuItemInfo(_menu, id + ID_USER, FALSE, &mi);
     }
 
     //--------------------------------------------------------------------------

@@ -13,7 +13,7 @@ namespace Core
         struct IListener
         {
             virtual Bool OnMessage( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam ) { return false; }
-            virtual Bool OnMenuOption( Id id, Bool& enabled ) { return false; }
+            virtual Bool OnMenuOption( Id id, Bool enabled ) { return false; }
         };
 
     public:
@@ -25,6 +25,7 @@ namespace Core
 
         /**/
         void AddMenu();
+        void AddMenuBreak();
         void AddMenuOption( Id id, const Char* name, Bool enabled );
 
         /**/
@@ -33,6 +34,7 @@ namespace Core
         /**/
         void SetIcon( Id icon_id );
         void SetName( const String& name );
+        void SetMenuOption( Id id, Bool enabled );
 
         /**/
         void AddListener( IListener& listener );

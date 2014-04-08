@@ -34,11 +34,13 @@ namespace Core
         /**/
         String  Get( Id id ) const;
         Bool    GetBoolean( Id id ) const;
+        Long    GetNumber( Id id ) const;
         const KeyValueCollection& GetCollection() const;
 
         /**/
         void Set( Id id, String value );
         void SetBoolean( Id id, Bool boolean );
+        void SetNumber( Id id, Long number );
 
         /**/
         Id Find( String key );

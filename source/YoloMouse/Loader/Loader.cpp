@@ -148,9 +148,15 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    void Loader::NotifyUpdate( HWND hwnd, Index cursor_index )
+    void Loader::NotifyAssign( HWND hwnd, Index cursor_index )
     {
         xassert(IsLoaded(hwnd));
         SendMessage(hwnd, WMYOLOMOUSE_ASSIGN, (WPARAM)cursor_index, 0);
+    }
+
+    void Loader::NotifyRefresh( HWND hwnd )
+    {
+        xassert(IsLoaded(hwnd));
+        SendMessage(hwnd, WMYOLOMOUSE_REFRESH, 0, 0);
     }
 }
