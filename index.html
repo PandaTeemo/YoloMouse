@@ -13,12 +13,14 @@
             position: relative;
             color: #fff;
             font-family: Arial;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         body
         {
             background-color: #445;
+            background-image:url('Bg.png');
+            background-repeat:repeat;
         }
 
         table
@@ -32,15 +34,9 @@
             vertical-align: middle;
         }
         
-        .TextBig
-        {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
         a:link, a:visited
         {
-            color:#ff0;
+            color:#fff;
             font-weight: bold;
             text-decoration:none;
         }
@@ -49,25 +45,33 @@
         {
             padding: 9px;
             background-color: #fff;
-            box-shadow: 6px 6px 0px rgba(0,0,0,.3);
+            box-shadow: 8px 8px 0px rgba(0,0,0,.2);
             position: absolute;
+            display: inline-block;
         }
 
         .SectionHeader
         {
             padding: 3px 20px 3px 20px;
-            width: 50%;
             font-size: 24px;
-            box-shadow: 3px 3px 0px rgba(0,0,0,.7);
-            text-shadow: 0 1px 0 rgba(0,0,0,.4);
+            box-shadow: 2px 2px 0px rgba(0,0,0,.3);
+            text-shadow: 0 1px 0 rgba(0,0,0,.3);
+            display: inline-block;
         }
 
-        .SectionContent
+        .Button
         {
+            background-color:#f70;
+        }
+        .Button:hover
+        {
+            background-color: #f08;
         }
 
         .ListHeader
         {
+            vertical-align: top;
+            font-weight: bold;
         }
 
         .ListContent
@@ -75,30 +79,67 @@
         }
     </style>
 </head>
-<body>
-    <!-- instructions -->
-    <div class="SectionBody" style="width:400px; background-color:#888; top:50px; left:50px;">
-        <div class="SectionHeader" style="background-color:#444">
-            <font style="font-size:28px">YoloMouse</font>
+<body style="margin: 0 auto; width:1050px;">
+    <!-- header -->
+    <div class="SectionBody" style="width:410px; background-color:#445; top:70px; left:80px; z-index:3;">
+        <div class="SectionHeader" style="background-color:#334">
+            <img src="Title.png"/>
         </div>
-            <br />
-            <a href="https://github.com/PandaTeemo/YoloMouse/releases/download/0.1.0/YoloMouse.msi">Download</a> ( <a href="https://github.com/PandaTeemo/YoloMouse/archive/0.1.0.zip">Source</a> )
     </div>
 
-    <!-- instructions -->
-    <div class="SectionBody" style="width:400px; background-color:#08f; top:170px; left:150px;">
-        <div class="SectionHeader" style="background-color:#05b">
-            how do...
+    <!-- download -->
+    <div class="SectionBody" style="width:253px; height:40px; background-color:#fa0; top:50px; left:730px; z-index:3;">
+        <a href="https://github.com/PandaTeemo/YoloMouse/releases/download/0.1.0/YoloMouse.msi" class="SectionHeader Button" style="width:113px; height:31px; font-size:24px; position:absolute; left:10px; top:10px;">Download</a>
+        <a href="https://github.com/PandaTeemo/YoloMouse/archive/0.1.0.zip" class="SectionHeader Button" style="width:46px; height:16px; font-size:14px; position:absolute; left:173px; top:15px;">Source</a>
+    </div>
+
+    <!-- howto: text -->
+    <div class="SectionBody" style="width:250px; top:200px; left:150px; z-index:3; background-color:#08f;">
+        <div class="SectionHeader" style="width:120px; background-color:#06e; margin-bottom:12px;">
+            how do?
         </div>
-        <div class="SectionContent">
+        <table>
+            <tr><td class="ListHeader">1</td><td class="ListContent"><a href="https://github.com/PandaTeemo/YoloMouse/releases/download/0.1.0/YoloMouse.msi">download</a>, install, run</td></tr>
+            <tr><td class="ListHeader">2</td><td class="ListContent">play a game</td></tr>
+            <tr><td class="ListHeader">3</td><td class="ListContent">hit <b>CTRL SHIFT ALT 1</b> or 2 or 3...</td></tr>
+            <tr><td class="ListHeader">4</td><td class="ListContent">repeat for other cursors</td></tr>
+        </table>
+    </div>
+
+    <!-- howto: image -->
+    <img src="HowDo.gif" style="position:absolute; top:380px; left:100px; z-index:2; box-shadow: 8px 8px 0px rgba(0,0,0,.2);"/>
+
+    <!-- faq -->
+    <div class="SectionBody" style="width:430px; top:630px; left:550px; background-color:#667; z-index:3;">
+        <div class="SectionHeader" style="background-color:#556; width:220px; margin-bottom:12px;">
+            faq me
         </div>
         <br />
         <table>
-            <tr><td class="ListHeader TextBig">1</td><td class="ListContent"><a href="https://github.com/PandaTeemo/YoloMouse/releases/download/0.1.0/YoloMouse.msi">Download</a>, install, run</td></tr>
-            <tr><td class="ListHeader TextBig">2</td><td class="ListContent">Play a game</td></tr>
-            <tr><td class="ListHeader TextBig">3</td><td class="ListContent">Hit <b>CTRL SHIFT ALT 1</b> or 2 or 3...</td></tr>
-            <tr><td class="ListHeader TextBig">4</td><td class="ListContent">Repeat for other cursors</td></tr>
+            <tr><td class="ListHeader">Q</td><td class="ListContent">how work?</td></tr>
+            <tr><td class="ListHeader">A</td><td class="ListContent">It hooks game memory and intercepts call to SetCursor</td></tr>
+            <tr><td class="ListHeader">Q</td><td class="ListContent">sounds like a BAN!</td></tr>
+            <tr><td class="ListHeader">A</td><td class="ListContent">It does no more than what <a href="http://www.fraps.com/">FRAPS</a> does. If that wont get you banned this shouldnt either.</td></tr>
         </table>
     </div>
+
+    <!-- etc -->
+    <div class="SectionBody" style="width:130px; top:720px; left:140px; background-color:#d0f; z-index:3;">
+
+        <!-- subreddit -->
+        <a href="http://www.reddit.com/r/yolomouse/"><img src="Reddit.Button.png"/></a>
+
+        <!-- paypal donate -->
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" style="display: inline-block">
+            <input type="hidden" name="cmd" value="_s-xclick">
+            <input type="hidden" name="hosted_button_id" value="GW2WUGLZ8REUC">
+            <input type="image" src="PayPal.Button.png" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+        </form>
+        
+    </div>
+
+    <!-- token image -->
+    <img src="YoloRiot.png" style="position:absolute; top:37px; left:420px; z-index:2;"/>
+    <img src="YoloHand.png" style="position:absolute; top:37px; left:420px; z-index:4;"/>
 </body>
 </html>
