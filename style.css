@@ -1,0 +1,134 @@
+/*---------------------------------------------------------------------------*/
+.TitleVersion:before
+{
+    content: '0.2.0';
+}
+
+/*---------------------------------------------------------------------------*/
+*
+{
+    margin: 0;
+    padding: 0;
+    border: 0;
+    position: relative;
+    color: #fff;
+    font-family: Arial;
+    font-size: 14px;
+}
+
+body
+{
+    width: 1050px;
+    margin: 0 auto;
+    background-color: #445;
+    background-image: url('Bg.png');
+    background-repeat: repeat;
+}
+
+table
+{
+    border-spacing: 0;
+}
+
+a:link, a:visited
+{
+    color: #fff;
+    text-decoration: none;
+}
+
+/*---------------------------------------------------------------------------*/
+.Section
+{
+    padding-bottom: 10px;
+}
+
+/*---------------------------------------------------------------------------*/
+.ListHeader
+{
+    padding-right: 14px;
+    vertical-align: top;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.ListContent
+{
+}
+
+/*---------------------------------------------------------------------------*/
+.Button
+{
+    padding: 3px 20px 3px 20px;
+    background-color:#f70;
+    box-shadow: 2px 2px 0px rgba(0,0,0,.3);
+    text-shadow: 0 1px 0 rgba(0,0,0,.3);
+}
+.Button:hover
+{
+    background-color: #f08;
+}
+
+/*---------------------------------------------------------------------------*/
+.Panel, .TitlePanel
+{
+    padding: 8px;
+    z-index: 3;
+    position: absolute;
+    display: inline-block;
+    background-color: #fff;
+    box-shadow: 8px 8px 0px rgba(0,0,0,.2);
+}
+
+.PanelImage
+{
+    z-index: 3;
+    position:absolute;
+    box-shadow: 8px 8px 0px rgba(0,0,0,.2);
+}
+
+/*---------------------------------------------------------------------------*/
+.Header, .TitleHeader
+{
+    padding: 3px 20px 3px 20px;
+    font-size: 24px;
+    box-shadow: 2px 2px 0px rgba(0,0,0,.3);
+    text-shadow: 0 1px 0 rgba(0,0,0,.3);
+    margin-bottom: 7px;
+    white-space: nowrap;
+}
+
+/*---------------------------------------------------------------------------*/
+.TitlePanel
+{
+    width: 435px;
+    background-color: #445;
+    top: 70px;
+    left: 45px;
+    z-index: 3;
+}
+
+.TitleHeader
+{
+    background-color: #334;
+    padding-right: 30px;
+}
+
+.TitleVersion
+{
+    text-align: right;
+    float: right;
+    top: 40px;
+    color: #889;
+}
+
+.TitleDescription
+{
+    color: #889;
+    float: left;
+}
+
+.TitleMenu
+{
+    float: right;
+    color: #889;
+}

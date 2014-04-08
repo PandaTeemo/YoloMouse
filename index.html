@@ -1,126 +1,51 @@
 <html>
 <head>
-    <!-- title -->
     <title>YoloMouse</title>
-
-    <!-- css -->
-    <style>
-        *
-        {
-            margin: 0;
-            padding: 0;
-            border: 0;
-            position: relative;
-            color: #fff;
-            font-family: Arial;
-            font-size: 14px;
-        }
-
-        body
-        {
-            background-color: #445;
-            background-image:url('Bg.png');
-            background-repeat:repeat;
-        }
-
-        table
-        {
-            border-spacing: 0;
-        }
-
-        td
-        {
-            padding-right: 14px;
-            vertical-align: middle;
-        }
-        
-        a:link, a:visited
-        {
-            color:#fff;
-            font-weight: bold;
-            text-decoration:none;
-        }
-
-        .SectionBody
-        {
-            padding: 8px;
-            background-color: #fff;
-            box-shadow: 8px 8px 0px rgba(0,0,0,.2);
-            position: absolute;
-            display: inline-block;
-        }
-
-        .SectionHeader
-        {
-            padding: 3px 20px 3px 20px;
-            font-size: 24px;
-            box-shadow: 2px 2px 0px rgba(0,0,0,.3);
-            text-shadow: 0 1px 0 rgba(0,0,0,.3);
-            display: inline-block;
-        }
-
-        .Button
-        {
-            background-color:#f70;
-        }
-        .Button:hover
-        {
-            background-color: #f08;
-        }
-
-        .ListHeader
-        {
-            vertical-align: top;
-            font-weight: bold;
-        }
-
-        .ListContent
-        {
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
 </head>
-<body style="margin: 0 auto; width:1050px;">
+<body>
     <!-- header -->
-    <div class="SectionBody" style="width:410px; background-color:#445; top:70px; left:80px; z-index:3;">
-        <div class="SectionHeader" style="background-color:#334">
+    <div class="TitlePanel">
+        <div class="TitleHeader">
             <img src="Title.png"/>
+            <div class="TitleVersion"></div>
         </div>
-        <div style="display:inline-block; padding-left:5px; color:#889;">
-            0.2.0
-        </div>
-        <div style="padding-top:5px; padding-left:215px; color:#889; font-size:12px; font-weight:bold">
+        <div class="TitleDescription">
             Game Cursor Changer
+        </div>
+        <div class="TitleMenu">
+            Home &bull;
+            <a href="help.html">Help</a>
         </div>
     </div>
 
     <!-- download -->
-    <div class="SectionBody" style="width:256px; height:40px; background-color:#fa0; top:50px; left:730px; z-index:3;">
-        <a href="https://github.com/PandaTeemo/YoloMouse/releases/download/0.2.0/YoloMouse.msi" class="SectionHeader Button" style="width:113px; height:31px; font-size:24px; position:absolute; left:10px; top:10px;">Download</a>
-        <a href="https://github.com/PandaTeemo/YoloMouse/archive/0.2.0.zip" class="SectionHeader Button" style="width:48px; height:16px; font-size:14px; position:absolute; left:173px; top:15px;">Source</a>
+    <div class="Panel" style="background-color:#fa0; top:50px; left:730px; padding: 12px;">
+        <a href="https://github.com/PandaTeemo/YoloMouse/releases/download/0.2.0/YoloMouse.msi" class="Button" style="font-size:24px;">Download</a>
+        <a href="https://github.com/PandaTeemo/YoloMouse/archive/0.2.0.zip" class="Button" style="font-size:12px; margin-left:10px;">C++</a>
     </div>
 
     <!-- howto: text -->
-    <div class="SectionBody" style="width:250px; top:205px; left:150px; z-index:3; background-color:#08f;">
-        <div class="SectionHeader" style="width:120px; background-color:#06e; margin-bottom:12px;">
+    <div class="Panel" style="top:217px; left:150px; background-color:#08f;">
+        <div class="Header" style="background-color:#06e; width:50%;">
             how do?
         </div>
         <table>
-            <tr><td class="ListHeader">1</td><td class="ListContent"><a href="https://github.com/PandaTeemo/YoloMouse/releases/download/0.1.0/YoloMouse.msi">download</a>, install, run</td></tr>
-            <tr><td class="ListHeader">2</td><td class="ListContent">play a game</td></tr>
-            <tr><td class="ListHeader">3</td><td class="ListContent">hit <b>CTRL SHIFT ALT 1</b> or 2 or 3...</td></tr>
-            <tr><td class="ListHeader">4</td><td class="ListContent">repeat for other cursors</td></tr>
+            <tr><td class="ListHeader">1</td><td class="ListContent">Download, install, run</td></tr>
+            <tr><td class="ListHeader">2</td><td class="ListContent">Play a game</td></tr>
+            <tr><td class="ListHeader">3</td><td class="ListContent">Hit <i>CTRL SHIFT ALT 1</i></td></tr>
+            <tr><td class="ListHeader"></td><td class="ListContent" style="padding-top:5px; text-align:right;">... <a href="help.html"><b>complete help</b></a></td></tr>
         </table>
     </div>
 
     <!-- howto: image -->
-    <img src="HowDo.gif" style="position:absolute; top:390px; left:100px; z-index:2; box-shadow: 8px 8px 0px rgba(0,0,0,.2);"/>
+    <img src="HowDo.gif" class="PanelImage" style="top:390px; left:100px;"/>
 
     <!-- faq -->
-    <div class="SectionBody" style="width:430px; top:630px; left:550px; background-color:#556; z-index:3;">
-        <div class="SectionHeader" style="background-color:#445; width:220px; margin-bottom:12px;">
+    <div class="Panel" style="width:430px; top:630px; left:560px; background-color:#556;">
+        <div class="Header" style="width:50%; background-color:#445;">
             faq me
         </div>
-        <br />
         <table>
             <tr><td class="ListHeader">Q</td><td class="ListContent">how work?</td></tr>
             <tr><td class="ListHeader">A</td><td class="ListContent">It hooks game memory and intercepts call to SetCursor</td></tr>
@@ -130,7 +55,7 @@
     </div>
 
     <!-- etc -->
-    <div class="SectionBody" style="width:126px; top:725px; left:140px; background-color:#d0f; z-index:3;">
+    <div class="Panel" style="top:725px; left:70px; background-color:#f0a;">
 
         <!-- subreddit -->
         <a href="http://www.reddit.com/r/yolomouse/"><img src="Reddit.Button.png"/></a>
