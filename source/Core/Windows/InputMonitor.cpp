@@ -54,6 +54,9 @@ namespace Core
         { 'Y',          "Y" },
         { 'Z',          "Z" },
 
+        { VK_OEM_MINUS, "-" },
+        { VK_OEM_PLUS,  "=" },
+
         { VK_F1,        "F1" },
         { VK_F2,        "F2" },
         { VK_F3,        "F3" },

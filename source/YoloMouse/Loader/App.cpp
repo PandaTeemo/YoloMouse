@@ -87,7 +87,7 @@ namespace YoloMouse
         _input_monitor.SetListener(this);
 
         // for each cursor key
-        for( Id id = SETTING_CURSORKEY_1; id <= SETTING_CURSORKEY_LARGE; id++ )
+        for( Id id = SETTING_CURSORKEY_1; id <= SETTING_CURSORKEY_LARGER; id++ )
         {
             // create combo
             _input_monitor.CreateCombo(id, _settings.Get(id));
@@ -112,7 +112,7 @@ namespace YoloMouse
         if( _settings.GetBoolean(SETTING_AUTOSTART) )
             _OptionAutoStart(true);
 
-        // set cursor size
+        // update cursor size
         _OptionCursorSize(_settings.GetNumber(SETTING_CURSORSIZE));
     }
 
@@ -151,20 +151,16 @@ namespace YoloMouse
         // if showmenu enabled
         if( _settings.GetBoolean(SETTING_SHOWMENU) )
         {
-            // get cursor size setting
-            Long size = _settings.GetNumber(SETTING_CURSORSIZE);
-
             // add menu
             _ui.AddMenu();
 
             // add menu options
             _ui.AddMenuBreak();
-            _ui.AddMenuOption(MENU_OPTION_AUTOSTART,    APP_MENU_STRINGS[MENU_OPTION_AUTOSTART],   _settings.GetBoolean(SETTING_AUTOSTART));
-            _ui.AddMenuOption(MENU_OPTION_SHOWMENU,     APP_MENU_STRINGS[MENU_OPTION_SHOWMENU],    true);
+            _ui.AddMenuOption(MENU_OPTION_SMALLER,      APP_MENU_STRINGS[MENU_OPTION_SMALLER],      false);
+            _ui.AddMenuOption(MENU_OPTION_LARGER,       APP_MENU_STRINGS[MENU_OPTION_LARGER],       false);
             _ui.AddMenuBreak();
-            _ui.AddMenuOption(MENU_OPTION_SIZE_SMALL,   APP_MENU_STRINGS[MENU_OPTION_SIZE_SMALL],  size == CURSOR_SIZE_SMALL);
-            _ui.AddMenuOption(MENU_OPTION_SIZE_MEDIUM,  APP_MENU_STRINGS[MENU_OPTION_SIZE_MEDIUM], size == CURSOR_SIZE_MEDIUM);
-            _ui.AddMenuOption(MENU_OPTION_SIZE_LARGE,   APP_MENU_STRINGS[MENU_OPTION_SIZE_LARGE],  size == CURSOR_SIZE_LARGE);
+            _ui.AddMenuOption(MENU_OPTION_AUTOSTART,    APP_MENU_STRINGS[MENU_OPTION_AUTOSTART],    _settings.GetBoolean(SETTING_AUTOSTART));
+            _ui.AddMenuOption(MENU_OPTION_SHOWMENU,     APP_MENU_STRINGS[MENU_OPTION_SHOWMENU],     true);
         }
 
         // register events
@@ -304,8 +300,8 @@ namespace YoloMouse
         else if( combo_id == SETTING_CURSORKEY_RESET )
             _ReplaceCursor(INVALID_INDEX);
         // change size
-        else if( combo_id >= SETTING_CURSORKEY_SMALL && combo_id <= SETTING_CURSORKEY_LARGE )
-            _OptionCursorSize(combo_id - SETTING_CURSORKEY_SMALL);
+        else if( combo_id >= SETTING_CURSORKEY_SMALLER && combo_id <= SETTING_CURSORKEY_LARGER )
+            _OptionCursorSize(_state.GetCursorSize() + (combo_id == SETTING_CURSORKEY_SMALLER ? -1 : 1));
     }
 
     //-------------------------------------------------------------------------
@@ -357,13 +353,9 @@ namespace YoloMouse
             return true;
 
         // cursor size
-        case MENU_OPTION_SIZE_SMALL:
-        case MENU_OPTION_SIZE_MEDIUM:
-        case MENU_OPTION_SIZE_LARGE:
-            _OptionCursorSize(id - MENU_OPTION_SIZE_SMALL);
-            _ui.SetMenuOption(MENU_OPTION_SIZE_SMALL, id == MENU_OPTION_SIZE_SMALL);
-            _ui.SetMenuOption(MENU_OPTION_SIZE_MEDIUM, id == MENU_OPTION_SIZE_MEDIUM);
-            _ui.SetMenuOption(MENU_OPTION_SIZE_LARGE, id == MENU_OPTION_SIZE_LARGE);
+        case MENU_OPTION_SMALLER:
+        case MENU_OPTION_LARGER:
+            _OptionCursorSize(_state.GetCursorSize() + (id == MENU_OPTION_SMALLER ? -1 : 1));
             return true;
 
         default:

@@ -7,16 +7,17 @@ namespace YoloMouse
     {
         "Start with Windows",
         "Show Icon",
-        "Small",
-        "Medium",
-        "Large",
+        "Smaller",
+        "Larger",
     };
 
     const Char* PATH_CURSORS_SIZE[CURSOR_SIZE_COUNT] =
     {
+        "Tiny",
         "Small",
         "Medium",
         "Large",
+        "Huge",
     };
     //------------------------------------------------------------------------
     static Settings::KeyValue _settings[] =
@@ -31,12 +32,11 @@ namespace YoloMouse
         { "CursorKey8",         "CONTROL ALT SHIFT 8" },
         { "CursorKey9",         "CONTROL ALT SHIFT 9" },
         { "CursorKeyReset",     "CONTROL ALT SHIFT 0" },
-        { "CursorKeySmall",     "CONTROL ALT SHIFT I" },
-        { "CursorKeyMedium",    "CONTROL ALT SHIFT O" },
-        { "CursorKeyLarge",     "CONTROL ALT SHIFT P" },
-        { "CursorSize",         "1" },
+        { "CursorKeySmaller",   "CONTROL ALT SHIFT -" },
+        { "CursorKeyLarger",    "CONTROL ALT SHIFT =" },
+        { "CursorSize",         "2" },
         { "AutoStart",          "1" },
-        { "AutoShowMenu",       "1" },
+        { "ShowMenu",           "1" },
     };
     Settings::KeyValueCollection SETTINGS_ITEMS(_settings, COUNT(_settings));
 }

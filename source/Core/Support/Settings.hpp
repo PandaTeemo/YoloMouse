@@ -10,7 +10,7 @@ namespace Core
     public:
         struct KeyValue
         {
-            ShortString     key;
+            MediumString    key;
             MediumString    value;
         };
 
