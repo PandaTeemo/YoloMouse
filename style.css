@@ -109,9 +109,10 @@ a:link, a:visited
 
 .TitleVersion
 {
+    position: absolute;
     text-align: right;
-    float: right;
     top: 40px;
+    right: 8px;
     color: #889;
 }
 

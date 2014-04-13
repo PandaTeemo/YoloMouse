@@ -8,7 +8,7 @@
     <div class="TitlePanel">
         <div class="TitleHeader">
             <img src="Title.png"/>
-            <div class="TitleVersion">0.3.0 <b style="color:red">BETA</b></div>
+            <div class="TitleVersion">0.4.0 <b style="color:red">BETA</b></div>
         </div>
         <div class="TitleDescription">
             Game Cursor Changer
@@ -20,24 +20,34 @@
         </div>
     </div>
 
-    <!-- faq -->
-    <div class="Panel" style="width: 425px; top:225px; left:85px; background-color:#08f;">
-        <div class="Header" style="background-color:#06e; width:50%;">
-            FAQ
+    <!-- changes -->
+    <div class="Panel" style="top:225px; left:70px; background-color:#08f;">
+        <div class="Header" style="width:50%; background-color:#06e;">
+            Change Log
         </div>
-        <table>
-            <tr><td class="ListHeader">Q</td><td class="ListContent">how work?</td></tr>
-            <tr><td class="ListHeader">A</td><td class="ListContent">It hooks game memory and intercepts call to SetCursor</td></tr>
-            <tr><td class="ListHeader">Q</td><td class="ListContent">sounds like a BAN!</td></tr>
-            <tr><td class="ListHeader">A</td><td class="ListContent">It does no more than what <a href="http://www.fraps.com/">FRAPS</a> does. If that wont get you banned this shouldnt either.</td></tr>
-            <tr><td class="ListHeader">Q</td><td class="ListContent">can I use my own cursors?</td></tr>
-            <tr><td class="ListHeader">A</td><td class="ListContent">sure, replace the .CUR files in Cursors folder. I used a photoshop plugin to make the ones provided.</td></tr>
-        </table>
+        <div class="Section">
+            0.4.0
+            <li/> added animated cursor (.ani) support
+            <li/> fixed a memory leak due to misuse of GetIconInfo()
+        </div>
+        <div class="Section">
+            0.3.0
+            <li/> added two more cursor sizes
+            <li/> changed hotkeys and start menu for changing cursor size
+        </div>
+        <div class="Section">
+            0.2.0
+            <li/> added cursor sizes
+        </div>
+        <div class="Section">
+            0.1.0
+            <li/> first release!
+        </div>
     </div>
 
     <!-- comms -->
-    <div class="Panel" style="top:150px; left:590px; background-color:#80f;">
-        <div class="Header" style="width:50%; background-color:#60d;">
+    <div class="Panel" style="top:130px; left:590px; background-color:#c08;">
+        <div class="Header" style="width:50%; background-color:#a06;">
             Comms
         </div>
         <table>
@@ -47,25 +57,5 @@
         </table>
     </div>
 
-    <!-- changes -->
-    <div class="Panel" style="top:315px; left:625px; background-color:#556;">
-        <div class="Header" style="width:50%; background-color:#445;">
-            Change Log
-        </div>
-        <div class="Section">
-            0.1.0
-            <li/> first release!
-        </div>
-        <div class="Section">
-            0.2.0
-            <li/> added cursor sizes
-        </div>
-        <div class="Section">
-            0.3.0
-            <li/> added two more cursor sizes
-            <li/> changed hotkeys and start menu for changing cursor size
-        </div>
-    </div>
-
-    </body>
+</body>
 </html>
