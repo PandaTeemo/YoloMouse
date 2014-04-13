@@ -25,7 +25,7 @@ namespace YoloMouse
     static void Main()
     {
         //_test(); return;
-        //Debug::Log(NULL); system("del Settings.ini"); system("del /Q Save\\*.*");
+        //xlog(NULL); system("del Settings.ini"); system("del /Q Save\\*.*");
 
         App& app = App::Instance();
 

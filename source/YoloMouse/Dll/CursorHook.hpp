@@ -20,10 +20,12 @@ namespace YoloMouse
         static Char             _target_id[STRING_PATH_SIZE];
         static Bool             _assign_ready;
         static Index            _assign_index;
+        static Bool             _refresh_ready;
 
         // objects
-        static Hook             _hook;
         static SharedState&     _state;
+        static Hook             _hook_setcursor;
+        static Hook             _hook_getcursor;
 
     public:
         /**/
@@ -43,5 +45,8 @@ namespace YoloMouse
 
         /**/
         static VOID HOOK_CALL _OnSetCursor( x86::Registers registers );
+
+        /* may need this in the future */
+        //static VOID HOOK_CALL _OnGetCursor( volatile x86::Registers registers );
     };
 }

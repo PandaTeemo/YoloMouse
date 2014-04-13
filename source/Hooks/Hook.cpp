@@ -4,11 +4,12 @@ namespace Hooks
 {
     // public
     //-------------------------------------------------------------------------
-    Hook::Hook( void* target_address, x86::HookFunction hook_function ):
+    Hook::Hook( void* target_address, x86::HookFunction hook_function, Placement placement ):
         _enabled        (false),
         _target_buffer  (CODE_BUFFER_SIZE),
         _target_address (target_address),
-        _hook_function  (hook_function)
+        _hook_function  (hook_function),
+        _placement      (placement)
     {
     }
 
@@ -138,17 +139,21 @@ namespace Hooks
         // clear
         _trampoline.Empty();
 
+        // relocate target (hook after)
+        if( _placement == AFTER && !_trampoline.Relocate(_target_backup))
+            return false;
+
         // push all registers
         _trampoline.OpPushAd();
 
-        // call hook function
+        // add call to hook function
         _trampoline.OpCall(hook_address);
 
         // pop all registers
         _trampoline.OpPopAd();
 
-        // relocate target
-        if(!_trampoline.Relocate(_target_backup))
+        // relocate target (hook before)
+        if( _placement == BEFORE && !_trampoline.Relocate(_target_backup))
             return false;
 
         // jump back to after target

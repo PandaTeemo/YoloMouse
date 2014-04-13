@@ -8,6 +8,14 @@ namespace Hooks
     /**/
     class Hook
     {
+    public:
+        enum Placement
+        {
+            BEFORE,
+            AFTER,
+            OVER,
+        };
+
     private:
         static const ULong CODE_BUFFER_SIZE =   32;
         static const ULong TARGET_MIN =         5;
@@ -25,10 +33,11 @@ namespace Hooks
 
         void*               _target_address;
         x86::HookFunction   _hook_function;
+        Placement           _placement;
 
     public:
         /**/
-        Hook( void* target_address, x86::HookFunction hook_function );
+        Hook( void* target_address, x86::HookFunction hook_function, Placement placement=BEFORE );
         ~Hook();
 
         /**/

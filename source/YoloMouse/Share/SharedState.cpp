@@ -96,6 +96,8 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     void SharedState::_LoadCursors()
     {
+        static const Char* EXTENSIONS[] = { "ani", "cur" };
+
         // for each size
         for( Index size_index = 0; size_index < CURSOR_SIZE_COUNT; size_index++ )
         {
@@ -104,18 +106,31 @@ namespace YoloMouse
             // for each potential cursor index
             for( Index cursor_index = 0; cursor_index < cursors.GetCount(); ++cursor_index )
             {
-                Char    path[STRING_PATH_SIZE];
-                UINT    loadimage_flags = LR_LOADFROMFILE|LR_SHARED;
+                Char path[STRING_PATH_SIZE];
 
-                // make cursor path
-                sprintf_s(path, sizeof(path), "%s/%s/%u.cur", PATH_CURSORS, PATH_CURSORS_SIZE[size_index], cursor_index + 1);
+                // for each extension
+                for( Index extension_index = 0; extension_index < COUNT(EXTENSIONS); ++extension_index )
+                {
+                    UINT loadimage_flags = LR_LOADFROMFILE|LR_SHARED;
+    
+                    // make cursor path
+                    sprintf_s(path, sizeof(path), "%s/%s/%u.%s",
+                        PATH_CURSORS,
+                        PATH_CURSORS_SIZE[size_index],
+                        cursor_index + 1,
+                        EXTENSIONS[extension_index]);
 
-                // windows versions older than vista require size confirmed to 32x32
-                if( SystemTools::GetOsVersion() < OSVERSION_WINVISTA )
-                    loadimage_flags |= LR_DEFAULTSIZE;
+                    // windows versions older than vista require size confirmed to 32x32
+                    if( SystemTools::GetOsVersion() < OSVERSION_WINVISTA )
+                        loadimage_flags |= LR_DEFAULTSIZE;
 
-                // load shared cursor
-                cursors[cursor_index] = (HCURSOR)LoadImage(NULL, path, IMAGE_CURSOR, 0, 0, loadimage_flags);
+                    // load shared cursor
+                    cursors[cursor_index] = (HCURSOR)LoadImage(NULL, path, IMAGE_CURSOR, 0, 0, loadimage_flags);
+
+                    // break if successful
+                    if( cursors[cursor_index] )
+                        break;
+                }
             }
         }
     }

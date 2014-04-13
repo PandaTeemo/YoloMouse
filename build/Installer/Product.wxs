@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="YoloMouse" Language="1033" Version="0.3.0.0" Manufacturer="HaPpY" UpgradeCode="69ce184e-a676-4169-a124-e1ee073bd0e6">
+  <Product Id="*" Name="YoloMouse" Language="1033" Version="0.4.0.0" Manufacturer="HaPpY" UpgradeCode="69ce184e-a676-4169-a124-e1ee073bd0e6">
 
     <Package Id="*" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
@@ -74,6 +74,9 @@
       </Component>
       <Component Id="TinyCursor9" Guid="{85F67D8D-CD6C-4F1C-A381-5A6FEFDA7852}">
         <File Id="TinyCursor9" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Tiny\9.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="TinyAni9" Guid="{CF60BDC5-C8C7-4268-A56F-D42D24FE3D89}">
+        <File Id="TinyAni9" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Tiny\9.ani" KeyPath="yes" />
       </Component>
     </ComponentGroup>
 

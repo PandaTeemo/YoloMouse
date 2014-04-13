@@ -25,6 +25,14 @@ namespace YoloMouse
 
         // get icon bitmap buffer
         count = GetBitmapBits( iconinfo.hbmColor ? iconinfo.hbmColor : iconinfo.hbmMask, sizeof(buffer), buffer );
+
+        // iconinfo cleanup 
+        if( iconinfo.hbmColor )
+            DeleteObject(iconinfo.hbmColor);
+        if( iconinfo.hbmMask )
+            DeleteObject(iconinfo.hbmMask);
+
+        // fail if no bits read
         if(count == 0)
             return 0;
 

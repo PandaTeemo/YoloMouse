@@ -64,7 +64,7 @@ namespace YoloMouse
     static const Char* APP_NAME =                   "YoloMouse";
 
     static const Char* PATH_LOADER =                "YoloMouse.exe";
-    static const Char* PATH_DLL32 =                 "Dll32.dll";
+    static const Char* PATH_DLL32 =                 "YoloDll32.dll";
     static const Char* PATH_SETTINGS =              "Settings.ini";
     static const Char* PATH_CURSORS =               "Cursors";
     extern const Char* PATH_CURSORS_SIZE[];
