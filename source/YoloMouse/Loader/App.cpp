@@ -253,8 +253,11 @@ namespace YoloMouse
         if( size >= CURSOR_SIZE_COUNT )
             return false;
 
-        // update cursor size
+        // update settings
         _settings.SetNumber(SETTING_CURSORSIZE, size);
+        _settings.Save();
+
+        // update cursor size
         _state.SetCursorSize(static_cast<CursorSize>(size));
 
         // get target window
