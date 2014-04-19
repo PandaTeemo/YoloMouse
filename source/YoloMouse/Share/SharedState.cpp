@@ -25,7 +25,6 @@ namespace YoloMouse
         if(host)
         {
             // reset state
-            _memory->path[0] = 0;
             _memory->cursors.Zero();
             _memory->size = CURSOR_SIZE_MEDIUM;
 
@@ -53,11 +52,6 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    const Char* SharedState::GetPath() const
-    {
-        return _memory->path;
-    }
-
     HCURSOR SharedState::GetCursor( Index cursor_index )
     {
         return _memory->cursors[_memory->size][cursor_index];
@@ -69,11 +63,6 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    void SharedState::SetPath( const Char* path )
-    {
-        strcpy_s(_memory->path, sizeof(_memory->path), path);
-    }
-
     void SharedState::SetCursorSize( CursorSize size )
     {
         _memory->size = size;
@@ -96,7 +85,7 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     void SharedState::_LoadCursors()
     {
-        static const Char* EXTENSIONS[] = { "ani", "cur" };
+        static const WCHAR* EXTENSIONS[] = { L"ani", L"cur" };
 
         // for each size
         for( Index size_index = 0; size_index < CURSOR_SIZE_COUNT; size_index++ )
@@ -106,7 +95,7 @@ namespace YoloMouse
             // for each potential cursor index
             for( Index cursor_index = 0; cursor_index < cursors.GetCount(); ++cursor_index )
             {
-                Char path[STRING_PATH_SIZE];
+                WCHAR path[STRING_PATH_SIZE];
 
                 // for each extension
                 for( Index extension_index = 0; extension_index < COUNT(EXTENSIONS); ++extension_index )
@@ -114,7 +103,7 @@ namespace YoloMouse
                     UINT loadimage_flags = LR_LOADFROMFILE|LR_SHARED;
     
                     // make cursor path
-                    sprintf_s(path, sizeof(path), "%s/%s/%u.%s",
+                    swprintf_s(path, COUNT(path), L"%s/%s/%u.%s",
                         PATH_CURSORS,
                         PATH_CURSORS_SIZE[size_index],
                         cursor_index + 1,

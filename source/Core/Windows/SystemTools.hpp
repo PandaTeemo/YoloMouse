@@ -14,10 +14,10 @@ namespace Core
         static OsVersion GetOsVersion();
 
         /**/
-        static Bool EnableAutoStart( const Char* name, const Char* path, Bool enable );
+        static Bool EnableAutoStart( const WCHAR* name, const WCHAR* path, Bool enable );
 
         /**/
-        static Bool GetProcessDirectory( Char* path, ULong limit );
-        static Bool GetProcessDirectory( DWORD process_id, Char* path, ULong limit );
+        static Bool GetProcessDirectory( WCHAR* path, ULong limit );
+        static Bool GetProcessDirectory( DWORD process_id, WCHAR* path, ULong limit );
     };
 }

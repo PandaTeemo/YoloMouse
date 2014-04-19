@@ -2,6 +2,7 @@
 #include <YoloMouse/Share/SharedTools.hpp>
 #include <YoloMouse/Share/SharedState.hpp>
 #include <Psapi.h>
+#include <Shlobj.h>
 
 namespace YoloMouse
 {
@@ -41,7 +42,7 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool SharedTools::BuildTargetId( Char* target_id, ULong limit, HWND hwnd )
+    Bool SharedTools::BuildTargetId( WCHAR* target_id, ULong limit, HWND hwnd )
     {
         static const ULong SLASH_LIMIT = 4;
         Bool    status = false;
@@ -54,15 +55,15 @@ namespace YoloMouse
         HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, process_id);
         if(process)
         {
-            Char path[STRING_PATH_SIZE] = {0};
+            WCHAR path[STRING_PATH_SIZE] = {0};
 
             // get executable path and build target id string
-            if(GetProcessImageFileName(process, path, sizeof(path)) > 0)
+            if(GetProcessImageFileName(process, path, COUNT(path)) > 0)
             {
-                ULong   length = strlen(path);
+                ULong   length = wcslen(path);
                 ULong   slashes = 0;
-                Char*   end = length + path;
-                Char    c;
+                WCHAR*  end = length + path;
+                WCHAR   c;
 
                 // for each character from the end of the path
                 do
@@ -86,7 +87,7 @@ namespace YoloMouse
                 while( end > path && slashes < SLASH_LIMIT );
 
                 // copy starting at end to target id
-                strcpy_s(target_id, limit, end + 1);
+                wcscpy_s(target_id, limit, end + 1);
 
                 status = true;
             }
@@ -99,12 +100,26 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    void SharedTools::BuildTargetSavePath( Char* path, ULong limit, const Char* target_id )
+    Bool SharedTools::BuildSavePath( WCHAR* path, ULong limit, const WCHAR* name )
     {
+        WCHAR   save_path[STRING_PATH_SIZE];
+        WCHAR   wpath[MAX_PATH];
+
+        // get appdata folder
+        if( SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA|CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, wpath) != S_OK )
+            return false;
+
         // build save path
-        eggs(sprintf_s(path, limit, "%s\\%s\\%s.ini",
-            SharedState::Instance().GetPath(),
-            PATH_SAVE,
-            target_id) > 0);
+        eggs(swprintf_s(save_path, COUNT(save_path), L"%s\\%s", wpath, APP_NAME) > 0);
+
+        // ensure save path exists
+        CreateDirectory(save_path, NULL);
+
+        // build save path
+        eggs(swprintf_s(path, limit, L"%s\\%s.ini",
+            save_path,
+            name) > 0);
+
+        return true;
     }
 }

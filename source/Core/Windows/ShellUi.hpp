@@ -26,14 +26,14 @@ namespace Core
         /**/
         void AddMenu();
         void AddMenuBreak();
-        void AddMenuOption( Id id, const Char* name, Bool enabled );
+        void AddMenuOption( Id id, const WCHAR* name, Bool enabled );
 
         /**/
         void HideMenu();
 
         /**/
         void SetIcon( Id icon_id );
-        void SetName( const String& name );
+        void SetName( const WCHAR* name );
         void SetMenuOption( Id id, Bool enabled );
 
         /**/

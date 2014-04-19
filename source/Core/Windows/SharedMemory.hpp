@@ -8,13 +8,13 @@ namespace Core
     class SharedMemory
     {
     private:
-        const Char* _name;
-        HANDLE      _handle;
-        TYPE*       _memory;
+        const WCHAR* _name;
+        HANDLE       _handle;
+        TYPE*        _memory;
 
     public:
         /**/
-        SharedMemory( const Char* name ):
+        SharedMemory( const WCHAR* name ):
             _name   (name),
             _handle (NULL),
             _memory (NULL)

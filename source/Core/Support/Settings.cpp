@@ -6,12 +6,18 @@ namespace Core
 {
     // public
     //-------------------------------------------------------------------------
-    Settings::Settings( KeyValueCollection& keyvalues, String path ):
+    Settings::Settings( KeyValueCollection& keyvalues ):
         _keyvalues  (keyvalues),
-        _path       (path),
         _ready      (false),
         _accessed   (0)
     {
+        _path[0] = 0;
+    }
+
+    //-------------------------------------------------------------------------
+    void Settings::SetPath( const WCHAR* path )
+    {
+        wcscpy_s( _path, COUNT(_path), path );
     }
 
     //-------------------------------------------------------------------------
@@ -20,7 +26,7 @@ namespace Core
         Char    line[STRING_MEDIUM_SIZE];
         FILE*   file;
 
-        if(fopen_s(&file, _path.GetMemory(), "rt") == 0)
+        if(_wfopen_s(&file, _path, L"rt") == 0)
         {
             while(fgets(line, sizeof(line), file))
             {
@@ -50,7 +56,7 @@ namespace Core
     {
         FILE* file;
 
-        if(fopen_s(&file, _path.GetMemory(),"wt") == 0)
+        if(_wfopen_s(&file, _path, L"wt") == 0)
         {
             for( KeyValueIterator i = _keyvalues.Begin(); i != _keyvalues.End(); ++i )
                 fprintf(file, "%s=%s\n", i->key.GetMemory(), i->value.GetMemory());

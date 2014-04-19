@@ -2,6 +2,7 @@
 #include <YoloMouse/Loader/App.hpp>
 #include <YoloMouse/Loader/Resource/resource.h>
 #include <YoloMouse/Share/Constants.hpp>
+#include <YoloMouse/Share/SharedTools.hpp>
 
 #include <psapi.h>
 
@@ -14,7 +15,7 @@ namespace YoloMouse
         _ui             (ShellUi::Instance()),
         _input_monitor  (_ui),
         _system_monitor (SystemMonitor::Instance()),
-        _settings       (SETTINGS_ITEMS, PATH_SETTINGS)
+        _settings       (SETTINGS_ITEMS)
     {
         // init ui
         _ui.SetName(APP_NAME);
@@ -55,7 +56,7 @@ namespace YoloMouse
         _StopSystem();
 
         // stop options
-        _StartOptions();
+        _StopOptions();
 
         // stop ui
         _StopUi();
@@ -99,9 +100,6 @@ namespace YoloMouse
 
     void App::_StartLoader()
     {
-        // create target save directory
-        CreateDirectory(PATH_SAVE, NULL);
-
         // start loader
         eggs(_loader.Start());
     }
@@ -110,28 +108,28 @@ namespace YoloMouse
     {
         // enable autostart
         if( _settings.GetBoolean(SETTING_AUTOSTART) )
-            _OptionAutoStart(true);
+            _OptionAutoStart(true, false);
 
         // update cursor size
-        _OptionCursorSize(_settings.GetNumber(SETTING_CURSORSIZE));
+        _OptionCursorSize(_settings.GetNumber(SETTING_CURSORSIZE), false);
     }
 
     void App::_StartSettings()
     {
+        WCHAR settings_path[STRING_PATH_SIZE];
+
+        // set settings path
+        if(SharedTools::BuildSavePath(settings_path, COUNT(settings_path), PATH_SETTINGS_NAME))
+            _settings.SetPath(settings_path);
+
         // load settings
         _settings.Load();
     }
 
     void App::_StartState()
     {
-        Char path[STRING_PATH_SIZE];
-
         // open shared cursor table as host
         eggs(_state.Open(true));
-
-        // set path
-        eggs(GetCurrentDirectory(sizeof(path), path) != 0);
-        _state.SetPath(path);
     }
 
     void App::_StartSystem()
@@ -155,9 +153,6 @@ namespace YoloMouse
             _ui.AddMenu();
 
             // add menu options
-            _ui.AddMenuBreak();
-            _ui.AddMenuOption(MENU_OPTION_SMALLER,      APP_MENU_STRINGS[MENU_OPTION_SMALLER],      false);
-            _ui.AddMenuOption(MENU_OPTION_LARGER,       APP_MENU_STRINGS[MENU_OPTION_LARGER],       false);
             _ui.AddMenuBreak();
             _ui.AddMenuOption(MENU_OPTION_AUTOSTART,    APP_MENU_STRINGS[MENU_OPTION_AUTOSTART],    _settings.GetBoolean(SETTING_AUTOSTART));
             _ui.AddMenuOption(MENU_OPTION_SHOWMENU,     APP_MENU_STRINGS[MENU_OPTION_SHOWMENU],     true);
@@ -215,16 +210,19 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool App::_OptionAutoStart( Bool enable )
+    Bool App::_OptionAutoStart( Bool enable, Bool save )
     {
-        Char path[STRING_PATH_SIZE];
+        WCHAR path[STRING_PATH_SIZE];
 
         // get exec path
-        if(GetFullPathName(PATH_LOADER, sizeof(path), path, NULL))
+        if(GetFullPathName(PATH_LOADER, COUNT(path), path, NULL))
         {
             // update settings
-            _settings.SetBoolean(SETTING_AUTOSTART, enable);
-            _settings.Save();
+            if( save )
+            {
+                _settings.SetBoolean(SETTING_AUTOSTART, enable);
+                _settings.Save();
+            }
 
             // enable or disable autostart
             SystemTools::EnableAutoStart( APP_NAME, path, enable );
@@ -235,11 +233,14 @@ namespace YoloMouse
         return false;
     }
 
-    Bool App::_OptionHideMenu()
+    Bool App::_OptionHideMenu( Bool save )
     {
         // update settings
-        _settings.SetBoolean(SETTING_SHOWMENU, false);
-        _settings.Save();
+        if( save )
+        {
+            _settings.SetBoolean(SETTING_SHOWMENU, false);
+            _settings.Save();
+        }
 
         // hide menu
         _ui.HideMenu();
@@ -247,15 +248,18 @@ namespace YoloMouse
         return true;
     }
 
-    Bool App::_OptionCursorSize( ULong size )
+    Bool App::_OptionCursorSize( ULong size, Bool save )
     {
         // check
         if( size >= CURSOR_SIZE_COUNT )
             return false;
 
         // update settings
-        _settings.SetNumber(SETTING_CURSORSIZE, size);
-        _settings.Save();
+        if( save )
+        {
+            _settings.SetNumber(SETTING_CURSORSIZE, size);
+            _settings.Save();
+        }
 
         // update cursor size
         _state.SetCursorSize(static_cast<CursorSize>(size));
@@ -304,7 +308,7 @@ namespace YoloMouse
             _ReplaceCursor(INVALID_INDEX);
         // change size
         else if( combo_id >= SETTING_CURSORKEY_SMALLER && combo_id <= SETTING_CURSORKEY_LARGER )
-            _OptionCursorSize(_state.GetCursorSize() + (combo_id == SETTING_CURSORKEY_SMALLER ? -1 : 1));
+            _OptionCursorSize(_state.GetCursorSize() + (combo_id == SETTING_CURSORKEY_SMALLER ? -1 : 1), true);
     }
 
     //-------------------------------------------------------------------------
@@ -342,7 +346,7 @@ namespace YoloMouse
         // auto start
         case MENU_OPTION_AUTOSTART:
             // toggle auto start
-            if(_OptionAutoStart(!enabled))
+            if(_OptionAutoStart(!enabled, true))
                 _ui.SetMenuOption(id, !enabled);
             return true;
 
@@ -350,15 +354,9 @@ namespace YoloMouse
         case MENU_OPTION_SHOWMENU:
             if(enabled)
             {
-                _OptionHideMenu();
+                _OptionHideMenu(true);
                 _ui.SetMenuOption(id, false);
             }
-            return true;
-
-        // cursor size
-        case MENU_OPTION_SMALLER:
-        case MENU_OPTION_LARGER:
-            _OptionCursorSize(_state.GetCursorSize() + (id == MENU_OPTION_SMALLER ? -1 : 1));
             return true;
 
         default:

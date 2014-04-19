@@ -42,7 +42,7 @@ namespace YoloMouse
         Index Find( Hash cursor_hash );
 
         /**/
-        Bool Load( const Char* target_id );
-        Bool Save( const Char* target_id );
+        Bool Load( const WCHAR* target_id );
+        Bool Save( const WCHAR* target_id );
     };
 }

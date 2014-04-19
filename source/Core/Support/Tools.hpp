@@ -69,8 +69,8 @@ namespace Core
         static ULong CStrLen( const Char* string );
 
         /**/
-        static Bool StripFileName( Char* path );
-        static Bool DoesFileExist( const Char* path );
+        static Bool StripFileName( WCHAR* path );
+        static Bool DoesFileExist( const WCHAR* path );
 
         /**/
         static Hash Fnv164Hash( const void* memory, ULong count );

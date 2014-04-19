@@ -7,20 +7,20 @@ namespace Core
 {
     // public
     //-------------------------------------------------------------------------
-    Bool Tools::StripFileName( Char* path )
+    Bool Tools::StripFileName( WCHAR* path )
     {
-        Char* end = path + strlen(path);
+        WCHAR* end = path + wcslen(path);
         for( ; *end != '\\' && end != path; end-- );
         *end = 0;
 
         return true;
     }
 
-    Bool Tools::DoesFileExist( const Char* path )
+    Bool Tools::DoesFileExist( const WCHAR* path )
     {
         FILE* file;
 
-        if(fopen_s(&file, path, "rt") == 0)
+        if(_wfopen_s(&file, path, L"rt") == 0)
         {
             fclose(file);
             return true;

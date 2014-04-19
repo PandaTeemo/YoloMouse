@@ -25,7 +25,7 @@ namespace YoloMouse
     static void Main()
     {
         //_test(); return;
-        //xlog(NULL); system("del Settings.ini"); system("del /Q Save\\*.*");
+        //xlog(NULL); system("del /Q C:\Users\Administrator\AppData\Local\YoloMouse\\*.*");
 
         App& app = App::Instance();
 
@@ -65,10 +65,10 @@ int WINAPI WinMain(
         // else good to go
         else
         {
-            Char path[STRING_PATH_SIZE];
+            WCHAR path[STRING_PATH_SIZE];
 
             // ensure working directory is that of the main executable
-            if(SystemTools::GetProcessDirectory(path, sizeof(path)) && SetCurrentDirectory(path))
+            if(SystemTools::GetProcessDirectory(path, COUNT(path)) && SetCurrentDirectory(path))
             {
                 // run main
                 try
@@ -77,9 +77,9 @@ int WINAPI WinMain(
                     status = 0;
                 }
                 // catch eggs
-                catch( const Core::Char* error )
+                catch( const Char* error )
                 {
-                    MessageBox(NULL, error, YoloMouse::APP_NAME, MB_OK|MB_ICONERROR);
+                    MessageBoxA(NULL, error, YoloMouse::APP_NAMEC, MB_OK|MB_ICONERROR);
                     status = 1;
                 }
             }

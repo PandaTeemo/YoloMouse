@@ -18,7 +18,6 @@ namespace YoloMouse
         /**/
         struct Root
         {
-            Char        path[STRING_PATH_SIZE];
             CursorTable cursors;
             CursorSize  size;
         };
@@ -36,12 +35,10 @@ namespace YoloMouse
         void Close();
 
         /**/
-        const Char* GetPath() const;
-        HCURSOR     GetCursor( Index cursor_index );
-        CursorSize  GetCursorSize() const;
+        HCURSOR      GetCursor( Index cursor_index );
+        CursorSize   GetCursorSize() const;
 
         /**/
-        void SetPath( const Char* path );
         void SetCursorSize( CursorSize size );
 
         /**/

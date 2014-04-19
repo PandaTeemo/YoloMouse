@@ -29,7 +29,7 @@ namespace Core
     // local: data
     //------------------------------------------------------------------------
     static ListenerCollection   _listeners;
-    static String               _name("");
+    static const WCHAR*         _name = L"";
     static HWND                 _hwnd = NULL;
     static HMENU                _menu = NULL;
     static HINSTANCE            _hinstance = NULL;
@@ -55,7 +55,7 @@ namespace Core
         nid.uCallbackMessage    = WMAPP_TRAYICON;
 
         // tooltip
-        strcpy_s( nid.szTip, sizeof(nid.szTip), _name.GetMemory() );
+        wcscpy_s( nid.szTip, COUNT(nid.szTip), _name );
 
         // create notify icon
         Shell_NotifyIcon( NIM_ADD, &nid );
@@ -208,7 +208,7 @@ namespace Core
         _menu = CreatePopupMenu();
 
         // add exit option
-        InsertMenu( _menu, 0, MF_BYPOSITION | MF_STRING, ID_EXIT, "E&xit" );
+        InsertMenu( _menu, 0, MF_BYPOSITION | MF_STRING, ID_EXIT, L"E&xit" );
         SetMenuDefaultItem( _menu, ID_EXIT, FALSE );
     }
 
@@ -218,7 +218,7 @@ namespace Core
         InsertMenu( _menu, 0, MF_BYPOSITION | MF_SEPARATOR, ID_SEPARATOR, NULL );
     }
 
-    void ShellUi::AddMenuOption( Id id, const Char* name, Bool enabled )
+    void ShellUi::AddMenuOption( Id id, const WCHAR* name, Bool enabled )
     {
         // add exit option
         InsertMenu( _menu, 0, MF_BYPOSITION | MF_STRING | (enabled ? MF_CHECKED : MF_UNCHECKED), id + ID_USER, name );
@@ -245,7 +245,7 @@ namespace Core
         _icon_id = icon_id;
     }
 
-    void ShellUi::SetName( const String& name )
+    void ShellUi::SetName( const WCHAR* name )
     {
         _name = name;
     }
@@ -292,7 +292,7 @@ namespace Core
         wclass.hCursor = LoadCursor( NULL, IDC_ARROW );
         wclass.hbrBackground = NULL;
         wclass.lpszMenuName = NULL;
-        wclass.lpszClassName = _name.GetMemory();
+        wclass.lpszClassName = _name;
 
         // application icon
         wclass.hIcon = wclass.hIconSm = (_icon_id == INVALID_ID) ?
@@ -305,7 +305,7 @@ namespace Core
         // create window
         _hwnd = CreateWindow(
             wclass.lpszClassName,
-            "",
+            L"",
             WS_OVERLAPPEDWINDOW,
             CW_USEDEFAULT,
             CW_USEDEFAULT,
@@ -325,7 +325,7 @@ namespace Core
         DestroyWindow(_hwnd);
 
         // unregister class
-        UnregisterClass(_name.GetMemory(), _hinstance);
+        UnregisterClass(_name, _hinstance);
     }
 
     //--------------------------------------------------------------------------

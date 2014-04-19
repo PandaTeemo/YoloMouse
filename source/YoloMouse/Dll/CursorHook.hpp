@@ -17,7 +17,7 @@ namespace YoloMouse
         static HCURSOR          _replace_cursor;
 
         // input
-        static Char             _target_id[STRING_PATH_SIZE];
+        static WCHAR            _target_id[STRING_PATH_SIZE];
         static Bool             _assign_ready;
         static Index            _assign_index;
         static Bool             _refresh_ready;

@@ -37,8 +37,6 @@ namespace YoloMouse
     {
         MENU_OPTION_AUTOSTART,
         MENU_OPTION_SHOWMENU,
-        MENU_OPTION_SMALLER,
-        MENU_OPTION_LARGER,
         MENU_OPTION_COUNT
     };
 
@@ -60,18 +58,18 @@ namespace YoloMouse
 
     // strings
     //-------------------------------------------------------------------------
-    extern const Char* APP_MENU_STRINGS[];
-    static const Char* APP_NAME =                   "YoloMouse";
+    extern const WCHAR* APP_MENU_STRINGS[];
+    static const WCHAR* APP_NAME =                   L"YoloMouse";
+    static const Char*  APP_NAMEC =                  "YoloMouse";
 
-    static const Char* PATH_LOADER =                "YoloMouse.exe";
-    static const Char* PATH_DLL32 =                 "YoloDll32.dll";
-    static const Char* PATH_SETTINGS =              "Settings.ini";
-    static const Char* PATH_CURSORS =               "Cursors";
-    extern const Char* PATH_CURSORS_SIZE[];
-    static const Char* PATH_SAVE =                  "Save";
+    static const WCHAR* PATH_LOADER =                L"YoloMouse.exe";
+    static const WCHAR* PATH_DLL32 =                 L"YoloDll32.dll";
+    static const WCHAR* PATH_SETTINGS_NAME =         L"Settings";
+    static const WCHAR* PATH_CURSORS =               L"Cursors";
+    extern const WCHAR* PATH_CURSORS_SIZE[];
 
-    static const Char* IPC_MUTEX_NAME =             "YoloMouseMutex";
-    static const Char* IPC_MEMORY_NAME =            "YoloMouseMemory";
+    static const WCHAR* IPC_MUTEX_NAME =             L"YoloMouseMutex";
+    static const WCHAR* IPC_MEMORY_NAME =            L"YoloMouseMemory";
 
     // settings
     //-------------------------------------------------------------------------

@@ -1,5 +1,7 @@
 #include <YoloMouse/Dll/CursorBindings.hpp>
 #include <YoloMouse/Share/SharedTools.hpp>
+#include <io.h>
+#include <wchar.h>
 
 namespace YoloMouse
 {
@@ -62,18 +64,19 @@ namespace YoloMouse
 
 
     //-------------------------------------------------------------------------
-    Bool CursorBindings::Load( const Char* target_id )
+    Bool CursorBindings::Load( const WCHAR* target_id )
     {
-        Char    save_path[STRING_PATH_SIZE];
+        WCHAR   save_path[STRING_PATH_SIZE];
         Hash    cursor_hash;
         Index   cursor_index;
         FILE*   file = NULL;
 
         // build save path
-        SharedTools::BuildTargetSavePath(save_path, sizeof(save_path), target_id);
+        if(!SharedTools::BuildSavePath(save_path, COUNT(save_path), target_id))
+            return false;
 
         // open binary file for writing
-        if( fopen_s(&file, save_path, "rt") != 0 )
+        if( _wfopen_s(&file, save_path, L"rt") != 0 )
             return false;
 
         // reset map
@@ -89,17 +92,18 @@ namespace YoloMouse
         return true;
     }
 
-    Bool CursorBindings::Save( const Char* target_id )
+    Bool CursorBindings::Save( const WCHAR* target_id )
     {
         ULong   written = 0;
-        Char    save_path[STRING_PATH_SIZE];
+        WCHAR   save_path[STRING_PATH_SIZE];
         FILE*   file = NULL;
 
         // build save path
-        SharedTools::BuildTargetSavePath(save_path, sizeof(save_path), target_id);
+        if(!SharedTools::BuildSavePath(save_path, COUNT(save_path), target_id))
+            return false;
         
         // open binary file for writing
-        if( fopen_s(&file, save_path, "wt") != 0 )
+        if( _wfopen_s(&file, save_path, L"wt") != 0 )
             return false;
 
         // for each map entry
@@ -118,7 +122,7 @@ namespace YoloMouse
 
         // if nothing written remove file instead
         if( written == 0 )
-            _unlink(save_path);
+            _wunlink(save_path);
 
         return true;
     }

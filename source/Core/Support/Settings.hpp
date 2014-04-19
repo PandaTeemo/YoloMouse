@@ -19,13 +19,16 @@ namespace Core
 
     private:
         KeyValueCollection  _keyvalues;
-        MediumString        _path;
+        WCHAR               _path[STRING_PATH_SIZE];
         Bool                _ready;
         ULong               _accessed;
 
     public:
         /**/
-        Settings( KeyValueCollection& items, String path );
+        Settings( KeyValueCollection& items );
+
+        /**/
+        void SetPath( const WCHAR* path );
 
         /**/
         Bool Load();

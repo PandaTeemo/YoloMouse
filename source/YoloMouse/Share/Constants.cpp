@@ -3,22 +3,21 @@
 namespace YoloMouse
 {
     //------------------------------------------------------------------------
-    const Char* APP_MENU_STRINGS[MENU_OPTION_COUNT] =
+    const WCHAR* APP_MENU_STRINGS[MENU_OPTION_COUNT] =
     {
-        "Start with Windows",
-        "Show Icon",
-        "Smaller",
-        "Larger",
+        L"Start with Windows",
+        L"Show Icon",
     };
 
-    const Char* PATH_CURSORS_SIZE[CURSOR_SIZE_COUNT] =
+    const WCHAR* PATH_CURSORS_SIZE[CURSOR_SIZE_COUNT] =
     {
-        "Tiny",
-        "Small",
-        "Medium",
-        "Large",
-        "Huge",
+        L"Tiny",
+        L"Small",
+        L"Medium",
+        L"Large",
+        L"Huge",
     };
+
     //------------------------------------------------------------------------
     static Settings::KeyValue _settings[] =
     {

@@ -56,9 +56,9 @@ namespace YoloMouse
         void _StopUi();
 
         /**/
-        Bool _OptionAutoStart( Bool enable );
-        Bool _OptionHideMenu();
-        Bool _OptionCursorSize( ULong size );
+        Bool _OptionAutoStart( Bool enable, Bool save );
+        Bool _OptionHideMenu( Bool save );
+        Bool _OptionCursorSize( ULong size, Bool save );
 
         /**/
         Bool _ReplaceCursor( Index cursor_index );

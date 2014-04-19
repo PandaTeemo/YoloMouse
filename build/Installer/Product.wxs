@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="YoloMouse" Language="1033" Version="0.4.1.0" Manufacturer="HaPpY" UpgradeCode="69ce184e-a676-4169-a124-e1ee073bd0e6">
+  <Product Id="*" Name="YoloMouse" Language="1033" Version="0.4.2.0" Manufacturer="HaPpY" UpgradeCode="69ce184e-a676-4169-a124-e1ee073bd0e6">
 
     <Package Id="*" InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
@@ -13,7 +13,6 @@
       <ComponentGroupRef Id="CursorMediumComponents" />
       <ComponentGroupRef Id="CursorLargeComponents" />
       <ComponentGroupRef Id="CursorHugeComponents" />
-      <ComponentGroupRef Id="SaveComponents" />
       <ComponentRef Id="ApplicationShortcut" />
     </Feature>
 
@@ -27,7 +26,6 @@
             <Directory Id="CURSOR_LARGE_DIR"  Name="Large" />
             <Directory Id="CURSOR_HUGE_DIR"  Name="Huge" />
           </Directory>
-        <Directory Id="SAVE_DIR" Name="Save"/>
         </Directory>
         <Directory Id="ProgramMenuFolder">
           <Directory Id="ApplicationProgramsFolder" Name="YoloMouse"/>
@@ -200,17 +198,11 @@
       </Component>
     </ComponentGroup>
 
-    <ComponentGroup Id="SaveComponents" Directory="SAVE_DIR">
-      <Component Id="SaveFiles" Guid="{CC9204DD-6B03-4D65-9D84-162236F32186}" KeyPath="yes">
-        <RemoveFile Id="SaveFiles" On="uninstall" Name="*.*" />
-      </Component>
-    </ComponentGroup>
-
     <DirectoryRef Id="ApplicationProgramsFolder">
       <Component Id="ApplicationShortcut" Guid="{00797B6E-D869-4803-99DE-A050B383653E}">
         <Shortcut Id="ApplicationStartMenuShortcut"
           Name="YoloMouse"
-          Description="Shine those dull game cursors"
+          Description="Game Cursor Changer"
           Target="[#YoloMouseExe]"
           WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
         <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>

@@ -55,9 +55,9 @@ namespace Core
     }
 
     //-------------------------------------------------------------------------
-    Bool SystemTools::EnableAutoStart( const Char* name, const Char* path, Bool enable )
+    Bool SystemTools::EnableAutoStart( const WCHAR* name, const WCHAR* path, Bool enable )
     {
-        const Char* REGISTRY_PATH = "Software\\Microsoft\\Windows\\CurrentVersion\\Run";
+        const WCHAR* REGISTRY_PATH = L"Software\\Microsoft\\Windows\\CurrentVersion\\Run";
         Bool status = false;
         HKEY hkey;
 
@@ -68,7 +68,7 @@ namespace Core
             if(RegCreateKeyEx(HKEY_CURRENT_USER, REGISTRY_PATH, 0, NULL, 0, KEY_SET_VALUE, NULL, &hkey, NULL) == ERROR_SUCCESS)
             {
                 // set value
-                if(RegSetValueEx (hkey, name, 0, REG_SZ, (Byte*)path, strlen(path)) == ERROR_SUCCESS)
+                if(RegSetValueEx (hkey, name, 0, REG_SZ, (Byte*)path, wcslen(path)*sizeof(WCHAR)) == ERROR_SUCCESS)
                     status = true;
 
                 // close key
@@ -90,7 +90,7 @@ namespace Core
     }
 
     //-------------------------------------------------------------------------
-    Bool SystemTools::GetProcessDirectory( Char* path, ULong limit )
+    Bool SystemTools::GetProcessDirectory( WCHAR* path, ULong limit )
     {
         if( GetModuleFileName( NULL, path, limit ) == 0 )
             return false;
@@ -99,7 +99,7 @@ namespace Core
         return true;
     }
 
-    Bool SystemTools::GetProcessDirectory( DWORD process_id, Char* path, ULong limit )
+    Bool SystemTools::GetProcessDirectory( DWORD process_id, WCHAR* path, ULong limit )
     {
         // open process
         HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, process_id);

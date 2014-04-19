@@ -44,15 +44,16 @@ namespace YoloMouse
 
     Bool Loader::IsConfigured( HWND hwnd ) const
     {
-        Char save_path[STRING_PATH_SIZE];
-        Char target_id[STRING_PATH_SIZE];
+        WCHAR save_path[STRING_PATH_SIZE];
+        WCHAR target_id[STRING_PATH_SIZE];
 
         // build target id
-        if(! SharedTools::BuildTargetId( target_id, sizeof(target_id), hwnd ) )
+        if(! SharedTools::BuildTargetId( target_id, COUNT(target_id), hwnd ) )
             return false;
 
         // build save path
-        SharedTools::BuildTargetSavePath(save_path, sizeof(save_path), target_id);
+        if(!SharedTools::BuildSavePath(save_path, COUNT(save_path), target_id))
+            return false;
 
         // sucess if save file exists
         return Tools::DoesFileExist(save_path);

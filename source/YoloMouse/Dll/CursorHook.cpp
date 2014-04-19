@@ -10,7 +10,7 @@ namespace YoloMouse
     HCURSOR         CursorHook::_last_cursor    (NULL);
     HCURSOR         CursorHook::_replace_cursor (NULL);
 
-    Char            CursorHook::_target_id      [STRING_PATH_SIZE];
+    WCHAR           CursorHook::_target_id      [STRING_PATH_SIZE];
     Bool            CursorHook::_assign_ready   (false);
     Index           CursorHook::_assign_index   (INVALID_INDEX);
     Bool            CursorHook::_refresh_ready  (false);
@@ -39,7 +39,7 @@ namespace YoloMouse
         _active = true;
 
         // build id string
-        if( !SharedTools::BuildTargetId(_target_id, sizeof(_target_id), hwnd) )
+        if( !SharedTools::BuildTargetId(_target_id, COUNT(_target_id), hwnd) )
             return;
 
         // enable hooks
