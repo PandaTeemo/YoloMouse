@@ -6,13 +6,13 @@ namespace YoloMouse
     // testing
     //-------------------------------------------------------------------------
     /*
-    static VOID HOOK_CALL _OnSleep( x86::Registers registers )
+    static VOID HOOK_CALL _OnHook( x86::Registers registers )
     {
     }
 
-    static void _test()
+    static void _test( HINSTANCE instance )
     {
-        Hooks::Hook hook(Sleep,_OnSleep);
+        Hooks::Hook hook(Sleep, _OnHook);
         hook.Init();
         hook.Enable();
         Sleep(100);
@@ -24,8 +24,7 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     static void Main()
     {
-        //_test(); return;
-        //xlog(NULL); system("del /Q C:\Users\Administrator\AppData\Local\YoloMouse\\*.*");
+        //xlog(NULL); system("del /Q C:\\Users\\Administrator\\AppData\\Local\\YoloMouse\\*.*");
 
         App& app = App::Instance();
 
@@ -48,6 +47,8 @@ int WINAPI WinMain(
     LPSTR       lpCmdLine,
     int         iCmdShow)
 {
+    //YoloMouse::_test(hInstance); return 0;
+
     using namespace Core;
     int status;
     

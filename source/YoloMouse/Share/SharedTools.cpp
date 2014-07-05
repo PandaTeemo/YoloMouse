@@ -20,6 +20,10 @@ namespace YoloMouse
         if( hcursor == NULL )
             return 0;
 
+        // if special use handle as hash
+        if( hcursor == CURSOR_SPECIAL_EMPTY )
+            return reinterpret_cast<Hash>(hcursor) & 0xffffffff;
+
         // get icon info
         if( GetIconInfo(hcursor, &iconinfo) == FALSE )
             return 0;
@@ -60,10 +64,14 @@ namespace YoloMouse
             // get executable path and build target id string
             if(GetProcessImageFileName(process, path, COUNT(path)) > 0)
             {
-                ULong   length = wcslen(path);
+                ULong   length = (ULong)wcslen(path);
                 ULong   slashes = 0;
                 WCHAR*  end = length + path;
                 WCHAR   c;
+
+                // state to supress path numbers. this helps to maintain a common
+                // id for targets with versioned directories.
+                Bool supress_numbers = false;
 
                 // for each character from the end of the path
                 do
@@ -74,7 +82,7 @@ namespace YoloMouse
                     // if not alphanumeric
                     if( (c < 'a' || c > 'z') &&
                         (c < 'A' || c > 'Z') &&
-                        (c < '0' || c > '9') )
+                        (supress_numbers || c < '0' || c > '9') )
                     {
                         // replace with _
                         *end = '_';
@@ -82,7 +90,10 @@ namespace YoloMouse
 
                     // if slash
                     if( (c == '\\' || c == '/') )
+                    {
+                        supress_numbers = true;
                         slashes++;
+                    }
                 }
                 while( end > path && slashes < SLASH_LIMIT );
 

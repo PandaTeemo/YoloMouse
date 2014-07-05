@@ -41,7 +41,7 @@ namespace Core
             for( ; end != End() && *end != delimiter; ++end );
 
             // get count
-            ULong count = end - begin;
+            ULong count = (ULong)(end - begin);
 
             // done if empty
             if( count == 0 )

@@ -40,6 +40,9 @@ namespace YoloMouse
 
     private:
         /**/
+        static HCURSOR _AdaptCursor( HCURSOR from );
+    
+        /**/
         static Bool _OnSetCursorAssign( HCURSOR hcursor, Index cursor_index );
         static Bool _OnSetCursorChange( HCURSOR hcursor );
 

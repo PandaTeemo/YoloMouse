@@ -49,7 +49,7 @@ namespace Core
     ULong Tools::CStrLen( const Char* string )
     {
         assert(string);
-        return strlen(string);
+        return (ULong)strlen(string);
     }
 
     Hash Tools::Fnv164Hash( const void* memory, ULong count )

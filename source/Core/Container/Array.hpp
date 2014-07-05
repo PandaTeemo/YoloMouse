@@ -292,7 +292,7 @@ namespace Core
         /**/
         Index IndexOf( Iterator iterator )
         {
-            return iterator - Begin();
+            return static_cast<Index>(iterator - Begin());
         }
 
         /**/

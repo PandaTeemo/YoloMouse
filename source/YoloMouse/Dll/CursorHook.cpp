@@ -114,6 +114,17 @@ namespace YoloMouse
 
     // private
     //-------------------------------------------------------------------------
+    HCURSOR CursorHook::_AdaptCursor( HCURSOR from )
+    {
+        // adapt null to special empty cursor
+        if(from == NULL)
+            return CURSOR_SPECIAL_EMPTY;
+        // else use given
+        else
+            return from;
+    }
+
+    //-------------------------------------------------------------------------
     Bool CursorHook::_OnSetCursorAssign( HCURSOR hcursor, Index cursor_index )
     {
         // cannot be yolomouse cursor
@@ -198,16 +209,15 @@ namespace YoloMouse
         xassert(_active);
         HCURSOR hcursor = *(HCURSOR*)(registers.esp + 4);
 
+        // adapt cursor
+        hcursor = _AdaptCursor(hcursor);
+
         // if cursor changing set refresh state
         if( hcursor != _last_cursor )
             _refresh_ready = true;
 
-        // update new last cursor
+        // set new last cursor
         _last_cursor = hcursor;
-
-        // ignore null
-        if( hcursor == NULL )
-            return;
 
         // if assigning new cursor
         if( _assign_ready )
@@ -238,7 +248,6 @@ namespace YoloMouse
         if( _replace_cursor )
             *(HCURSOR*)(registers.esp + 4) = _replace_cursor;
     }
-
     /*
     VOID HOOK_CALL CursorHook::_OnGetCursor( volatile x86::Registers registers )
     {

@@ -27,4 +27,7 @@
       <Filter>Resource</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\todo.txt" />
+  </ItemGroup>
 </Project>

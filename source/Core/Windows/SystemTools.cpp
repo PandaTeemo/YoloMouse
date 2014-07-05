@@ -68,7 +68,7 @@ namespace Core
             if(RegCreateKeyEx(HKEY_CURRENT_USER, REGISTRY_PATH, 0, NULL, 0, KEY_SET_VALUE, NULL, &hkey, NULL) == ERROR_SUCCESS)
             {
                 // set value
-                if(RegSetValueEx (hkey, name, 0, REG_SZ, (Byte*)path, wcslen(path)*sizeof(WCHAR)) == ERROR_SUCCESS)
+                if(RegSetValueEx (hkey, name, 0, REG_SZ, (Byte*)path, (DWORD)(wcslen(path) * sizeof(WCHAR))) == ERROR_SUCCESS)
                     status = true;
 
                 // close key

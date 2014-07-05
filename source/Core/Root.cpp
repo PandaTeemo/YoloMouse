@@ -21,7 +21,7 @@ namespace Core
         static Char buffer[0x100];
 
         // path length
-        ULong file_length = strlen(file);
+        ULong file_length = (ULong)strlen(file);
 
         // create message
         sprintf_s(buffer, sizeof(buffer),
