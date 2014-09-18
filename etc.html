@@ -8,7 +8,7 @@
     <div class="TitlePanel">
         <div class="TitleHeader">
             <img src="Title.png"/>
-            <div class="TitleVersion">0.4.3 <b style="color:red">BETA</b></div>
+            <div class="TitleVersion">0.5.0 <b style="color:red">BETA</b></div>
         </div>
         <div class="TitleDescription">
             Game Cursor Changer
@@ -24,6 +24,14 @@
     <div class="Panel" style="top:225px; left:70px; background-color:#08f;">
         <div class="Header" style="width:50%; background-color:#06e;">
             Change Log
+        </div>
+        <div class="Section">
+            0.5.0
+            <li/> 64 bit game support. examples include HotS and WoW (if configured for 64bit in battle.net client)
+            <li/> changed injection to CreateRemoteThread method to accomodate 64 bit support. this also fixed several bugs.
+            <li/> improved support for World of Warcraft and any other games that depend on SetClassLong to change cursors.
+            <li/> increased number of different cursors that can be bound per game from 10 to 200.
+            <li/> added a new color negative cursor #6 and removed the old cursor #8.
         </div>
         <div class="Section">
             0.4.3
@@ -60,7 +68,7 @@
     </div>
 
     <!-- comms -->
-    <div class="Panel" style="top:130px; left:570px; background-color:#c08;">
+    <div class="Panel" style="top:80px; left:570px; background-color:#c08;">
         <div class="Header" style="width:50%; background-color:#a06;">
             Comms
         </div>

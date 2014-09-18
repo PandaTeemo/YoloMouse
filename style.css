@@ -7,7 +7,6 @@
     position: relative;
     color: #fff;
     font-family: Arial;
-    font-size: 14px;
 }
 
 body
@@ -22,6 +21,11 @@ body
 table
 {
     border-spacing: 0;
+}
+
+table, div
+{
+    font-size: 14px;
 }
 
 a:link, a:visited
@@ -47,19 +51,6 @@ a:link, a:visited
 
 .ListContent
 {
-}
-
-/*---------------------------------------------------------------------------*/
-.Button
-{
-    padding: 3px 20px 3px 20px;
-    background-color:#f70;
-    box-shadow: 2px 2px 0px rgba(0,0,0,.3);
-    text-shadow: 0 1px 0 rgba(0,0,0,.3);
-}
-.Button:hover
-{
-    background-color: #f08;
 }
 
 /*---------------------------------------------------------------------------*/
