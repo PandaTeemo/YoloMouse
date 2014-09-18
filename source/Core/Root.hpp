@@ -38,6 +38,13 @@ namespace Core
     extern void ExceptionMessage( const char* message, const char *file, unsigned line );
     #define eggs(x) ((x) ? (void)0 : ExceptionMessage(#x, __FILE__, __LINE__))
 
+    /**/
+    #if 0
+        #define xlog(...) ((void)0)
+    #else
+        #define xlog Core::Debug::Log
+    #endif
+
     // forward declarations
     template<typename TYPE> class Enum;
 }

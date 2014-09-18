@@ -174,10 +174,10 @@ namespace Core
         }
 
         /**/
-        TYPE& Add()
+        Iterator Add()
         {
             xassert(_count < _limit);
-            return _memory[_count++];
+            return _memory + _count++;
         }
         void Add( const TYPE& value )
         {

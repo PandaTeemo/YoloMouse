@@ -54,7 +54,7 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     HCURSOR SharedState::GetCursor( Index cursor_index )
     {
-        return _memory->cursors[_memory->size][cursor_index];
+        return reinterpret_cast<HCURSOR>(_memory->cursors[_memory->size][cursor_index]);
     }
 
     CursorSize SharedState::GetCursorSize() const
@@ -75,7 +75,7 @@ namespace YoloMouse
 
         // for each cursor
         for( Index i = 0; i < cursors.GetCount(); ++i )
-            if(hcursor == cursors[i])
+            if(hcursor == reinterpret_cast<HCURSOR>(cursors[i]))
                 return i;
 
         return INVALID_INDEX;
@@ -114,7 +114,7 @@ namespace YoloMouse
                         loadimage_flags |= LR_DEFAULTSIZE;
 
                     // load shared cursor
-                    cursors[cursor_index] = (HCURSOR)LoadImage(NULL, path, IMAGE_CURSOR, 0, 0, loadimage_flags);
+                    cursors[cursor_index] = reinterpret_cast<Byte8>(LoadImage(NULL, path, IMAGE_CURSOR, 0, 0, loadimage_flags));
 
                     // break if successful
                     if( cursors[cursor_index] )

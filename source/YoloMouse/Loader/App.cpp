@@ -31,9 +31,6 @@ namespace YoloMouse
         // start shared state
         _StartState();
 
-        // start loader
-        _StartLoader();
-
         // start ui
         _StartUi();
 
@@ -60,9 +57,6 @@ namespace YoloMouse
 
         // stop ui
         _StopUi();
-
-        // stop loader
-        _StopLoader();
 
         // stop state
         _StopState();
@@ -96,12 +90,6 @@ namespace YoloMouse
 
         // start input monitor
         eggs(_input_monitor.Start());
-    }
-
-    void App::_StartLoader()
-    {
-        // start loader
-        eggs(_loader.Start());
     }
 
     void App::_StartOptions()
@@ -170,11 +158,6 @@ namespace YoloMouse
 
         // stop system events
         _input_monitor.Stop();
-    }
-
-    void App::_StopLoader()
-    {
-        _loader.Stop();
     }
 
     void App::_StopOptions()
@@ -272,7 +255,7 @@ namespace YoloMouse
             if(_loader.IsLoaded(hwnd))
             {
                 // notify target to refresh
-                _loader.NotifyRefresh(hwnd);
+                return _loader.Notify(hwnd, NOTIFY_REFRESH);
             }
         }
 
@@ -292,9 +275,7 @@ namespace YoloMouse
             return false;
 
         // notify target
-        _loader.NotifyAssign(hwnd, cursor_index);
-
-        return true;
+        return _loader.Notify(hwnd, NOTIFY_ASSIGN, cursor_index);
     }
 
     //-------------------------------------------------------------------------
@@ -328,7 +309,7 @@ namespace YoloMouse
         if( _loader.IsLoaded(hwnd) )
         {
             // notify target to refresh
-            _loader.NotifyRefresh(hwnd);
+            _loader.Notify(hwnd, NOTIFY_REFRESH);
         }
         else
         {

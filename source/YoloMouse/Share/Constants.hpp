@@ -6,16 +6,16 @@ namespace YoloMouse
 {
     // enums
     //-------------------------------------------------------------------------
-    enum
+    enum NotifyId
     {
-        WMYOLOMOUSE_INIT =      WM_USER + 0,
-        WMYOLOMOUSE_ASSIGN =    WM_USER + 1,
-        WMYOLOMOUSE_REFRESH =   WM_USER + 2,
+        NOTIFY_INIT,
+        NOTIFY_ASSIGN,
+        NOTIFY_REFRESH,
     };
 
     enum
     {
-        // these should match SHARED_CURSOR_LIMIT
+        // number of SETTING_CURSORKEY_# should match SHARED_CURSOR_LIMIT
         SETTING_CURSORKEY_1,
         SETTING_CURSORKEY_2,
         SETTING_CURSORKEY_3,
@@ -52,25 +52,27 @@ namespace YoloMouse
 
     // numeric
     //-------------------------------------------------------------------------
-    static const ULong CURSOR_MAPPING_LIMIT =       10;
+    static const ULong CURSOR_MAPPING_LIMIT =       200;
     static const ULong LOADER_ACTIVE_LIMIT =        100;
     static const ULong SHARED_CURSOR_LIMIT =        9;
 
     // strings
     //-------------------------------------------------------------------------
     extern const WCHAR* APP_MENU_STRINGS[];
-    static const WCHAR* APP_NAME =                   L"YoloMouse";
-    static const Char*  APP_NAMEC =                  "YoloMouse";
+    static const WCHAR* APP_NAME =                  L"YoloMouse";
+    static const Char*  APP_NAMEC =                 "YoloMouse";
 
-    static const WCHAR* PATH_LOADER =                L"YoloMouse.exe";
-    static const WCHAR* PATH_DLL32 =                 L"YoloDll32.dll";
-    static const WCHAR* PATH_DLL64 =                 L"YoloDll64.dll";
-    static const WCHAR* PATH_SETTINGS_NAME =         L"Settings";
-    static const WCHAR* PATH_CURSORS =               L"Cursors";
+    static const WCHAR* PATH_LOADER =               L"YoloMouse.exe";
+    static const CHAR*  PATH_DLL32 =                "Yolo32.dll";
+    static const CHAR*  PATH_DLL64 =                "Yolo64.dll";
+    static const WCHAR* PATH_SETTINGS_NAME =        L"Settings";
+    static const WCHAR* PATH_CURSORS =              L"Cursors";
     extern const WCHAR* PATH_CURSORS_SIZE[];
 
-    static const WCHAR* IPC_MUTEX_NAME =             L"YoloMouseMutex";
-    static const WCHAR* IPC_MEMORY_NAME =            L"YoloMouseMemory";
+    static const CHAR*  INJECT_NOTIFY_FUNCTION =    "YoloNotify";
+
+    static const WCHAR* IPC_MUTEX_NAME =            L"YoloMouseMutex";
+    static const WCHAR* IPC_MEMORY_NAME =           L"YoloMouseMemory";
 
     // settings
     //-------------------------------------------------------------------------
@@ -78,5 +80,5 @@ namespace YoloMouse
 
     // etc
     //-------------------------------------------------------------------------
-    static HCURSOR CURSOR_SPECIAL_EMPTY =           (HCURSOR)0xdeadbeef;
+    static HCURSOR CURSOR_SPECIAL_EMPTY = (HCURSOR)0xdeadbeef;
 }

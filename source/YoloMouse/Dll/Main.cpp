@@ -1,29 +1,30 @@
 #include <YoloMouse/Dll/CursorHook.hpp>
+#include <YoloMouse/Share/NotifyMessage.hpp>
+using namespace YoloMouse;
 
 // exports
 //-----------------------------------------------------------------------------
-LRESULT __declspec(dllexport) CALLBACK
-OnHookProc(int nCode, WPARAM wParam, LPARAM lParam)
+void __declspec(dllexport)
+YoloNotify( void* arg )
 {
-    CWPSTRUCT& m = *(CWPSTRUCT*)lParam;
+    NotifyMessage&  m = *reinterpret_cast<NotifyMessage*>(arg);
+    HWND            hwnd = reinterpret_cast<HWND>(m.hwnd);
 
-    // intercept messages
-    switch(m.message)
+    // handle notify
+    switch(m.id)
     {
-    case YoloMouse::WMYOLOMOUSE_INIT:
-        YoloMouse::CursorHook::Load(m.hwnd);
-        return 0;
+    case NOTIFY_INIT:
+        CursorHook::Load(hwnd);
+        break;
 
-    case YoloMouse::WMYOLOMOUSE_ASSIGN:
-        YoloMouse::CursorHook::Assign(m.hwnd, (Core::Index)m.wParam);
-        return 0;
+    case NOTIFY_ASSIGN:
+        CursorHook::Assign(hwnd, static_cast<Index>(m.parameter));
+        break;
 
-    case YoloMouse::WMYOLOMOUSE_REFRESH:
-        YoloMouse::CursorHook::Refresh(m.hwnd);
-        return 0;
+    case NOTIFY_REFRESH:
+        CursorHook::Refresh(hwnd);
+        break;
     }
-
-    return CallNextHookEx(NULL, nCode, wParam, lParam);
 }
 
 // platform
@@ -34,7 +35,7 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
     switch(fdwReason)
     {
     case DLL_PROCESS_DETACH:
-        YoloMouse::CursorHook::Unload();
+        CursorHook::Unload();
         break;
     }
 

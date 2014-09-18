@@ -28,6 +28,7 @@
     <ClInclude Include="..\..\source\YoloMouse\Share\SharedTools.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\Root.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\SharedState.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Share\NotifyMessage.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

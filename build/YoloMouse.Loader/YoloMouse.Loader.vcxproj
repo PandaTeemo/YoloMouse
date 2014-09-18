@@ -113,6 +113,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -172,6 +173,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
       <Project>{02002f1c-398a-4184-aa6d-f49085d14c0e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Snoopy\Snoopy.vcxproj">
+      <Project>{987fb53c-12e6-4310-ac56-021c1165839e}</Project>
     </ProjectReference>
     <ProjectReference Include="..\YoloMouse.Share\YoloMouse.Share.vcxproj">
       <Project>{ee756497-8afe-4fa4-8dd0-049d73b95321}</Project>

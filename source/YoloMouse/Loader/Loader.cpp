@@ -5,10 +5,6 @@
 
 namespace YoloMouse
 {
-    // constants
-    //-------------------------------------------------------------------------
-    static const Char* _HOOKPROC_NAME = "?OnHookProc@@YGJHIJ@Z";
-
     // TargetState.Mapping
     //-------------------------------------------------------------------------
     Bool Loader::Active::operator==( HWND hwnd ) const
@@ -18,10 +14,15 @@ namespace YoloMouse
 
     // public
     //-------------------------------------------------------------------------
-    Loader::Loader():
-        _dll            (NULL),
-        _hook_function  (NULL)
+    Loader::Loader()
     {
+    }
+
+    Loader::~Loader()
+    {
+        // unload all
+        for( ActiveIterator active = _actives.Begin(); active != _actives.End(); ++active )
+            _UnloadActive(*active);
     }
 
     //-------------------------------------------------------------------------
@@ -31,14 +32,8 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool Loader::IsStarted() const
-    {
-        return _hook_function != NULL;
-    }
-
     Bool Loader::IsLoaded( HWND hwnd ) const
     {
-        xassert(IsStarted());
         return _actives.Find(hwnd) != NULL;
     }
 
@@ -60,87 +55,57 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool Loader::Start()
-    {
-        xassert(!IsStarted());
-        xassert(_dll == NULL);
-        xassert(_hook_function == NULL);
-
-        // load dll
-        _dll = LoadLibrary(PATH_DLL32);
-        if(_dll)
-        {
-            // get hook proc
-            _hook_function = (HOOKPROC)GetProcAddress(_dll, _HOOKPROC_NAME);
-            if(_hook_function)
-                return true;
-        }
-
-        return false;
-    }
-
-    void Loader::Stop()
-    {
-        xassert(IsStarted());
-        xassert(_dll);
-
-        // unload all
-        for( ActiveIterator active = _actives.Begin(); active != _actives.End(); ++active )
-            UnhookWindowsHookEx(active->_hook);
-
-        // free dll
-        FreeLibrary(_dll);
-
-        // reset state
-        _dll = NULL;
-        _hook_function = NULL;
-        _actives.Empty();
-    }
-
-    //-------------------------------------------------------------------------
     Bool Loader::Load( HWND hwnd )
     {
-        xassert(IsStarted());
         xassert(!IsLoaded(hwnd));
         DWORD process_id;
 
         // get thread id
         DWORD thread_id = GetWindowThreadProcessId(hwnd, &process_id);
 
-        // get process bitness
-        Bitness bitness = SystemTools::GetProcessBitness(process_id);
+        // choose inject dll
+        const Char* inject_dll = _ChooseInjectDll(process_id);
+        eggs(inject_dll);
 
-        //TODO: handle 64bit
-        if( bitness != BITNESS_32 )
-            return false;
+        // create injector
+        Injector* injector = new Injector;
+        eggs(injector);
 
-        // set hook
-        HHOOK hook = SetWindowsHookEx(WH_CALLWNDPROC, _hook_function, _dll, thread_id);
-        if( hook == NULL )
-            return false;
+        // set notify name
+        injector->SetNotifyName(INJECT_NOTIFY_FUNCTION);
 
-        // add to active list
-        Active& active = _actives.Add();
-        active._hook = hook;
-        active._hwnd = hwnd;
+        // load
+        if(injector->Load(process_id, inject_dll) && !_actives.IsFull())
+        {
+            ActiveIterator active = _actives.Add();
 
-        // notify init and pass hash
-        SendMessage(hwnd, WMYOLOMOUSE_INIT, 0, 0);
+            // add to active list
+            active->_hwnd = hwnd;
+            active->_injector = injector;
 
-        return true;
+            // notify init
+            if( Notify(hwnd, NOTIFY_INIT) )
+                return true;
+
+            // remove
+            _actives.PopSwap(active);
+        }
+
+        // cleanup
+        delete injector;
+
+        return false;
     }
 
     Bool Loader::Unload( HWND hwnd )
     {
-        xassert(IsStarted());
-
         // find active entry
         ActiveIterator active = _actives.Find(hwnd);
         if( active == NULL )
             return false;
 
-        // remove hook
-        UnhookWindowsHookEx(active->_hook);
+        // unload active entry
+        _UnloadActive(*active);
 
         // remove active
         _actives.PopSwap(active);
@@ -149,15 +114,47 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    void Loader::NotifyAssign( HWND hwnd, Index cursor_index )
+    Bool Loader::Notify( HWND hwnd, NotifyId id, Byte8 parameter )
     {
-        xassert(IsLoaded(hwnd));
-        SendMessage(hwnd, WMYOLOMOUSE_ASSIGN, (WPARAM)cursor_index, 0);
+        NotifyMessage m;
+
+        // locate active entry
+        ActiveIterator active = _actives.Find(hwnd);
+        if(active == NULL)
+            return false;
+
+        // build message
+        m.id = id;
+        m.hwnd = reinterpret_cast<Byte8>(hwnd);
+        m.parameter = parameter;
+
+        // call remote notify handler
+        return active->_injector->CallNotify(&m, sizeof(m));
     }
 
-    void Loader::NotifyRefresh( HWND hwnd )
+    // private
+    //-------------------------------------------------------------------------
+    void Loader::_UnloadActive( Active& active )
     {
-        xassert(IsLoaded(hwnd));
-        SendMessage(hwnd, WMYOLOMOUSE_REFRESH, 0, 0);
+        // unload injected dll
+        active._injector->Unload();
+
+        // destroy injector
+        delete active._injector;
+    }
+
+    //-------------------------------------------------------------------------
+    const CHAR* Loader::_ChooseInjectDll( DWORD process_id )
+    {
+        // get process bitness
+        Bitness bitness = SystemTools::GetProcessBitness(process_id);
+
+        // choose dll
+        if( bitness == BITNESS_32 )
+            return PATH_DLL32;
+        if( bitness == BITNESS_64 )
+            return PATH_DLL64;
+
+        return NULL;
     }
 }

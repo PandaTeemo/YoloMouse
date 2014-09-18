@@ -5,19 +5,24 @@ namespace YoloMouse
 {
     // private
     //-------------------------------------------------------------------------
-    Bool            CursorHook::_active         (false);
-    CursorBindings  CursorHook::_bindings;
-    HCURSOR         CursorHook::_last_cursor    (NULL);
-    HCURSOR         CursorHook::_replace_cursor (NULL);
+    Bool                CursorHook::_active             (false);
+    CursorBindings      CursorHook::_bindings;
+    HCURSOR             CursorHook::_last_cursor        (NULL);
+    HCURSOR             CursorHook::_replace_cursor     (NULL);
+    CursorHook::Method  CursorHook::_method             (CursorHook::METHOD_SETCURSOR);
 
-    WCHAR           CursorHook::_target_id      [STRING_PATH_SIZE];
-    Bool            CursorHook::_assign_ready   (false);
-    Index           CursorHook::_assign_index   (INVALID_INDEX);
-    Bool            CursorHook::_refresh_ready  (false);
+    WCHAR               CursorHook::_target_id          [STRING_PATH_SIZE];
+    Bool                CursorHook::_assign_ready       (false);
+    Index               CursorHook::_assign_index       (INVALID_INDEX);
+    Bool                CursorHook::_refresh_ready      (false);
 
-    SharedState&    CursorHook::_state =        SharedState::Instance();
-    Hook            CursorHook::_hook_setcursor (SetCursor, CursorHook::_OnSetCursor, Hook::BEFORE);
-    //Hook          CursorHook::_hook_getcursor (GetCursor, CursorHook::_OnGetCursor, Hook::AFTER);
+    SharedState&        CursorHook::_state =            SharedState::Instance();
+    Hook                CursorHook::_hook_setcursor     (SetCursor, CursorHook::_OnSetCursor, Hook::BEFORE);
+#ifdef _WIN64
+    Hook                CursorHook::_hook_setclasslong  (SetClassLongPtrA, CursorHook::_OnSetClassLong, Hook::BEFORE);
+#else
+    Hook                CursorHook::_hook_setclasslong  (SetClassLongA, CursorHook::_OnSetClassLong, Hook::BEFORE);
+#endif
 
      // public
     //-------------------------------------------------------------------------
@@ -32,7 +37,7 @@ namespace YoloMouse
             return;
 
         // enable hooks
-        if( !_hook_setcursor.Init() )//|| !_hook_getcursor.Init())
+        if( !_hook_setcursor.Init() )
             return;
 
         // activate
@@ -43,11 +48,15 @@ namespace YoloMouse
             return;
 
         // enable hooks
-        if(!_hook_setcursor.Enable() )//|| !_hook_getcursor.Enable())
+        if(!_hook_setcursor.Enable() )
             return;
 
         // load cursor map from file
         _bindings.Load(_target_id);
+
+        // enable optional hooks
+        if(_hook_setclasslong.Init())
+            _hook_setclasslong.Enable();
 
         // refresh cursor
         Refresh(hwnd);
@@ -62,9 +71,9 @@ namespace YoloMouse
         // unload state
         _state.Close();
 
-        // disable hook
+        // disable hooks
+        _hook_setclasslong.Disable();
         _hook_setcursor.Disable();
-        //_hook_getcursor.Disable();
 
         // deactivate
         _assign_index = INVALID_INDEX;
@@ -91,6 +100,13 @@ namespace YoloMouse
         // get last cursor
         HCURSOR refresh_cursor = _last_cursor;
 
+        // get current and window threads
+        DWORD hwnd_thread_id = GetWindowThreadProcessId(hwnd, 0);
+        DWORD current_thread_id = GetCurrentThreadId();
+
+        // attach to window thread. this is to make GetCursor and SetCursor work properly
+        AttachThreadInput(hwnd_thread_id, current_thread_id, TRUE);
+
         // if does not exist
         if( refresh_cursor == NULL )
         {
@@ -99,17 +115,36 @@ namespace YoloMouse
 
             // cannot be yolomouse cursor
             if( _state.FindCursor(refresh_cursor) != INVALID_INDEX )
+            {
+                AttachThreadInput(hwnd_thread_id, current_thread_id, FALSE);
                 return;
+            }
         }
 
         // set refresh state
         _refresh_ready = true;
-            
-        // set current cursor to force update
-        SetCursor(refresh_cursor);
 
-        // then trigger application to call SetCursor with its own cursor
-        PostMessage(hwnd, WM_SETCURSOR, (WPARAM)hwnd, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
+        // refresh according to method
+        if( _method == METHOD_SETCLASSLONG )
+        {
+            // set current cursor to force update
+        #ifdef _WIN64
+            SetClassLongPtrA(hwnd, GCLP_HCURSOR, (LONG_PTR)refresh_cursor);
+        #else
+            SetClassLongA(hwnd, GCL_HCURSOR, (LONG)refresh_cursor);
+        #endif
+        }
+        else
+        {
+            // set current cursor to force update
+            SetCursor(refresh_cursor);
+
+            // then trigger application to call SetCursor with its own cursor
+            SendMessage(hwnd, WM_SETCURSOR, (WPARAM)hwnd, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
+        }
+
+        // detach from window thread
+        AttachThreadInput(hwnd_thread_id, current_thread_id, FALSE);
     }
 
     // private
@@ -125,7 +160,7 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool CursorHook::_OnSetCursorAssign( HCURSOR hcursor, Index cursor_index )
+    Bool CursorHook::_OnCursorAssign( HCURSOR hcursor, Index cursor_index )
     {
         // cannot be yolomouse cursor
         if( _state.FindCursor(hcursor) != INVALID_INDEX )
@@ -174,7 +209,7 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool CursorHook::_OnSetCursorChange( HCURSOR hcursor )
+    Bool CursorHook::_OnCursorChanging( HCURSOR hcursor )
     {
         // cannot be yolomouse cursor
         if( _state.FindCursor(hcursor) != INVALID_INDEX )
@@ -187,7 +222,7 @@ namespace YoloMouse
         if( cursor_hash == 0 )
             return false;
 
-        // reset replace cursor
+        // reset replacement cursor
         _replace_cursor = NULL;
 
         // find cursor mapping
@@ -204,20 +239,17 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    VOID HOOK_CALL CursorHook::_OnSetCursor( x86::Registers registers )
+    Bool CursorHook::_OnCursorEvent( HCURSOR& new_cursor, HCURSOR old_cursor )
     {
-        xassert(_active);
-        HCURSOR hcursor = *(HCURSOR*)(registers.esp + 4);
-
         // adapt cursor
-        hcursor = _AdaptCursor(hcursor);
+        old_cursor = _AdaptCursor(old_cursor);
 
         // if cursor changing set refresh state
-        if( hcursor != _last_cursor )
+        if( old_cursor != _last_cursor )
             _refresh_ready = true;
 
         // set new last cursor
-        _last_cursor = hcursor;
+        _last_cursor = old_cursor;
 
         // if assigning new cursor
         if( _assign_ready )
@@ -226,8 +258,8 @@ namespace YoloMouse
             _assign_ready = false;
 
             // handle cursor assign
-            if(!_OnSetCursorAssign(hcursor, _assign_index))
-                return;
+            if(!_OnCursorAssign(old_cursor, _assign_index))
+                return false;
 
             // set refresh state
             _refresh_ready = true;
@@ -240,20 +272,41 @@ namespace YoloMouse
             _refresh_ready = false;
 
             // handle cursor change
-            if(!_OnSetCursorChange(hcursor))
-                return;
+            if(!_OnCursorChanging(old_cursor))
+                return false;
         }
 
-        // replace hcursor parameter before call to SetCursor
-        if( _replace_cursor )
-            *(HCURSOR*)(registers.esp + 4) = _replace_cursor;
+        // fail if no replacement
+        if( _replace_cursor == NULL )
+            return false;
+        
+        // return replacement cursor
+        new_cursor = _replace_cursor;
+        return true;
     }
-    /*
-    VOID HOOK_CALL CursorHook::_OnGetCursor( volatile x86::Registers registers )
+    //-------------------------------------------------------------------------
+    VOID HOOK_CALL CursorHook::_OnSetCursor( Native* arguments )
     {
-        // replace the return value of GetCursor with last called parameter to SetCursor
-        if( _last_cursor != NULL )
-            registers.eax = (Byte4)_last_cursor;
+        xassert(_active);
+
+        // update cursor
+        _OnCursorEvent((HCURSOR&)arguments[1], (HCURSOR)arguments[1]);
     }
-    */
+
+    VOID HOOK_CALL CursorHook::_OnSetClassLong( Native* arguments )
+    {
+        // if changing cursor
+    #ifdef _WIN64
+        if((int)arguments[2] == GCLP_HCURSOR)
+    #else
+        if((int)arguments[2] == GCL_HCURSOR)
+    #endif
+        {
+            // change method
+            _method = METHOD_SETCLASSLONG;
+
+            // update cursor
+            _OnCursorEvent((HCURSOR&)arguments[3], (HCURSOR)arguments[3]);
+        }
+    }
 }

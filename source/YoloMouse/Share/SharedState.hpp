@@ -11,8 +11,8 @@ namespace YoloMouse
         public Singleton<SharedState>
     {
     private:
-        /**/
-        typedef FlatArray<HCURSOR, SHARED_CURSOR_LIMIT>     CursorArray;
+        // array of HCURSOR handles casted to a 64bit value for 32/64 bit coexistence
+        typedef FlatArray<Byte8, SHARED_CURSOR_LIMIT>       CursorArray;
         typedef FlatArray<CursorArray, CURSOR_SIZE_COUNT>   CursorTable;
 
         /**/

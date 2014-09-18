@@ -1,6 +1,8 @@
 #pragma once
 #include <Core/Container/Array.hpp>
+#include <Snoopy/Inject/Injector.hpp>
 #include <YoloMouse/Share/Constants.hpp>
+#include <YoloMouse/Share/NotifyMessage.hpp>
 
 namespace YoloMouse
 {
@@ -8,10 +10,11 @@ namespace YoloMouse
     class Loader
     {
     private:
+        /**/
         struct Active
         {
-            HWND    _hwnd;
-            HHOOK   _hook;
+            HWND        _hwnd;
+            Injector*   _injector;
 
             Bool operator==( HWND hwnd ) const;
         };
@@ -20,32 +23,33 @@ namespace YoloMouse
         typedef ActiveCollection::Iterator              ActiveIterator;
 
     private:
-        HMODULE             _dll;
-        HOOKPROC            _hook_function;
-        ActiveCollection    _actives;
+        // state
+        ActiveCollection _actives;
 
     public:
         /**/
         Loader();
+        ~Loader();
 
         /**/
         static HWND GetActiveTarget();
 
         /**/
-        Bool IsStarted() const;
         Bool IsLoaded( HWND hwnd ) const;
         Bool IsConfigured( HWND hwnd ) const;
-
-        /**/
-        Bool Start();
-        void Stop();
 
         /**/
         Bool Load( HWND hwnd );
         Bool Unload( HWND hwnd );
 
         /**/
-        void NotifyAssign( HWND hwnd, Index cursor_index );
-        void NotifyRefresh( HWND hwnd );
+        Bool Notify( HWND hwnd, NotifyId id, Byte8 parameter=0 );
+
+    private:
+        /**/
+        void _UnloadActive( Active& active );
+
+        /**/
+        const CHAR* _ChooseInjectDll( DWORD process_id );
     };
 }

@@ -12,16 +12,7 @@ namespace Core
         Short,UShort            2
         Long,ULong,Float        4
         Huge,UHuge,Double       8
-        Int,UInt                native
     */
-    typedef char                Int1;
-    typedef short               Int2;
-    typedef int                 Int4;
-    typedef long long           Int8;
-    typedef unsigned char       UInt1;
-    typedef unsigned short      UInt2;
-    typedef unsigned int        UInt4;
-    typedef unsigned long long  UInt8;
     typedef float               Real4;
     typedef double              Real8;
 
@@ -36,8 +27,6 @@ namespace Core
     typedef unsigned long long  UHuge;
     typedef float               Float;
     typedef double              Double;
-    typedef int                 Int;
-    typedef unsigned int        UInt;
 
     typedef Byte                Byte1;
     typedef UShort              Byte2;
@@ -49,6 +38,14 @@ namespace Core
     typedef ULong               Index;
     typedef void*               Handle;
     typedef Byte8               Hash;
+
+    #ifdef _WIN64
+        typedef Huge            Native;
+        typedef UHuge           UNative;
+    #else
+        typedef Long            Native;
+        typedef ULong           UNative;
+    #endif
 
     #ifdef PRECISION_DOUBLE
         typedef Double          Real;

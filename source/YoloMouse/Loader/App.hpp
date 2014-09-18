@@ -1,9 +1,8 @@
 #pragma once
-#include <Core/Support/Singleton.hpp>
 #include <Core/Support/Settings.hpp>
 #include <Core/Windows/InputMonitor.hpp>
-#include <Core/Windows/SystemMonitor.hpp>
 #include <Core/Windows/ShellUi.hpp>
+#include <Core/Windows/SystemMonitor.hpp>
 #include <YoloMouse/Share/SharedState.hpp>
 #include <YoloMouse/Loader/Loader.hpp>
 
@@ -11,7 +10,6 @@ namespace YoloMouse
 {
     /**/
     class App:
-        public Singleton<App>,
         public InputMonitor::IListener,
         public SystemMonitor::IListener,
         public ShellUi::IListener
@@ -20,7 +18,7 @@ namespace YoloMouse
         Loader          _loader;
         SharedState&    _state;
 
-        ShellUi&             _ui;
+        ShellUi&        _ui;
         InputMonitor    _input_monitor;
         SystemMonitor&  _system_monitor;
         Settings        _settings;
@@ -39,7 +37,6 @@ namespace YoloMouse
     private:
         /**/
         void _StartInput();
-        void _StartLoader();
         void _StartOptions();
         void _StartSettings();
         void _StartState();
@@ -48,7 +45,6 @@ namespace YoloMouse
 
         /**/
         void _StopInput();
-        void _StopLoader();
         void _StopOptions();
         void _StopSettings();
         void _StopState();

@@ -1,21 +1,31 @@
 #include <YoloMouse/Loader/App.hpp>
 #include <Core/Windows/SystemTools.hpp>
 
+#include <Snoopy/Inject/Injector.hpp>
+
 namespace YoloMouse
 {
     // testing
     //-------------------------------------------------------------------------
     /*
-    static VOID HOOK_CALL _OnHook( x86::Registers registers )
+    static VOID HOOK_CALL _OnHookSetCursor( HCURSOR cursor )
     {
     }
 
-    static void _test( HINSTANCE instance )
+    static VOID HOOK_CALL _OnHookSleep( Native* arguments )
     {
-        Hooks::Hook hook(Sleep, _OnHook);
+        xlog("TEST!\n");
+        //arguments[1] = 100;
+    }
+
+    static void _test1()
+    {
+        //Snoopy::Hook hook(Sleep, (x86::HookFunction)_OnHookSleep);
+        Snoopy::Hook hook(SetClassLongPtrA, (x86::HookFunction)_OnHookSleep);
         hook.Init();
         hook.Enable();
-        Sleep(100);
+        SetClassLongPtrA(0, -12, 123);
+        //Sleep(2000);
         hook.Disable();
     }
     //*/
@@ -25,8 +35,7 @@ namespace YoloMouse
     static void Main()
     {
         //xlog(NULL); system("del /Q C:\\Users\\Administrator\\AppData\\Local\\YoloMouse\\*.*");
-
-        App& app = App::Instance();
+        App app;
 
         // start
         app.Start();
@@ -47,11 +56,10 @@ int WINAPI WinMain(
     LPSTR       lpCmdLine,
     int         iCmdShow)
 {
-    //YoloMouse::_test(hInstance); return 0;
-
+    //YoloMouse::_test1(); return 0;
     using namespace Core;
     int status;
-    
+
     // create duplicate instance prevention mutex
     HANDLE instance_mutex = CreateMutex( NULL, TRUE, YoloMouse::IPC_MUTEX_NAME );
 

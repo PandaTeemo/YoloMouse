@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Hook">
+      <UniqueIdentifier>{49a5a845-f73e-4d1d-9120-a6dcc3d310e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Inject">
+      <UniqueIdentifier>{9a0468eb-7bf0-44fe-bed1-1782011d5922}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="X86">
+      <UniqueIdentifier>{38e646fa-f896-48fc-9a69-a08e3655eefa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="X86\hde">
+      <UniqueIdentifier>{7a093737-ea1b-4e91-bf83-75927eb433d2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\source\Snoopy\Hook\Hook.cpp">
+      <Filter>Hook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Snoopy\X86\hde\hde32.cpp">
+      <Filter>X86\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Snoopy\Inject\Injector.cpp">
+      <Filter>Inject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Snoopy\X86\hde\hde64.cpp">
+      <Filter>X86\hde</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Snoopy\X86\Assembly.cpp">
+      <Filter>X86</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\Snoopy\Hook\Hook.hpp">
+      <Filter>Hook</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Snoopy\X86\Types.hpp">
+      <Filter>X86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Snoopy\X86\Enums.hpp">
+      <Filter>X86</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Snoopy\X86\hde\hde32.hpp">
+      <Filter>X86\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Snoopy\X86\hde\table32.hpp">
+      <Filter>X86\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Snoopy\Root.hpp" />
+    <ClInclude Include="..\..\source\Snoopy\Inject\Injector.hpp">
+      <Filter>Inject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Snoopy\Constants.hpp" />
+    <ClInclude Include="..\..\source\Snoopy\X86\hde\hde64.hpp">
+      <Filter>X86\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Snoopy\X86\hde\table64.hpp">
+      <Filter>X86\hde</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Snoopy\X86\Assembly.hpp">
+      <Filter>X86</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

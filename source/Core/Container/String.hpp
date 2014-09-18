@@ -15,10 +15,6 @@ namespace Core
         BaseString()
         {
         }
-        BaseString( ULong count ):
-            ARRAY(count)
-        {
-        }
         BaseString( const Char* chars ):
             ARRAY(const_cast<Char*>(chars), Tools::CStrLen(chars))
         {
@@ -26,6 +22,13 @@ namespace Core
         BaseString( const Char* chars, ULong count ):
             ARRAY(const_cast<Char*>(chars), count)
         {
+        }
+
+        /**/
+        Char* GetZ()
+        {
+            xassert(_memory[_count] == 0);
+            return _memory;
         }
 
         /**/
@@ -91,13 +94,6 @@ namespace Core
             xassert(_count < _limit);
             Copy(chars, _count);
             _memory[_count] = 0;
-        }
-
-        /**/
-        static const BaseString& GetEmpty()
-        {
-            static BaseString empty("", 1);
-            return empty;
         }
     };
 

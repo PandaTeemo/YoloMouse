@@ -133,7 +133,7 @@ namespace Core
     Bool InputMonitor::CreateCombo( Id id, String format )
     {
         String  token;
-        Combo&  combo = _combos.Add();
+        Combo&  combo = *_combos.Add();
 
         // empty
         combo.keys.Empty();
