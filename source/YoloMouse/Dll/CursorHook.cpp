@@ -105,46 +105,47 @@ namespace YoloMouse
         DWORD current_thread_id = GetCurrentThreadId();
 
         // attach to window thread. this is to make GetCursor and SetCursor work properly
-        AttachThreadInput(hwnd_thread_id, current_thread_id, TRUE);
-
-        // if does not exist
-        if( refresh_cursor == NULL )
+        if( AttachThreadInput(hwnd_thread_id, current_thread_id, TRUE) )
         {
-            // get active windows cursor
-            refresh_cursor = GetCursor();
-
-            // cannot be yolomouse cursor
-            if( _state.FindCursor(refresh_cursor) != INVALID_INDEX )
+            // if does not exist
+            if( refresh_cursor == NULL )
             {
-                AttachThreadInput(hwnd_thread_id, current_thread_id, FALSE);
-                return;
+                // get active windows cursor
+                refresh_cursor = GetCursor();
+
+                // cannot be yolomouse cursor
+                if( _state.FindCursor(refresh_cursor) != INVALID_INDEX )
+                {
+                    AttachThreadInput(hwnd_thread_id, current_thread_id, FALSE);
+                    return;
+                }
             }
+
+            // set refresh state
+            _refresh_ready = true;
+
+            // refresh according to method
+            if( _method == METHOD_SETCLASSLONG )
+            {
+                // set current cursor to force update
+            #ifdef _WIN64
+                SetClassLongPtrA(hwnd, GCLP_HCURSOR, (LONG_PTR)refresh_cursor);
+            #else
+                SetClassLongA(hwnd, GCL_HCURSOR, (LONG)refresh_cursor);
+            #endif
+            }
+            else
+            {
+                // set current cursor to force update
+                SetCursor(refresh_cursor);
+
+                // then trigger application to call SetCursor with its own cursor
+                PostMessage(hwnd, WM_SETCURSOR, (WPARAM)hwnd, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
+            }
+
+            // detach from window thread
+            AttachThreadInput(hwnd_thread_id, current_thread_id, FALSE);
         }
-
-        // set refresh state
-        _refresh_ready = true;
-
-        // refresh according to method
-        if( _method == METHOD_SETCLASSLONG )
-        {
-            // set current cursor to force update
-        #ifdef _WIN64
-            SetClassLongPtrA(hwnd, GCLP_HCURSOR, (LONG_PTR)refresh_cursor);
-        #else
-            SetClassLongA(hwnd, GCL_HCURSOR, (LONG)refresh_cursor);
-        #endif
-        }
-        else
-        {
-            // set current cursor to force update
-            SetCursor(refresh_cursor);
-
-            // then trigger application to call SetCursor with its own cursor
-            SendMessage(hwnd, WM_SETCURSOR, (WPARAM)hwnd, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
-        }
-
-        // detach from window thread
-        AttachThreadInput(hwnd_thread_id, current_thread_id, FALSE);
     }
 
     // private

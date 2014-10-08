@@ -1,40 +1,12 @@
 #include <YoloMouse/Loader/App.hpp>
 #include <Core/Windows/SystemTools.hpp>
 
-#include <Snoopy/Inject/Injector.hpp>
-
 namespace YoloMouse
 {
-    // testing
-    //-------------------------------------------------------------------------
-    /*
-    static VOID HOOK_CALL _OnHookSetCursor( HCURSOR cursor )
-    {
-    }
-
-    static VOID HOOK_CALL _OnHookSleep( Native* arguments )
-    {
-        xlog("TEST!\n");
-        //arguments[1] = 100;
-    }
-
-    static void _test1()
-    {
-        //Snoopy::Hook hook(Sleep, (x86::HookFunction)_OnHookSleep);
-        Snoopy::Hook hook(SetClassLongPtrA, (x86::HookFunction)_OnHookSleep);
-        hook.Init();
-        hook.Enable();
-        SetClassLongPtrA(0, -12, 123);
-        //Sleep(2000);
-        hook.Disable();
-    }
-    //*/
-
     // main
     //-------------------------------------------------------------------------
     static void Main()
     {
-        //xlog(NULL); system("del /Q C:\\Users\\Administrator\\AppData\\Local\\YoloMouse\\*.*");
         App app;
 
         // start
