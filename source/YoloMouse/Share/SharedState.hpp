@@ -46,7 +46,8 @@ namespace YoloMouse
 
     private:
         /**/
-        void _LoadCursors();
-        void _UnloadCursors();
+        HCURSOR _LoadCursor( Index cursor_index, const WCHAR* base_path );
+        void    _LoadCursors();
+        void    _UnloadCursors();
     };
 }

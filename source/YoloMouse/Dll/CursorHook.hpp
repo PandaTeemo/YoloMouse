@@ -32,7 +32,8 @@ namespace YoloMouse
         // objects
         static SharedState&     _state;
         static Hook             _hook_setcursor;
-        static Hook             _hook_setclasslong;
+        static Hook             _hook_setclasslonga;
+        static Hook             _hook_setclasslongw;
 
     public:
         /**/
@@ -46,6 +47,10 @@ namespace YoloMouse
         static void Refresh( HWND hwnd );
 
     private:
+        /**/
+        static Bool _LoadHooks();
+        static void _UnloadHooks();
+
         /**/
         static HCURSOR _AdaptCursor( HCURSOR from );
     

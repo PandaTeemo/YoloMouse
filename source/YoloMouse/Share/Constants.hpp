@@ -25,6 +25,32 @@ namespace YoloMouse
         SETTING_CURSORKEY_7,
         SETTING_CURSORKEY_8,
         SETTING_CURSORKEY_9,
+        SETTING_CURSORKEY_10,
+        SETTING_CURSORKEY_11,
+        SETTING_CURSORKEY_12,
+        SETTING_CURSORKEY_13,
+        SETTING_CURSORKEY_14,
+        SETTING_CURSORKEY_15,
+        SETTING_CURSORKEY_16,
+        SETTING_CURSORKEY_17,
+        SETTING_CURSORKEY_18,
+        SETTING_CURSORKEY_19,
+        SETTING_CURSORKEY_20,
+        SETTING_CURSORKEY_21,
+        SETTING_CURSORKEY_22,
+        SETTING_CURSORKEY_23,
+        SETTING_CURSORKEY_24,
+        SETTING_CURSORKEY_25,
+        SETTING_CURSORKEY_26,
+        SETTING_CURSORKEY_27,
+        SETTING_CURSORKEY_28,
+        SETTING_CURSORKEY_29,
+        SETTING_CURSORKEY_30,
+        SETTING_CURSORKEY_31,
+        SETTING_CURSORKEY_32,
+        SETTING_CURSORKEY_33,
+        SETTING_CURSORKEY_34,
+        SETTING_CURSORKEY_35,
         SETTING_CURSORKEY_RESET,
         SETTING_CURSORKEY_SMALLER,
         SETTING_CURSORKEY_LARGER,
@@ -54,7 +80,7 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     static const ULong CURSOR_MAPPING_LIMIT =       200;
     static const ULong LOADER_ACTIVE_LIMIT =        100;
-    static const ULong SHARED_CURSOR_LIMIT =        9;
+    static const ULong SHARED_CURSOR_LIMIT =        35;
 
     // strings
     //-------------------------------------------------------------------------

@@ -13,7 +13,7 @@ namespace Core
         /**/
         static const ULong STATE_LIMIT =    0xff;
         static const ULong KEY_LIMIT =      4;
-        static const ULong COMBO_LIMIT =    20;
+        static const ULong COMBO_LIMIT =    50;
 
         /**/
         struct IListener

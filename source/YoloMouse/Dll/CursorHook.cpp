@@ -19,9 +19,11 @@ namespace YoloMouse
     SharedState&        CursorHook::_state =            SharedState::Instance();
     Hook                CursorHook::_hook_setcursor     (SetCursor, CursorHook::_OnSetCursor, Hook::BEFORE);
 #ifdef _WIN64
-    Hook                CursorHook::_hook_setclasslong  (SetClassLongPtrA, CursorHook::_OnSetClassLong, Hook::BEFORE);
+    Hook                CursorHook::_hook_setclasslonga (SetClassLongPtrA, CursorHook::_OnSetClassLong, Hook::BEFORE);
+    Hook                CursorHook::_hook_setclasslongw (SetClassLongPtrW, CursorHook::_OnSetClassLong, Hook::BEFORE);
 #else
-    Hook                CursorHook::_hook_setclasslong  (SetClassLongA, CursorHook::_OnSetClassLong, Hook::BEFORE);
+    Hook                CursorHook::_hook_setclasslonga (SetClassLongA, CursorHook::_OnSetClassLong, Hook::BEFORE);
+    Hook                CursorHook::_hook_setclasslongw (SetClassLongW, CursorHook::_OnSetClassLong, Hook::BEFORE);
 #endif
 
      // public
@@ -36,27 +38,19 @@ namespace YoloMouse
         if( !_state.Open(false) )
             return;
 
-        // enable hooks
-        if( !_hook_setcursor.Init() )
+        // load hooks
+        if( !_LoadHooks() )
             return;
-
-        // activate
-        _active = true;
 
         // build id string
         if( !SharedTools::BuildTargetId(_target_id, COUNT(_target_id), hwnd) )
             return;
 
-        // enable hooks
-        if(!_hook_setcursor.Enable() )
-            return;
-
         // load cursor map from file
         _bindings.Load(_target_id);
 
-        // enable optional hooks
-        if(_hook_setclasslong.Init())
-            _hook_setclasslong.Enable();
+        // activate
+        _active = true;
 
         // refresh cursor
         Refresh(hwnd);
@@ -71,9 +65,8 @@ namespace YoloMouse
         // unload state
         _state.Close();
 
-        // disable hooks
-        _hook_setclasslong.Disable();
-        _hook_setcursor.Disable();
+        // unload  hooks
+        _UnloadHooks();
 
         // deactivate
         _assign_index = INVALID_INDEX;
@@ -149,6 +142,36 @@ namespace YoloMouse
     }
 
     // private
+    //-------------------------------------------------------------------------
+    Bool CursorHook::_LoadHooks()
+    {
+        // init hooks
+        if( !_hook_setcursor.Init() )
+            return false;
+        if( !_hook_setclasslonga.Init() )
+            return false;
+        if( !_hook_setclasslongw.Init() )
+            return false;
+
+        // enable hooks
+        if( !_hook_setcursor.Enable() )
+            return false;
+        if( !_hook_setclasslonga.Enable() )
+            return false;
+        if( !_hook_setclasslongw.Enable() )
+            return false;
+
+        return true;
+    }
+
+    void CursorHook::_UnloadHooks()
+    {
+        // disable hooks
+        _hook_setclasslongw.Disable();
+        _hook_setclasslonga.Disable();
+        _hook_setcursor.Disable();
+    }
+
     //-------------------------------------------------------------------------
     HCURSOR CursorHook::_AdaptCursor( HCURSOR from )
     {
@@ -288,8 +311,6 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     VOID HOOK_CALL CursorHook::_OnSetCursor( Native* arguments )
     {
-        xassert(_active);
-
         // update cursor
         _OnCursorEvent((HCURSOR&)arguments[1], (HCURSOR)arguments[1]);
     }

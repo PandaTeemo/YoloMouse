@@ -282,7 +282,7 @@ namespace YoloMouse
     void App::OnKeyCombo( Id combo_id )
     {
         // change cursor
-        if( combo_id >= SETTING_CURSORKEY_1 && combo_id <= SETTING_CURSORKEY_9 )
+        if( combo_id >= SETTING_CURSORKEY_1 && combo_id <= SETTING_CURSORKEY_35 )
             _ReplaceCursor(combo_id - SETTING_CURSORKEY_1);
         // reset cursor
         else if( combo_id == SETTING_CURSORKEY_RESET )
