@@ -8,7 +8,7 @@
     <div class="TitlePanel">
         <div class="TitleHeader">
             <img src="Title.png"/>
-            <div class="TitleVersion">0.5.1 <b style="color:red">BETA</b></div>
+            <div class="TitleVersion">0.5.2 <b style="color:red">BETA</b></div>
         </div>
         <div class="TitleDescription">
             Game Cursor Changer
@@ -37,12 +37,12 @@
     </div>
 
     <!-- problems -->
-    <div class="Panel" style="width:400px; top:595px; left:110px; background-color:#80f;">
+    <div class="Panel" style="width:400px; top:585px; left:100px; background-color:#80f;">
         <div class="Header" style="background-color:#60d; width:50%;">
             Problems
         </div>
         <table>
-            <tr><td class="ListHeader">Windows DPI Scaling</td><td class="ListContent">Ensure <b><a href="https://www.google.com/?q=windows+dpi+scaling">windows dpi scaling</a></b> is OFF.</td></tr>
+            <tr><td class="ListHeader">Windows DPI Scaling</td><td class="ListContent">Ensure <b><a href="https://www.google.com/?q=windows+dpi+scaling">windows dpi scaling</a></b> is OFF. This only causes a problem with some games like Diablo 3.</td></tr>
             <tr><td class="ListHeader">Hardware Cursor</td><td class="ListContent">If the "hardware cursor" setting is available in your game, ensure it is ON. This is standard in all modern games.</td></tr>
         </table>
     </div>
@@ -56,6 +56,7 @@
             <tr><td class="ListHeader">Ctrl Shift Alt 1-9</td><td class="ListContent">Change active game cursor</td></tr>
             <tr><td class="ListHeader">Ctrl Shift Alt 0</td><td class="ListContent">Reset current cursor to the game's default</td></tr>
             <tr><td class="ListHeader">Ctrl Shift Alt - or =</td><td class="ListContent">Decrease or increase cursor size</td></tr>
+            <tr><td class="ListHeader">Ctrl Shift Alt A-Z</td><td class="ListContent">Additional cursor hotkeys</td></tr>
         </table>
     </div>
 
@@ -74,7 +75,7 @@
     </div>
 
     <!-- faq -->
-    <div class="Panel" style="width: 400px; top:505px; left:585px; background-color:#556;">
+    <div class="Panel" style="width: 400px; top:495px; left:615px; background-color:#556;">
         <div class="Header" style="background-color:#445; width:50%;">
             FAQ
         </div>
@@ -83,10 +84,22 @@
             <tr><td class="ListHeader">A</td><td class="ListContent">It hooks the OS part of game memory and intercepts call to SetCursor</td></tr>
             <tr><td class="ListHeader">Q</td><td class="ListContent">sounds like a BAN!</td></tr>
             <tr><td class="ListHeader">A</td><td class="ListContent">It does no more than what <a href="http://www.fraps.com/">FRAPS</a> does. If that wont get you banned this shouldnt either.</td></tr>
-            <tr><td class="ListHeader">Q</td><td class="ListContent">can I use my own cursors?</td></tr>
-            <tr><td class="ListHeader">A</td><td class="ListContent">copy your .CUR or .ANI files to <i>YoloMouse/Cursors/&lt;size&gt;/</i> and name them after the hotkey number then restart yolomouse.</td></tr>
-            <tr><td class="ListHeader">Q</td><td class="ListContent">I want to fiddle with settings!</td></tr>
-            <tr><td class="ListHeader">A</td><td class="ListContent">C:\Users\...\AppData\Local\YoloMouse\Settings.ini. then restart yolomouse.</td></tr>        </table>
+            <tr><td class="ListHeader">Q</td><td class="ListContent">I want to change hotkeys and other settings!</td></tr>
+            <tr><td class="ListHeader">A</td><td class="ListContent">C:\Users\...\AppData\Local\YoloMouse\Settings.ini. then restart yolomouse.</td></tr>
+        </table>
+    </div>
+
+    <!-- user cursors -->
+    <div class="Panel" style="width: 350px; top:755px; left:585px; background-color:#5b0;">
+        <div class="Header" style="background-color:#380; width:70%;">
+            Add Your Own Cursors
+        </div>
+        <table>
+            <tr><td class="ListHeader">1</td><td class="ListContent">Collect your .CUR or .ANI files and rename them to numbers between 1 and 35 (Example: 12.ANI).</td></tr>
+            <tr><td class="ListHeader">3</td><td class="ListContent">Copy them to YoloMouse/Cursors.</td></tr>
+            <tr><td class="ListHeader">4</td><td class="ListContent">Restart yolomouse.</td></tr>
+            <tr><td class="ListHeader">5</td><td class="ListContent">Test using <i>CTRL SHIFT ALT 1-9 or A-Z</i>. 1-9 is file 1 to 9, Q is 10, W is 11, E is 12...</td></tr>
+        </table>
     </div>
 
 </body>
