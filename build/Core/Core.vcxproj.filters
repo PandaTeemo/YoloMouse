@@ -13,7 +13,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Core\Constants.hpp" />
-    <ClInclude Include="..\..\source\Core\Macros.hpp" />
     <ClInclude Include="..\..\source\Core\Root.hpp" />
     <ClInclude Include="..\..\source\Core\Types.hpp" />
     <ClInclude Include="..\..\source\Core\Windows\InputMonitor.hpp">

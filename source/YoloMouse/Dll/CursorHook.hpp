@@ -37,23 +37,20 @@ namespace YoloMouse
 
     public:
         /**/
-        static void Load( HWND hwnd );
+        static Bool Load();
         static void Unload();
 
         /**/
-        static void Assign( HWND hwnd, Index cursor_index );
+        static Bool Assign( Index cursor_index );
 
         /**/
-        static void Refresh( HWND hwnd );
+        static Bool Refresh();
 
     private:
         /**/
         static Bool _LoadHooks();
         static void _UnloadHooks();
 
-        /**/
-        static HCURSOR _AdaptCursor( HCURSOR from );
-    
         /**/
         static Bool _OnCursorAssign( HCURSOR hcursor, Index cursor_index );
         static Bool _OnCursorChanging( HCURSOR hcursor );

@@ -7,9 +7,9 @@ namespace YoloMouse
 {
     // TargetState.Mapping
     //-------------------------------------------------------------------------
-    Bool Loader::Active::operator==( HWND hwnd ) const
+    Bool Loader::Active::operator==( DWORD process_id ) const
     {
-        return _hwnd == hwnd;
+        return this->process_id == process_id;
     }
 
     // public
@@ -26,24 +26,32 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    HWND Loader::GetActiveTarget()
+    DWORD Loader::GetActiveProcessId()
     {
-        return GetForegroundWindow();
+        DWORD process_id = 0;
+
+        // get active window
+        HWND hwnd = GetForegroundWindow();
+
+        // get process id
+        GetWindowThreadProcessId(hwnd, &process_id);
+
+        return process_id;
     }
 
     //-------------------------------------------------------------------------
-    Bool Loader::IsLoaded( HWND hwnd ) const
+    Bool Loader::IsLoaded( DWORD process_id ) const
     {
-        return _actives.Find(hwnd) != NULL;
+        return _actives.Find(process_id) != NULL;
     }
 
-    Bool Loader::IsConfigured( HWND hwnd ) const
+    Bool Loader::IsConfigured( DWORD process_id ) const
     {
         WCHAR save_path[STRING_PATH_SIZE];
         WCHAR target_id[STRING_PATH_SIZE];
 
         // build target id
-        if(! SharedTools::BuildTargetId( target_id, COUNT(target_id), hwnd ) )
+        if(! SharedTools::BuildTargetId( target_id, COUNT(target_id), process_id ) )
             return false;
 
         // build save path
@@ -55,17 +63,16 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool Loader::Load( HWND hwnd )
+    Bool Loader::Load( DWORD process_id )
     {
-        xassert(!IsLoaded(hwnd));
-        DWORD process_id;
-
-        // get thread id
-        DWORD thread_id = GetWindowThreadProcessId(hwnd, &process_id);
+        // ignore if already loaded
+        if( IsLoaded(process_id) )
+            return true;
 
         // choose inject dll
         const Char* inject_dll = _ChooseInjectDll(process_id);
-        eggs(inject_dll);
+        if( inject_dll == NULL )
+            return false;
 
         // create injector
         Injector* injector = new Injector;
@@ -80,11 +87,11 @@ namespace YoloMouse
             ActiveIterator active = _actives.Add();
 
             // add to active list
-            active->_hwnd = hwnd;
-            active->_injector = injector;
+            active->process_id = process_id;
+            active->injector = injector;
 
             // notify init
-            if( Notify(hwnd, NOTIFY_INIT) )
+            if( Notify(process_id, NOTIFY_INIT) )
                 return true;
 
             // remove
@@ -97,10 +104,10 @@ namespace YoloMouse
         return false;
     }
 
-    Bool Loader::Unload( HWND hwnd )
+    Bool Loader::Unload( DWORD process_id )
     {
         // find active entry
-        ActiveIterator active = _actives.Find(hwnd);
+        ActiveIterator active = _actives.Find(process_id);
         if( active == NULL )
             return false;
 
@@ -114,22 +121,21 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool Loader::Notify( HWND hwnd, NotifyId id, Byte8 parameter )
+    Bool Loader::Notify( DWORD process_id, NotifyId id, Byte8 parameter )
     {
         NotifyMessage m;
 
         // locate active entry
-        ActiveIterator active = _actives.Find(hwnd);
+        ActiveIterator active = _actives.Find(process_id);
         if(active == NULL)
             return false;
 
         // build message
         m.id = id;
-        m.hwnd = reinterpret_cast<Byte8>(hwnd);
         m.parameter = parameter;
 
         // call remote notify handler
-        return active->_injector->CallNotify(&m, sizeof(m));
+        return active->injector->CallNotify(&m, sizeof(m));
     }
 
     // private
@@ -137,10 +143,10 @@ namespace YoloMouse
     void Loader::_UnloadActive( Active& active )
     {
         // unload injected dll
-        active._injector->Unload();
+        active.injector->Unload();
 
         // destroy injector
-        delete active._injector;
+        delete active.injector;
     }
 
     //-------------------------------------------------------------------------

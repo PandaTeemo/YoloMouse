@@ -1,4 +1,5 @@
 #include <YoloMouse/Loader/App.hpp>
+#include <YoloMouse/Share/SharedTools.hpp>
 #include <Core/Windows/SystemTools.hpp>
 
 namespace YoloMouse
@@ -28,7 +29,6 @@ int WINAPI WinMain(
     LPSTR       lpCmdLine,
     int         iCmdShow)
 {
-    //YoloMouse::_test1(); return 0;
     using namespace Core;
     int status;
 
@@ -60,7 +60,7 @@ int WINAPI WinMain(
                 // catch eggs
                 catch( const Char* error )
                 {
-                    MessageBoxA(NULL, error, YoloMouse::APP_NAMEC, MB_OK|MB_ICONERROR);
+                    YoloMouse::SharedTools::ErrorMessage(error);
                     status = 1;
                 }
             }

@@ -11,9 +11,6 @@ namespace YoloMouse
         // NotifyId
         Byte8 id;
 
-        // target window handle
-        Byte8 hwnd;
-
         // additional parameter
         Byte8 parameter;
     };

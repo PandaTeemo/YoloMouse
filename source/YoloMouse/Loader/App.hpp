@@ -54,10 +54,10 @@ namespace YoloMouse
         /**/
         Bool _OptionAutoStart( Bool enable, Bool save );
         Bool _OptionHideMenu( Bool save );
-        Bool _OptionCursorSize( ULong size, Bool save );
 
         /**/
-        Bool _ReplaceCursor( Index cursor_index );
+        Bool _AssignCursor( Index cursor_index );
+        Bool _AssignSize( ULong size, Bool save );
 
         /**/
         void OnKeyCombo( Id combo_id );

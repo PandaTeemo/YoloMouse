@@ -28,23 +28,25 @@ namespace YoloMouse
 
      // public
     //-------------------------------------------------------------------------
-    void CursorHook::Load( HWND hwnd )
+    Bool CursorHook::Load()
     {
+        DWORD process_id = GetCurrentProcessId();
+
         // if not already active
         if( _active )
-            return;
+            return true;
+
+        // build id string
+        if( !SharedTools::BuildTargetId(_target_id, COUNT(_target_id), process_id) )
+            return false;
 
         // load state
         if( !_state.Open(false) )
-            return;
+            return false;
 
         // load hooks
         if( !_LoadHooks() )
-            return;
-
-        // build id string
-        if( !SharedTools::BuildTargetId(_target_id, COUNT(_target_id), hwnd) )
-            return;
+            return false;
 
         // load cursor map from file
         _bindings.Load(_target_id);
@@ -53,7 +55,9 @@ namespace YoloMouse
         _active = true;
 
         // refresh cursor
-        Refresh(hwnd);
+        Refresh();
+
+        return true;
     }
 
     void CursorHook::Unload()
@@ -75,26 +79,45 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    void CursorHook::Assign( HWND hwnd, Index cursor_index )
+    Bool CursorHook::Assign( Index cursor_index )
     {
-        xassert(_active);
+        // require active
+        if( !_active )
+            return false;
 
         // mark for update
         _assign_index = cursor_index;
         _assign_ready = true;
 
         // refresh cursor
-        Refresh(hwnd);
+        Refresh();
+
+        return true;
     }
 
     //-------------------------------------------------------------------------
-    void CursorHook::Refresh( HWND hwnd )
+    Bool CursorHook::Refresh()
     {
+        DWORD process_id;
+
+        // require active
+        if( !_active )
+            return false;
+
         // get last cursor
         HCURSOR refresh_cursor = _last_cursor;
 
-        // get current and window threads
-        DWORD hwnd_thread_id = GetWindowThreadProcessId(hwnd, 0);
+        // get active window
+        HWND hwnd = GetForegroundWindow();
+
+        // get thread and process id of this window
+        DWORD hwnd_thread_id = GetWindowThreadProcessId(hwnd, &process_id);
+
+        // require active window belongs to this process. otherwise dont bother refreshing.
+        if( process_id != GetCurrentProcessId() )
+            return false;
+
+        // get thread id of this thread (the one Loader's CreateRemoteThread created).
         DWORD current_thread_id = GetCurrentThreadId();
 
         // attach to window thread. this is to make GetCursor and SetCursor work properly
@@ -110,7 +133,7 @@ namespace YoloMouse
                 if( _state.FindCursor(refresh_cursor) != INVALID_INDEX )
                 {
                     AttachThreadInput(hwnd_thread_id, current_thread_id, FALSE);
-                    return;
+                    return false;
                 }
             }
 
@@ -139,6 +162,8 @@ namespace YoloMouse
             // detach from window thread
             AttachThreadInput(hwnd_thread_id, current_thread_id, FALSE);
         }
+
+        return true;
     }
 
     // private
@@ -170,17 +195,6 @@ namespace YoloMouse
         _hook_setclasslongw.Disable();
         _hook_setclasslonga.Disable();
         _hook_setcursor.Disable();
-    }
-
-    //-------------------------------------------------------------------------
-    HCURSOR CursorHook::_AdaptCursor( HCURSOR from )
-    {
-        // adapt null to special empty cursor
-        if(from == NULL)
-            return CURSOR_SPECIAL_EMPTY;
-        // else use given
-        else
-            return from;
     }
 
     //-------------------------------------------------------------------------
@@ -265,8 +279,9 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     Bool CursorHook::_OnCursorEvent( HCURSOR& new_cursor, HCURSOR old_cursor )
     {
-        // adapt cursor
-        old_cursor = _AdaptCursor(old_cursor);
+        // ignore null cursor
+        if( old_cursor == NULL )
+            return false;
 
         // if cursor changing set refresh state
         if( old_cursor != _last_cursor )

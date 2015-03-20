@@ -20,10 +20,6 @@ namespace YoloMouse
         if( hcursor == NULL )
             return 0;
 
-        // if special use handle as hash
-        if( hcursor == CURSOR_SPECIAL_EMPTY )
-            return reinterpret_cast<Hash>(hcursor) & 0xffffffff;
-
         // get icon info
         if( GetIconInfo(hcursor, &iconinfo) == FALSE )
             return 0;
@@ -46,14 +42,10 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool SharedTools::BuildTargetId( WCHAR* target_id, ULong limit, HWND hwnd )
+    Bool SharedTools::BuildTargetId( WCHAR* target_id, ULong limit, DWORD process_id )
     {
         static const ULong SLASH_LIMIT = 4;
-        Bool    status = false;
-        DWORD   process_id;
-
-        // get process id
-        GetWindowThreadProcessId(hwnd, &process_id);
+        Bool status = false;
 
         // get process
         HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, process_id);
@@ -132,5 +124,11 @@ namespace YoloMouse
             name) > 0);
 
         return true;
+    }
+
+    //-------------------------------------------------------------------------
+    void SharedTools::ErrorMessage( const Char* message )
+    {
+        MessageBoxA(NULL, message, APP_NAMEC, MB_OK|MB_ICONERROR);
     }
 }

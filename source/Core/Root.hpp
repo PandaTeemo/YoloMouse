@@ -39,11 +39,7 @@ namespace Core
     #define eggs(x) ((x) ? (void)0 : ExceptionMessage(#x, __FILE__, __LINE__))
 
     /**/
-    #if 0
-        #define xlog(...) ((void)0)
-    #else
-        #define xlog Core::Debug::Log
-    #endif
+    #define xlog Core::Debug::Log
 
     // forward declarations
     template<typename TYPE> class Enum;

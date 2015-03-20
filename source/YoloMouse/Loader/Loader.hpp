@@ -13,10 +13,10 @@ namespace YoloMouse
         /**/
         struct Active
         {
-            HWND        _hwnd;
-            Injector*   _injector;
+            DWORD       process_id;
+            Injector*   injector;
 
-            Bool operator==( HWND hwnd ) const;
+            Bool operator==( DWORD process_id ) const;
         };
 
         typedef FixedArray<Active, LOADER_ACTIVE_LIMIT> ActiveCollection;
@@ -32,18 +32,18 @@ namespace YoloMouse
         ~Loader();
 
         /**/
-        static HWND GetActiveTarget();
+        static DWORD GetActiveProcessId();
 
         /**/
-        Bool IsLoaded( HWND hwnd ) const;
-        Bool IsConfigured( HWND hwnd ) const;
+        Bool IsLoaded( DWORD process_id ) const;
+        Bool IsConfigured( DWORD process_id ) const;
 
         /**/
-        Bool Load( HWND hwnd );
-        Bool Unload( HWND hwnd );
+        Bool Load( DWORD process_id );
+        Bool Unload( DWORD process_id );
 
         /**/
-        Bool Notify( HWND hwnd, NotifyId id, Byte8 parameter=0 );
+        Bool Notify( DWORD process_id, NotifyId id, Byte8 parameter=0 );
 
     private:
         /**/

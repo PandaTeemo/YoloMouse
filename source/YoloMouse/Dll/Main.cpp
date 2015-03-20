@@ -7,22 +7,21 @@ using namespace YoloMouse;
 void __declspec(dllexport)
 YoloNotify( void* arg )
 {
-    NotifyMessage&  m = *reinterpret_cast<NotifyMessage*>(arg);
-    HWND            hwnd = reinterpret_cast<HWND>(m.hwnd);
+    NotifyMessage& m = *reinterpret_cast<NotifyMessage*>(arg);
 
     // handle notify
     switch(m.id)
     {
     case NOTIFY_INIT:
-        CursorHook::Load(hwnd);
+        CursorHook::Load();
         break;
 
     case NOTIFY_ASSIGN:
-        CursorHook::Assign(hwnd, static_cast<Index>(m.parameter));
+        CursorHook::Assign(static_cast<Index>(m.parameter));
         break;
 
     case NOTIFY_REFRESH:
-        CursorHook::Refresh(hwnd);
+        CursorHook::Refresh();
         break;
     }
 }

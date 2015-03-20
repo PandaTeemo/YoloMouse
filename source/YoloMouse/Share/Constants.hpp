@@ -103,8 +103,4 @@ namespace YoloMouse
     // settings
     //-------------------------------------------------------------------------
     extern Settings::KeyValueCollection SETTINGS_ITEMS;
-
-    // etc
-    //-------------------------------------------------------------------------
-    static HCURSOR CURSOR_SPECIAL_EMPTY = (HCURSOR)0xdeadbeef;
 }

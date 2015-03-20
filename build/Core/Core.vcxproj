@@ -22,7 +22,6 @@
     <ClInclude Include="..\..\source\Core\Constants.hpp" />
     <ClInclude Include="..\..\source\Core\Container\Array.hpp" />
     <ClInclude Include="..\..\source\Core\Container\String.hpp" />
-    <ClInclude Include="..\..\source\Core\Macros.hpp" />
     <ClInclude Include="..\..\source\Core\Root.hpp" />
     <ClInclude Include="..\..\source\Core\Support\Debug.hpp" />
     <ClInclude Include="..\..\source\Core\Support\Enum.hpp" />
