@@ -7,7 +7,7 @@ namespace Core
 {
     // public
     //-------------------------------------------------------------------------
-    Bitness SystemTools::GetProcessBitness( DWORD process_id )
+    Bitness SystemTools::GetProcessBitness( HANDLE process )
     {
         SYSTEM_INFO system_info;
 
@@ -23,14 +23,9 @@ namespace Core
             {
                 BOOL is_wow64;
 
-                // open process
-                HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, process_id);
-
                 // get wow64 (emulated 32) status
                 if( process==NULL || !IsWow64Process(process, &is_wow64) )
                     return BITNESS_UNKNOWN;
-
-                CloseHandle(process);
 
                 // if emulated then 32 else 64
                 return is_wow64 ? BITNESS_32 : BITNESS_64;
@@ -97,24 +92,5 @@ namespace Core
 
         Tools::StripFileName(path);
         return true;
-    }
-
-    Bool SystemTools::GetProcessDirectory( DWORD process_id, WCHAR* path, ULong limit )
-    {
-        // open process
-        HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, process_id);
-
-        // get wow64 (emulated 32) status
-        if( process==NULL )
-            return false;
-
-        Bool status = GetModuleFileNameEx( process, NULL, path, limit ) != 0;
-
-        CloseHandle(process);
-
-        if(status)
-            Tools::StripFileName(path);
-
-        return status;
     }
 }

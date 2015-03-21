@@ -26,7 +26,7 @@ namespace Core
 
     // strings
     //-------------------------------------------------------------------------
-    static const Char* DEBUG_PATH = "debug.log";
+    static const Char* DEBUG_PATH = "d:\\debug.log";
 
     // numeric
     //-------------------------------------------------------------------------

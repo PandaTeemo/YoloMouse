@@ -23,12 +23,6 @@ namespace Core
         {
             switch(event)
             {
-            case EVENT_OBJECT_CREATE:
-                _listener->OnWindowCreate(hwnd);
-                break;
-            case EVENT_OBJECT_DESTROY:
-                _listener->OnWindowDestroy(hwnd);
-                break;
             case EVENT_SYSTEM_FOREGROUND:
                 _listener->OnWindowFocus(hwnd);
                 break;
@@ -47,9 +41,7 @@ namespace Core
     Bool SystemMonitor::Start()
     {
         return 
-            SetWinEventHook(EVENT_OBJECT_CREATE,     EVENT_OBJECT_CREATE,     NULL, _WinEvent, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS) &&
-            SetWinEventHook(EVENT_OBJECT_DESTROY,    EVENT_OBJECT_DESTROY,    NULL, _WinEvent, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS) &&
-            SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, NULL, _WinEvent, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
+            SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, NULL, _WinEvent, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS) != 0;
     }
 
     //-------------------------------------------------------------------------

@@ -8,7 +8,7 @@ namespace Core
     {
     public:
         /**/
-        static Bitness GetProcessBitness( DWORD process_id );
+        static Bitness GetProcessBitness( HANDLE process );
 
         /**/
         static OsVersion GetOsVersion();
@@ -18,6 +18,5 @@ namespace Core
 
         /**/
         static Bool GetProcessDirectory( WCHAR* path, ULong limit );
-        static Bool GetProcessDirectory( DWORD process_id, WCHAR* path, ULong limit );
     };
 }

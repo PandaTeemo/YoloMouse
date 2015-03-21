@@ -10,8 +10,6 @@ namespace Core
     public:
         struct IListener
         {
-            virtual void OnWindowCreate( HWND hwnd ) {}
-            virtual void OnWindowDestroy( HWND hwnd ) {}
             virtual void OnWindowFocus( HWND hwnd ) {}
         };
 

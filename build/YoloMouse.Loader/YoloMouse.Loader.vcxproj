@@ -156,13 +156,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\YoloMouse\Loader\App.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Loader\Loader.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\InstanceManager.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Main.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Instance.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\YoloMouse\Loader\App.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Loader\Loader.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\InstanceManager.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Resource\resource.h" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Instance.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\source\YoloMouse\Loader\Resource\AppIcon.ico" />

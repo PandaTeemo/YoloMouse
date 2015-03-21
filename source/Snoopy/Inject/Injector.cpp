@@ -5,9 +5,21 @@
 
 namespace Snoopy
 {
-    // public
+    // local
     //-------------------------------------------------------------------------
-    Injector::Function::Function()
+    namespace
+    {
+        // constants
+        const ULong LOADSYMBOLMODULE_RETRIES =      10;
+        const ULong LOADSYMBOLMODULE_RETRYDELAY =   20;     //ms
+        const ULong LOAD_WAIT_DELAY =               3000;   //ms
+    }
+
+    // Function
+    //-------------------------------------------------------------------------
+    Injector::Function::Function():
+        name    (NULL),
+        address (0)
     {
     }
 
@@ -25,8 +37,7 @@ namespace Snoopy
 
     Injector::~Injector()
     {
-        if( _process )
-            Unload();
+        Unload();
     }
 
     //-------------------------------------------------------------------------
@@ -36,27 +47,24 @@ namespace Snoopy
     }
 
     //-------------------------------------------------------------------------
-    Bool Injector::Load( DWORD process_id, const CHAR* dll_path )
+    Bool Injector::Load( HANDLE process, const CHAR* dll_path )
     {
         xassert(_process == NULL);
 
-        // open process
-        _process = OpenProcess(
-            PROCESS_CREATE_THREAD|PROCESS_QUERY_INFORMATION|PROCESS_VM_OPERATION|PROCESS_VM_WRITE|PROCESS_VM_READ,
-            FALSE,
-            process_id);
-
-        // if opened
-        if( _process )
+        // wait until ready
+        if( WaitForInputIdle(process, LOAD_WAIT_DELAY) == 0 )
         {
             // initialize symbol loader
-            if(SymInitialize(_process, NULL, FALSE))
+            if( SymInitialize(process, NULL, FALSE) )
             {
+                // save process handle
+                _process = process;
+
                 // load initial modules
                 if( _LoadSymbolModule("kernel32.dll") )
                 {
                     // allocate argument memory
-                    _argument_memory = VirtualAllocEx(_process, NULL, INJECTOR_ARGUMENT_MEMORY, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+                    _argument_memory = VirtualAllocEx(process, NULL, INJECTOR_ARGUMENT_MEMORY, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
 
                     // if allocated
                     if( _argument_memory )
@@ -78,26 +86,20 @@ namespace Snoopy
     //-------------------------------------------------------------------------
     void Injector::Unload()
     {
-        // if loaded
-        if(_process)
-        {
-            // unload dll if successfully injected
-            if( _inject_base )
-                _CallFunction(FUNCTION_FREELIBRARY, (void*)_inject_base);
+        // unload dll if successfully injected
+        if( _inject_base )
+            _CallFunction(FUNCTION_FREELIBRARY, (void*)_inject_base);
 
-            // free argument memory
-            if( _argument_memory )
-                VirtualFreeEx(_process, _argument_memory, INJECTOR_ARGUMENT_MEMORY, MEM_RELEASE);
+        // free argument memory
+        if( _argument_memory )
+            VirtualFreeEx(_process, _argument_memory, INJECTOR_ARGUMENT_MEMORY, MEM_RELEASE);
 
-            // close symbol handler
+        // close symbol handler
+        if( _process )
             SymCleanup(_process);
 
-            // close process
-            CloseHandle(_process);
-
-            // reset state
-            _Reset();
-        }
+        // reset state
+        _Reset();
     }
 
     //-------------------------------------------------------------------------
@@ -206,47 +208,58 @@ namespace Snoopy
     DWORD64 Injector::_LoadSymbolModule( const CHAR* name )
     {
         MODULEENTRY32 me;
-        DWORD64       base_address = 0;
+        HANDLE        handle;
 
-        // create toolhelp snapshot
-        HANDLE handle = CreateToolhelp32Snapshot( TH32CS_SNAPMODULE|TH32CS_SNAPMODULE32, GetProcessId(_process) );
-
-        // if created
-        if( handle != INVALID_HANDLE_VALUE )
+        // loop until retries exhausted
+        for( ULong retry = 0; retry < LOADSYMBOLMODULE_RETRIES; ++retry )
         {
-            // init
-            me.dwSize = sizeof(me);
+            // create toolhelp snapshot
+            handle = CreateToolhelp32Snapshot( TH32CS_SNAPMODULE|TH32CS_SNAPMODULE32, GetProcessId(_process) );
 
-            // walk modules
-            if( Module32First(handle, &me) )
+            // if created
+            if( handle != INVALID_HANDLE_VALUE )
             {
-                do
-                {
-                    // if matches
-                    if( _stricmp(me.szModule, name) == 0 )
-                    {
-                        // load module into symbol loader
-                        base_address = SymLoadModuleEx(
-                            _process,
-                            NULL,
-                            me.szExePath,
-                            me.szModule,
-                            (DWORD64)me.modBaseAddr,
-                            me.modBaseSize,
-                            NULL,
-                            0);
+                DWORD64 base_address;
 
-                        break;
+                // init
+                me.dwSize = sizeof(me);
+
+                // walk modules
+                if( Module32First(handle, &me) )
+                {
+                    do
+                    {
+                        // if matches
+                        if( _stricmp(me.szModule, name) == 0 )
+                        {
+                            // load module into symbol loader
+                            base_address = SymLoadModuleEx(
+                                _process,
+                                NULL,
+                                me.szExePath,
+                                me.szModule,
+                                (DWORD64)me.modBaseAddr,
+                                me.modBaseSize,
+                                NULL,
+                                0);
+
+                            break;
+                        }
                     }
+                    while( Module32Next(handle, &me) );
                 }
-                while( Module32Next(handle, &me) );
+
+                // close toolhelp snapshot
+                CloseHandle(handle);
+
+                return base_address;
             }
 
-            // close toolhelp snapshot
-            CloseHandle(handle);
+            // wait a little
+            Sleep(LOADSYMBOLMODULE_RETRYDELAY);
         }
 
-        return base_address;
+        return 0;
     }
 
     //-------------------------------------------------------------------------

@@ -99,7 +99,9 @@ namespace YoloMouse
             _OptionAutoStart(true, false);
 
         // update cursor size
-        _AssignSize(_settings.GetNumber(SETTING_CURSORSIZE), false);
+        ULong cursor_size = _settings.GetNumber(SETTING_CURSORSIZE);
+        if( cursor_size < CURSOR_SIZE_COUNT )
+            _state.SetCursorSize(static_cast<CursorSize>(cursor_size));
     }
 
     void App::_StartSettings()
@@ -234,46 +236,60 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     Bool App::_AssignCursor( Index cursor_index )
     {
-        // get target window
-        DWORD process_id = Loader::GetActiveProcessId();
-        if( process_id == 0 )
+        // access active instance
+        Instance* instance = _AccessCurrentInstance();
+        if( instance == NULL )
             return false;
 
-        // load target if not already loaded
-        if( !_loader.IsLoaded(process_id) && !_loader.Load(process_id) )
-            return false;
-
-        // notify target to assign
-        return _loader.Notify(process_id, NOTIFY_ASSIGN, cursor_index);
+        // notify instance to assign
+        return instance->Notify(NOTIFY_ASSIGN, cursor_index);
     }
 
-    Bool App::_AssignSize( ULong size, Bool save )
+    Bool App::_AssignSize( ULong size )
     {
         // check
         if( size >= CURSOR_SIZE_COUNT )
             return false;
 
-        // update settings
-        if( save )
-        {
-            _settings.SetNumber(SETTING_CURSORSIZE, size);
-            _settings.Save();
-        }
-
         // update cursor size
         _state.SetCursorSize(static_cast<CursorSize>(size));
 
-        // get target window
-        DWORD process_id = Loader::GetActiveProcessId();
-        if( process_id == 0 )
+        // update settings
+        _settings.SetNumber(SETTING_CURSORSIZE, size);
+        _settings.Save();
+
+        // access active instance
+        Instance* instance = _AccessCurrentInstance();
+        if( instance == NULL )
             return false;
 
-        // require target is loaded
-        if( !_loader.IsLoaded(process_id) )
-            return false;
- 
-        // notify target to refresh
-        return _loader.Notify(process_id, NOTIFY_REFRESH);
+        // notify instance to assign
+        return instance->Notify(NOTIFY_REFRESH);
+    }
+
+    //-------------------------------------------------------------------------
+    Instance* App::_AccessCurrentInstance()
+    {
+        DWORD process_id = 0;
+
+        // get active window
+        HWND hwnd = GetForegroundWindow();
+        if( hwnd == NULL )
+            return NULL;
+
+        // get its process id
+        if( GetWindowThreadProcessId(hwnd, &process_id) == 0 )
+            return NULL;
+
+        // find instance if one exists
+        Instance* instance = _instance_manager.Find(process_id);
+        if( instance == NULL )
+        {
+            // allocate new instance
+            instance = _instance_manager.Load(process_id);
+        }
+
+        return instance;
     }
 
     //-------------------------------------------------------------------------
@@ -287,34 +303,10 @@ namespace YoloMouse
             _AssignCursor(INVALID_INDEX);
         // change size
         else if( combo_id >= SETTING_CURSORKEY_SMALLER && combo_id <= SETTING_CURSORKEY_LARGER )
-            _AssignSize(_state.GetCursorSize() + (combo_id == SETTING_CURSORKEY_SMALLER ? -1 : 1), true);
+            _AssignSize(_state.GetCursorSize() + (combo_id == SETTING_CURSORKEY_SMALLER ? -1 : 1));
     }
 
     //-------------------------------------------------------------------------
-    void App::OnWindowCreate( HWND hwnd )
-    {
-    }
-
-    void App::OnWindowDestroy( HWND hwnd )
-    {
-        try
-        {
-            DWORD process_id = 0;
-
-            // get process id of window
-            if( GetWindowThreadProcessId(hwnd, &process_id) )
-            {
-                // unload
-                _loader.Unload(process_id);
-            }
-        }
-        // catch eggs
-        catch( const Char* error )
-        {
-            SharedTools::ErrorMessage(error);
-        }
-    }
-
     void App::OnWindowFocus( HWND hwnd )
     {
         try
@@ -324,17 +316,18 @@ namespace YoloMouse
             // get process id of window
             if( GetWindowThreadProcessId(hwnd, &process_id) )
             {
-                // if already loaded
-                if( _loader.IsLoaded(process_id) )
+                // find instance
+                Instance* instance = _instance_manager.Find(process_id);
+                if( instance != NULL )
                 {
                     // notify target to refresh
-                    _loader.Notify(process_id, NOTIFY_REFRESH);
+                    instance->Notify(NOTIFY_REFRESH);
                 }
                 else
                 {
-                    // load target if configured for yolomouse
-                    if( _loader.IsConfigured(process_id) )
-                        _loader.Load(process_id);
+                    // load instance if configured for yolomouse
+                    if( _instance_manager.IsConfigured(process_id) )
+                        _instance_manager.Load(process_id);
                 }
             }
         }

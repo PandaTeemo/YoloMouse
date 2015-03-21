@@ -4,7 +4,7 @@
 #include <Core/Windows/ShellUi.hpp>
 #include <Core/Windows/SystemMonitor.hpp>
 #include <YoloMouse/Share/SharedState.hpp>
-#include <YoloMouse/Loader/Loader.hpp>
+#include <YoloMouse/Loader/InstanceManager.hpp>
 
 namespace YoloMouse
 {
@@ -15,7 +15,7 @@ namespace YoloMouse
         public ShellUi::IListener
     {
     private:
-        Loader          _loader;
+        InstanceManager _instance_manager;
         SharedState&    _state;
 
         ShellUi&        _ui;
@@ -57,14 +57,15 @@ namespace YoloMouse
 
         /**/
         Bool _AssignCursor( Index cursor_index );
-        Bool _AssignSize( ULong size, Bool save );
+        Bool _AssignSize( ULong size );
+
+        /**/
+        Instance* _AccessCurrentInstance();
 
         /**/
         void OnKeyCombo( Id combo_id );
 
         /**/
-        void OnWindowCreate( HWND hwnd );
-        void OnWindowDestroy( HWND hwnd );
         void OnWindowFocus( HWND hwnd );
 
         /**/

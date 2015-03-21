@@ -79,7 +79,7 @@ namespace YoloMouse
     // numeric
     //-------------------------------------------------------------------------
     static const ULong CURSOR_MAPPING_LIMIT =       200;
-    static const ULong LOADER_ACTIVE_LIMIT =        100;
+    static const ULong LOADER_TARGET_LIMIT =        20;
     static const ULong SHARED_CURSOR_LIMIT =        35;
 
     // strings

@@ -41,7 +41,7 @@ namespace Snoopy
         void SetNotifyName( const CHAR* name );
 
         /**/
-        Bool Load( DWORD process_id, const CHAR* dll_path );
+        Bool Load( HANDLE process, const CHAR* dll_path );
 
         /**/
         void Unload();
