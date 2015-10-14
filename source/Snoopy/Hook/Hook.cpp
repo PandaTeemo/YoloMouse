@@ -149,7 +149,7 @@ namespace Snoopy
         if( _placement == AFTER && !_trampoline.Relocate(_target_backup))
             return false;
 
-    #ifdef _WIN64
+    #if CPU_64
         // push hook arguments
         _trampoline.OpPushReg(x86::REGISTER_R9);
         _trampoline.OpPushReg(x86::REGISTER_R8);

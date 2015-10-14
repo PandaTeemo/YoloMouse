@@ -53,7 +53,6 @@ namespace YoloMouse
 
         /**/
         Bool _OptionAutoStart( Bool enable, Bool save );
-        Bool _OptionHideMenu( Bool save );
 
         /**/
         Bool _AssignCursor( Index cursor_index );

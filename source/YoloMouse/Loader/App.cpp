@@ -136,17 +136,13 @@ namespace YoloMouse
         // start ui
         eggs(_ui.Start());
 
-        // if showmenu enabled
-        if( _settings.GetBoolean(SETTING_SHOWMENU) )
-        {
-            // add menu
-            _ui.AddMenu();
+        // add menu
+        _ui.AddMenu();
 
-            // add menu options
-            _ui.AddMenuBreak();
-            _ui.AddMenuOption(MENU_OPTION_AUTOSTART,    APP_MENU_STRINGS[MENU_OPTION_AUTOSTART],    _settings.GetBoolean(SETTING_AUTOSTART));
-            _ui.AddMenuOption(MENU_OPTION_SHOWMENU,     APP_MENU_STRINGS[MENU_OPTION_SHOWMENU],     true);
-        }
+        // add menu options
+        _ui.AddMenuBreak();
+        _ui.AddMenuOption(MENU_OPTION_AUTOSTART,    APP_MENU_STRINGS[MENU_OPTION_AUTOSTART],    _settings.GetBoolean(SETTING_AUTOSTART));
+        _ui.AddMenuOption(MENU_OPTION_ABOUT,        APP_MENU_STRINGS[MENU_OPTION_ABOUT],        false);
 
         // register events
         _ui.AddListener(*this);
@@ -216,21 +212,6 @@ namespace YoloMouse
         }
 
         return false;
-    }
-
-    Bool App::_OptionHideMenu( Bool save )
-    {
-        // update settings
-        if( save )
-        {
-            _settings.SetBoolean(SETTING_SHOWMENU, false);
-            _settings.Save();
-        }
-
-        // hide menu
-        _ui.HideMenu();
-
-        return true;
     }
 
     //-------------------------------------------------------------------------
@@ -351,12 +332,8 @@ namespace YoloMouse
             return true;
 
         // show menu
-        case MENU_OPTION_SHOWMENU:
-            if(enabled)
-            {
-                _OptionHideMenu(true);
-                _ui.SetMenuOption(id, false);
-            }
+        case MENU_OPTION_ABOUT:
+            MessageBoxA(NULL, APP_ABOUT, APP_NAMEC, MB_OK|MB_ICONINFORMATION);
             return true;
 
         default:

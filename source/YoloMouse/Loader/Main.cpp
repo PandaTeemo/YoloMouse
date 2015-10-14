@@ -4,6 +4,31 @@
 
 namespace YoloMouse
 {
+    // unit
+    //-------------------------------------------------------------------------
+    void _UnitTest()
+    {
+        /*
+        //Byte xx[] = {0xFF, 0x25, 0x1E, 0x00, 0x81, 0x71};         //32: jmp absolute
+        //Byte xx[] = {0xFF, 0x25, 0x90, 0xEF, 0x5C, 0x00};         //64: jmp relative
+        //Byte xx[] = {0xB8, 0x9F, 0x20, 0x07, 0x00};               //64: mov reg constant
+        Byte xx[] = {0x48, 0x8B, 0xC4, 0x48, 0x89, 0x58, 0x08};   //64: 2 regular instructions
+        
+        Byte buff[20] = {0};
+        Snoopy::x86::Assembly zz;
+        ByteArray ba(xx, sizeof(xx));
+        ByteArray bzz(buff, sizeof(buff));
+        zz.SetSourceAddress(0);
+        zz.SetCodeBuffer(ba);
+        Snoopy::x86::Assembly aa;
+        aa.SetCodeBuffer(bzz);
+        aa.Empty();
+
+        aa.Relocate(zz);
+        return;
+        //*/
+    }
+
     // main
     //-------------------------------------------------------------------------
     static void Main()
@@ -31,6 +56,8 @@ int WINAPI WinMain(
 {
     using namespace Core;
     int status;
+
+    //YoloMouse::_UnitTest(); return 0;
 
     // create duplicate instance prevention mutex
     HANDLE instance_mutex = CreateMutex( NULL, TRUE, YoloMouse::IPC_MUTEX_NAME );

@@ -18,7 +18,7 @@ namespace YoloMouse
 
     SharedState&        CursorHook::_state =            SharedState::Instance();
     Hook                CursorHook::_hook_setcursor     (SetCursor, CursorHook::_OnSetCursor, Hook::BEFORE);
-#ifdef _WIN64
+#if CPU_64
     Hook                CursorHook::_hook_setclasslonga (SetClassLongPtrA, CursorHook::_OnSetClassLong, Hook::BEFORE);
     Hook                CursorHook::_hook_setclasslongw (SetClassLongPtrW, CursorHook::_OnSetClassLong, Hook::BEFORE);
 #else
@@ -30,14 +30,12 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     Bool CursorHook::Load()
     {
-        DWORD process_id = GetCurrentProcessId();
-
         // if not already active
         if( _active )
             return true;
 
         // build id string
-        if( !SharedTools::BuildTargetId(_target_id, COUNT(_target_id), process_id) )
+        if( !SharedTools::BuildTargetId(_target_id, COUNT(_target_id), GetCurrentProcess()) )
             return false;
 
         // load state
@@ -144,7 +142,7 @@ namespace YoloMouse
             if( _method == METHOD_SETCLASSLONG )
             {
                 // set current cursor to force update
-            #ifdef _WIN64
+            #if CPU_64
                 SetClassLongPtrA(hwnd, GCLP_HCURSOR, (LONG_PTR)refresh_cursor);
             #else
                 SetClassLongA(hwnd, GCL_HCURSOR, (LONG)refresh_cursor);
@@ -333,7 +331,7 @@ namespace YoloMouse
     VOID HOOK_CALL CursorHook::_OnSetClassLong( Native* arguments )
     {
         // if changing cursor
-    #ifdef _WIN64
+    #if CPU_64
         if((int)arguments[2] == GCLP_HCURSOR)
     #else
         if((int)arguments[2] == GCL_HCURSOR)

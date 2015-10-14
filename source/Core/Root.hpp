@@ -9,6 +9,11 @@
 #ifndef NULL
     #define NULL 0
 #endif
+#ifdef _WIN64
+    #define CPU_64 1
+#else
+    #define CPU_64 0
+#endif
 
 // default includes
 #include <Core/Types.hpp>

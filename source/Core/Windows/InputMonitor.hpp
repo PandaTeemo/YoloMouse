@@ -37,7 +37,7 @@ namespace Core
         typedef ComboCollection::Iterator       ComboIterator;
 
     private:
-        ShellUi&             _ui;
+        ShellUi&        _ui;
         StateTable      _state;
         ComboCollection _combos;
 

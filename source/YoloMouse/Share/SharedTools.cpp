@@ -42,64 +42,53 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool SharedTools::BuildTargetId( WCHAR* target_id, ULong limit, DWORD process_id )
+    Bool SharedTools::BuildTargetId( WCHAR* target_id, ULong limit, HANDLE process )
     {
         static const ULong SLASH_LIMIT = 4;
         Bool status = false;
+        WCHAR path[STRING_PATH_SIZE] = {0};
 
-        // get process
-        HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, process_id);
-        if(process)
+        // get executable path and build target id string
+        if( GetProcessImageFileName(process, path, COUNT(path)) == 0 )
+            return false;
+
+        ULong   length = (ULong)wcslen(path);
+        ULong   slashes = 0;
+        WCHAR*  end = length + path;
+        WCHAR   c;
+
+        // state to supress path numbers. this helps to maintain a common
+        // id for targets with versioned directories.
+        Bool supress_numbers = false;
+
+        // for each character from the end of the path
+        do
         {
-            WCHAR path[STRING_PATH_SIZE] = {0};
+            // get next character
+            c = *--end;
 
-            // get executable path and build target id string
-            if(GetProcessImageFileName(process, path, COUNT(path)) > 0)
+            // if not alphanumeric
+            if( (c < 'a' || c > 'z') &&
+                (c < 'A' || c > 'Z') &&
+                (supress_numbers || c < '0' || c > '9') )
             {
-                ULong   length = (ULong)wcslen(path);
-                ULong   slashes = 0;
-                WCHAR*  end = length + path;
-                WCHAR   c;
-
-                // state to supress path numbers. this helps to maintain a common
-                // id for targets with versioned directories.
-                Bool supress_numbers = false;
-
-                // for each character from the end of the path
-                do
-                {
-                    // get next character
-                    c = *--end;
-
-                    // if not alphanumeric
-                    if( (c < 'a' || c > 'z') &&
-                        (c < 'A' || c > 'Z') &&
-                        (supress_numbers || c < '0' || c > '9') )
-                    {
-                        // replace with _
-                        *end = '_';
-                    }
-
-                    // if slash
-                    if( (c == '\\' || c == '/') )
-                    {
-                        supress_numbers = true;
-                        slashes++;
-                    }
-                }
-                while( end > path && slashes < SLASH_LIMIT );
-
-                // copy starting at end to target id
-                wcscpy_s(target_id, limit, end + 1);
-
-                status = true;
+                // replace with _
+                *end = '_';
             }
 
-            // close process
-            CloseHandle(process);
+            // if slash
+            if( (c == '\\' || c == '/') )
+            {
+                supress_numbers = true;
+                slashes++;
+            }
         }
+        while( end > path && slashes < SLASH_LIMIT );
 
-        return status;
+        // copy starting at end to target id
+        wcscpy_s(target_id, limit, end + 1);
+
+        return true;
     }
 
     //-------------------------------------------------------------------------

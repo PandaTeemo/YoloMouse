@@ -8,7 +8,7 @@ namespace Snoopy { namespace x86
     Assembly::Assembly():
         _source_address(0)
     {
-    #ifdef _WIN64
+    #if CPU_64
         xassert(sizeof(Native) == 8);
     #else
         xassert(sizeof(Native) == 4);
@@ -85,7 +85,7 @@ namespace Snoopy { namespace x86
 
     void Assembly::OpMovRegReg( RegisterId register_to, RegisterId register_from )
     {
-    #ifdef _WIN64
+    #if CPU_64
         _code.Add(OP_PREFIX_MOV_64);
     #endif
         _code.Add(OP_MOV_REG_REG);
@@ -94,7 +94,7 @@ namespace Snoopy { namespace x86
 
     void Assembly::OpMovRegImm( RegisterId register_id, Native imm )
     {
-    #ifdef _WIN64
+    #if CPU_64
         _code.Add(OP_PREFIX_MOV_64);
     #endif
         _code.Add(OP_MOV_REG_IMM + register_id);
@@ -145,8 +145,11 @@ namespace Snoopy { namespace x86
             if( op.flags & F_ERROR )
                 return false;
 
+            // WARNING: this is major hackjobbery to identify relative vs
+            // absolute address operands. a legit version would be much longer
+
             // if displacement and address (mod=00 rm=101)
-            if( ((op.flags & (F_DISP8|F_DISP16|F_DISP32)) && (op.modrm_mod == 0 && op.modrm_rm == 0x05)) ||
+            if( ((op.flags & (F_DISP8|F_DISP16|F_DISP32)) && ((op.modrm_mod == 0 && op.modrm_rm == 0x05 && (op.flags & F_RELATIVE)) || (CPU_64 && (op.flags & F_DISP32)))) ||
             // or relative address operation
                 ((op.flags & (F_IMM8|F_IMM16|F_IMM32|F_IMM64)) && (op.flags & F_RELATIVE)) )
             {

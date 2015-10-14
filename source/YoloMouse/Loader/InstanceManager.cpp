@@ -45,18 +45,29 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     Bool InstanceManager::IsConfigured( DWORD process_id ) const
     {
-        WCHAR save_path[STRING_PATH_SIZE];
-        WCHAR target_id[STRING_PATH_SIZE];
+        WCHAR   save_path[STRING_PATH_SIZE];
+        WCHAR   target_id[STRING_PATH_SIZE];
+        Bool    status = false;
 
-        // build target id
-        if(!SharedTools::BuildTargetId(target_id, COUNT(target_id), process_id))
-            return false;
+        // get process
+        HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, process_id);
+        if( process )
+        {
+            // build target id
+            if( SharedTools::BuildTargetId(target_id, COUNT(target_id), process))
+            {
+                // build save path
+                if(SharedTools::BuildSavePath(save_path, COUNT(save_path), target_id))
+                {
+                    // success if save file exists
+                    status = Tools::DoesFileExist(save_path);
+                }
 
-        // build save path
-        if(!SharedTools::BuildSavePath(save_path, COUNT(save_path), target_id))
-            return false;
+                // close process
+                CloseHandle(process);
+            }
+        }
 
-        // sucess if save file exists
-        return Tools::DoesFileExist(save_path);
+        return status;
     }
 }

@@ -11,7 +11,7 @@ namespace YoloMouse
         static Hash CalculateCursorHash( HCURSOR hcursor );
 
         /**/
-        static Bool BuildTargetId( WCHAR* target_id, ULong limit, DWORD process_id );
+        static Bool BuildTargetId( WCHAR* target_id, ULong limit, HANDLE process );
 
         /**/
         static Bool BuildSavePath( WCHAR* path, ULong limit, const WCHAR* name );

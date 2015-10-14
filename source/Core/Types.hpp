@@ -39,7 +39,7 @@ namespace Core
     typedef void*               Handle;
     typedef Byte8               Hash;
 
-    #ifdef _WIN64
+    #if CPU_64
         typedef Huge            Native;
         typedef UHuge           UNative;
     #else

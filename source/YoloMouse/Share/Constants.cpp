@@ -6,7 +6,7 @@ namespace YoloMouse
     const WCHAR* APP_MENU_STRINGS[MENU_OPTION_COUNT] =
     {
         L"Start with Windows",
-        L"Show Icon",
+        L"About",
     };
 
     const WCHAR* PATH_CURSORS_SIZE[CURSOR_SIZE_COUNT] =
@@ -61,7 +61,6 @@ namespace YoloMouse
         { "CursorKeyLarger",    "CONTROL ALT SHIFT =" },
         { "CursorSize",         "2" },
         { "AutoStart",          "1" },
-        { "ShowMenu",           "1" },
     };
     Settings::KeyValueCollection SETTINGS_ITEMS(_settings, COUNT(_settings));
 }

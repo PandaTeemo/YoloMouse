@@ -23,6 +23,7 @@ namespace Core
 
         ~SharedMemory()
         {
+            Close();
         }
 
         /**/
@@ -45,6 +46,7 @@ namespace Core
             if(_memory == NULL)
             {
                 CloseHandle(_handle);
+                _handle = NULL;
                 return false;
             }
 
@@ -53,14 +55,20 @@ namespace Core
 
         void Close()
         {
-            xassert(_memory);
-            xassert(_handle);
+            // if loaded
+            if( _handle )
+            {
+                // unmap from memory
+                if( _memory )
+                {
+                    UnmapViewOfFile(_memory);
+                    _memory = NULL;
+                }
 
-            // unmap from memory
-            UnmapViewOfFile(_memory);
-
-            // close shared memory handle
-            CloseHandle(_handle);
+                // close shared memory handle
+                CloseHandle(_handle);
+                _handle = NULL;
+            }
         }
 
         /**/
