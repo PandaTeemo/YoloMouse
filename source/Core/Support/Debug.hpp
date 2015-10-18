@@ -10,8 +10,5 @@ namespace Core
     public:
         /**/
         static void Console( const Char* format, ... );
-
-        /**/
-        static void Log( const Char* format, ... );
     };
 }

@@ -22,9 +22,10 @@ namespace YoloMouse
             CursorSize  size;
         };
 
-    private:
-        Bool                _host;
-        SharedMemory<Root>  _memory;
+        struct Client
+        {
+            CursorTable cursors;
+        };
 
     public:
         /**/
@@ -48,6 +49,17 @@ namespace YoloMouse
         /**/
         HCURSOR _LoadCursor( Index cursor_index, const WCHAR* base_path );
         void    _LoadCursors();
-        void    _UnloadCursors();
+
+        /**/
+        void _CacheCursors();
+
+        /**/
+        void _FreeCursors();
+
+        // fields
+        Bool                _host;
+        Client              _client;
+        SharedMemory<Root>  _shared;
+
     };
 }

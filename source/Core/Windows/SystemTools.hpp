@@ -18,5 +18,9 @@ namespace Core
 
         /**/
         static Bool GetProcessDirectory( WCHAR* path, ULong limit );
+
+        /**/
+        static HANDLE OpenDebugPrivileges();
+        static void CloseDebugPrivileges( HANDLE handle );
     };
 }

@@ -24,10 +24,6 @@ namespace Core
         OSVERSION_WIN81 =           0x0603,
     };
 
-    // strings
-    //-------------------------------------------------------------------------
-    static const Char* DEBUG_PATH = "debug.log";
-
     // numeric
     //-------------------------------------------------------------------------
     static const ULong STRING_SHORT_SIZE =  16;

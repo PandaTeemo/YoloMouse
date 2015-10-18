@@ -32,27 +32,27 @@ namespace YoloMouse
         _process = OpenProcess(
             PROCESS_QUERY_INFORMATION|PROCESS_VM_OPERATION|PROCESS_CREATE_THREAD|PROCESS_VM_READ|PROCESS_VM_WRITE|SYNCHRONIZE,
             FALSE, process_id);
-        if( _process == NULL )
-            return false;
-
-        // choose inject dll
-        const Char* inject_dll = _ChooseInjectDll();
-        if( inject_dll != NULL )
+        if( _process )
         {
-            // set notify name
-            _injector.SetNotifyName(INJECT_NOTIFY_FUNCTION);
-
-            // load
-            if( _injector.Load(_process, inject_dll) )
+            // choose inject dll
+            const Char* inject_dll = _ChooseInjectDll();
+            if( inject_dll != NULL )
             {
-                // notify init
-                if( Notify(NOTIFY_INIT) )
+                // set notify name
+                _injector.SetNotifyName(INJECT_NOTIFY_FUNCTION);
+
+                // load
+                if( _injector.Load(_process, inject_dll) )
                 {
-                    // register process exit handler
-                    if( RegisterWaitForSingleObject(&_wait_handle, _process, _ProcessExitHandler, this, INFINITE, WT_EXECUTEONLYONCE) )
+                    // notify init
+                    if( Notify(NOTIFY_INIT) )
                     {
-                        _process_id = process_id;
-                        return true;
+                        // register process exit handler
+                        if( RegisterWaitForSingleObject(&_wait_handle, _process, _ProcessExitHandler, this, INFINITE, WT_EXECUTEONLYONCE) )
+                        {
+                            _process_id = process_id;
+                            return true;
+                        }
                     }
                 }
             }

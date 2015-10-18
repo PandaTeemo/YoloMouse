@@ -29,23 +29,4 @@ namespace Core
         vfprintf(stdout, format, vargs); fputs("", stdout);
         va_end(vargs);
     }
-
-    void Debug::Log( const Char* format, ... )
-    {
-        FILE* file;
-
-        if(format == NULL)
-        {
-            if(fopen_s(&file, DEBUG_PATH, "w") == 0)
-                fclose(file);
-        }
-        else if(fopen_s(&file, DEBUG_PATH, "at") == 0)
-        {
-            va_list args;
-            va_start(args, format);
-            vfprintf(file, format, args);
-            va_end(args);
-            fclose(file);
-        }
-    }
 }

@@ -7,10 +7,28 @@
 namespace Core
 {
     //------------------------------------------------------------------------
+    void LogFile( const Char* format, ... )
+    {
+        FILE* file;
+
+        if(format == NULL)
+        {
+            if(fopen_s(&file, LOG_PATH, "w") == 0)
+                fclose(file);
+        }
+        else if(fopen_s(&file, LOG_PATH, "at") == 0)
+        {
+            va_list args;
+            va_start(args, format);
+            vfprintf(file, format, args);
+            va_end(args);
+            fclose(file);
+        }
+    }
     void LogAssert( const char* message, const char *file, unsigned line )
     {
         // log
-        Debug::Log("%s @ %s:%u\n", message, file, line);
+        LogFile("%s @ %s:%u\n", message, file, line);
 
         // the end!
         abort();

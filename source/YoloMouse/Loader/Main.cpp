@@ -4,7 +4,23 @@
 
 namespace YoloMouse
 {
-    // unit
+    // main
+    //-------------------------------------------------------------------------
+    static void Main()
+    {
+        App app;
+
+        // start
+        app.Start();
+
+        // run
+        app.Run();
+
+        // stop
+        app.Stop();
+    }
+
+    // debugging
     //-------------------------------------------------------------------------
     void _UnitTest()
     {
@@ -27,22 +43,6 @@ namespace YoloMouse
         aa.Relocate(zz);
         return;
         //*/
-    }
-
-    // main
-    //-------------------------------------------------------------------------
-    static void Main()
-    {
-        App app;
-
-        // start
-        app.Start();
-
-        // run
-        app.Run();
-
-        // stop
-        app.Stop();
     }
 }
 

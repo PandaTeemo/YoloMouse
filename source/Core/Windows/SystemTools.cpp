@@ -5,6 +5,60 @@
 
 namespace Core
 {
+    // local
+    namespace
+    {
+        // from https://support.microsoft.com/en-us/kb/131065
+        //---------------------------------------------------------------------
+        BOOL _SetPrivileges( HANDLE hToken, LPCTSTR Privilege, BOOL bEnablePrivilege )
+        {
+            TOKEN_PRIVILEGES tp = {0};
+            LUID             luid;
+            TOKEN_PRIVILEGES tpPrevious;
+            DWORD            cbPrevious = sizeof(TOKEN_PRIVILEGES);
+
+            if(!LookupPrivilegeValue( NULL, Privilege, &luid )) 
+                return FALSE;
+
+            // first pass. get current privilege setting
+            tp.PrivilegeCount           = 1;
+            tp.Privileges[0].Luid       = luid;
+            tp.Privileges[0].Attributes = 0;
+
+            AdjustTokenPrivileges(
+                hToken,
+                FALSE,
+                &tp,
+                sizeof(TOKEN_PRIVILEGES),
+                &tpPrevious,
+                &cbPrevious);
+            if (GetLastError() != ERROR_SUCCESS)
+                return FALSE;
+
+            // second pass. set privilege based on previous setting
+            tpPrevious.PrivilegeCount       = 1;
+            tpPrevious.Privileges[0].Luid   = luid;
+
+            if(bEnablePrivilege)
+                tpPrevious.Privileges[0].Attributes |= (SE_PRIVILEGE_ENABLED);
+            else
+                tpPrevious.Privileges[0].Attributes ^= (SE_PRIVILEGE_ENABLED & tpPrevious.Privileges[0].Attributes);
+
+            AdjustTokenPrivileges(
+                hToken,
+                FALSE,
+                &tpPrevious,
+                cbPrevious,
+                NULL,
+                NULL);
+            if( GetLastError() != ERROR_SUCCESS )
+                return false;
+
+            return true;
+        }
+    }
+
+
     // public
     //-------------------------------------------------------------------------
     Bitness SystemTools::GetProcessBitness( HANDLE process )
@@ -92,5 +146,48 @@ namespace Core
 
         Tools::StripFileName(path);
         return true;
+    }
+
+    // from https://support.microsoft.com/en-us/kb/131065
+    //-------------------------------------------------------------------------
+    HANDLE SystemTools::OpenDebugPrivileges()
+    {
+        HANDLE token;
+
+        // open thread access token
+        if( !OpenThreadToken(GetCurrentThread(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, FALSE, &token) )
+        {
+            if( GetLastError() == ERROR_NO_TOKEN )
+            {
+                if( !ImpersonateSelf(SecurityImpersonation) )
+                    return NULL;
+
+                if( !OpenThreadToken(GetCurrentThread(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, FALSE, &token) )
+                    return NULL;
+            }
+            else
+                return NULL;
+        }
+
+        // enable SeDebugPrivilege
+        if(!_SetPrivileges(token, SE_DEBUG_NAME, TRUE))
+        {
+            // close token handle
+            CloseHandle(token);
+
+            // indicate failure
+            return NULL;
+        }
+
+        return token;
+    }
+
+    void SystemTools::CloseDebugPrivileges( HANDLE handle )
+    {
+        // disable SeDebugPrivilege
+        _SetPrivileges(handle, SE_DEBUG_NAME, FALSE);
+
+        // close token handle
+        CloseHandle(handle);
     }
 }

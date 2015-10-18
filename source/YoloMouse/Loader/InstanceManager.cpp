@@ -1,3 +1,4 @@
+#include <Core/Windows/SystemTools.hpp>
 #include <YoloMouse/Loader/InstanceManager.hpp>
 #include <YoloMouse/Share/SharedTools.hpp>
 
@@ -6,8 +7,11 @@ namespace YoloMouse
     // public
     //-------------------------------------------------------------------------
     InstanceManager::InstanceManager():
-        _targets(LOADER_TARGET_LIMIT)
+        _targets    (LOADER_TARGET_LIMIT),
+        _privileges (NULL)
     {
+        // open privileges. required for openprocess to succeed by some games (like wildstar)
+        _privileges = SystemTools::OpenDebugPrivileges();
     }
 
     InstanceManager::~InstanceManager()
@@ -15,6 +19,10 @@ namespace YoloMouse
         // unload all
         for( Index i = 0; i < LOADER_TARGET_LIMIT; ++i )
             _targets[i].Unload();
+
+        // close privileges handle
+        if( _privileges )
+            CloseHandle(_privileges);
     }
 
     //-------------------------------------------------------------------------

@@ -30,13 +30,16 @@
 #define HIGH32(huge)            ((unsigned long)(((huge) >> 32) & 0xffffffff))
 #define MAKEHUGE(low, high)     ((unsigned long long)(low) | ((unsigned long long)(high) << 32))
 
+// constants
+#define LOG_PATH                "debug.log"
+
 namespace Core
 {
     /**/
     #ifdef NDEBUG
         #define xassert(x) ((void)0)
     #else
-        extern void LogAssert(const char* message, const char *file, unsigned line);
+        extern void LogAssert( const char* message, const char *file, unsigned line );
         #define xassert(x) ((x) ? (void)0 : (LogAssert(#x, __FILE__, __LINE__)))
     #endif
 
@@ -44,7 +47,8 @@ namespace Core
     #define eggs(x) ((x) ? (void)0 : ExceptionMessage(#x, __FILE__, __LINE__))
 
     /**/
-    #define xlog Core::Debug::Log
+    extern void LogFile( const Char* format, ... );
+    #define xlog LogFile
 
     // forward declarations
     template<typename TYPE> class Enum;

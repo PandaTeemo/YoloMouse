@@ -10,7 +10,8 @@ namespace YoloMouse
     // public
     //-------------------------------------------------------------------------
     SharedState::SharedState():
-        _memory(IPC_MEMORY_NAME)
+        _host   (false),
+        _shared (IPC_MEMORY_NAME)
     {
     }
 
@@ -18,18 +19,27 @@ namespace YoloMouse
     Bool SharedState::Open( Bool host )
     {
         // open shared memory
-        if(!_memory.Open(host))
+        if(!_shared.Open(host))
             return false;
 
         // if host
         if(host)
         {
             // reset state
-            _memory->cursors.Zero();
-            _memory->size = CURSOR_SIZE_MEDIUM;
+            _shared->cursors.Zero();
+            _shared->size = CURSOR_SIZE_MEDIUM;
 
             // load cursors
             _LoadCursors();
+        }
+        // else local
+        else
+        {
+            // reset state
+            _client.cursors.Zero();
+
+            // cache cursors
+            _CacheCursors();
         }
 
         // update state
@@ -40,22 +50,18 @@ namespace YoloMouse
 
     void SharedState::Close()
     {
-        // if host
-        if(_host)
-        {
-            // unload cursors
-            _UnloadCursors();
-        }
+        // free cursors
+        _FreeCursors();
 
         // close shared memory
-        _memory.Close();
+        _shared.Close();
     }
 
     //-------------------------------------------------------------------------
     HCURSOR SharedState::GetCursor( Index cursor_index )
     {
-        Long base = _memory->size;
-        CursorTable& cursors = _memory->cursors;
+        Long         base = _shared->size;
+        CursorTable& cursors = _host ? _shared->cursors : _client.cursors;
 
         // find cursor nearest cursor index
         for( Long offset = 0; offset < CURSOR_SIZE_COUNT; offset++ )
@@ -75,19 +81,19 @@ namespace YoloMouse
 
     CursorSize SharedState::GetCursorSize() const
     {
-        return _memory->size;
+        return _shared->size;
     }
 
     //-------------------------------------------------------------------------
     void SharedState::SetCursorSize( CursorSize size )
     {
-        _memory->size = size;
+        _shared->size = size;
     }
 
     //-------------------------------------------------------------------------
     Index SharedState::FindCursor( HCURSOR hcursor )
     {
-        CursorArray& cursors = _memory->cursors[_memory->size];
+        CursorArray& cursors = _shared->cursors[_shared->size];
 
         // for each cursor
         for( Index i = 0; i < cursors.GetCount(); ++i )
@@ -142,7 +148,7 @@ namespace YoloMouse
         {
             // load user cursors into medium slot
             Byte8 cursor =
-                _memory->cursors[CURSOR_SIZE_MEDIUM][cursor_index] = 
+                _shared->cursors[CURSOR_SIZE_MEDIUM][cursor_index] = 
                 reinterpret_cast<Byte8>(_LoadCursor(cursor_index, PATH_CURSORS));
 
             // mark user loaded (to prevent loading default cursors)
@@ -152,7 +158,7 @@ namespace YoloMouse
         // default cursors: for each size
         for( Index size_index = 0; size_index < CURSOR_SIZE_COUNT; size_index++ )
         {
-            CursorArray& cursors = _memory->cursors[size_index];
+            CursorArray& cursors = _shared->cursors[size_index];
 
             // for each cursor index
             for( Index cursor_index = 0; cursor_index < SHARED_CURSOR_LIMIT; ++cursor_index )
@@ -172,9 +178,49 @@ namespace YoloMouse
         }
     }
 
-    void SharedState::_UnloadCursors()
+    //-------------------------------------------------------------------------
+    void SharedState::_CacheCursors()
     {
-        // do nothing. docs say dont destroy shared cursors
+        // for each size
+        for( Index size_index = 0; size_index < CURSOR_SIZE_COUNT; size_index++ )
+        {
+            // for each cursor index
+            for( Index cursor_index = 0; cursor_index < SHARED_CURSOR_LIMIT; ++cursor_index )
+            {
+                // get shared cursor
+                HCURSOR cursor = reinterpret_cast<HCURSOR>(_shared->cursors[size_index][cursor_index]);
+
+                // if exists create cached copy
+                if( cursor )
+                    _client.cursors[size_index][cursor_index] = reinterpret_cast<Byte8>(CopyImage(cursor, IMAGE_CURSOR, 0, 0, 0));
+            }
+        }
     }
 
+    //-------------------------------------------------------------------------
+    void SharedState::_FreeCursors()
+    {
+        // if host
+        if( _host )
+        {
+            // do nothing. docs say dont destroy shared cursors
+        }
+        else
+        {
+            // for each size
+            for( Index size_index = 0; size_index < CURSOR_SIZE_COUNT; size_index++ )
+            {
+                // for each cursor index
+                for( Index cursor_index = 0; cursor_index < SHARED_CURSOR_LIMIT; ++cursor_index )
+                {
+                    // get cached cursor
+                    HCURSOR cursor = reinterpret_cast<HCURSOR>(_client.cursors[size_index][cursor_index]);
+
+                    // if exists destroy
+                    if( cursor )
+                        DestroyCursor(cursor);
+                }
+            }
+        }
+    }
 }

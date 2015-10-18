@@ -28,6 +28,7 @@ namespace YoloMouse
         typedef InstanceCollection::Iterator                InstanceIterator;
 
         // fields
-        InstanceCollection _targets;
+        InstanceCollection  _targets;
+        HANDLE              _privileges;
     };
 }
