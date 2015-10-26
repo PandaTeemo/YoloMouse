@@ -8,7 +8,7 @@
     <div class="TitlePanel">
         <div class="TitleHeader">
             <img src="Title.png"/>
-            <div class="TitleVersion">0.5.6 <b style="color:red">BETA</b></div>
+            <div class="TitleVersion">0.6.0 <b style="color:red">BETA</b></div>
         </div>
         <div class="TitleDescription">
             Game Cursor Changer
@@ -29,25 +29,28 @@
             <tr><td class="ListHeader">1</td><td class="ListContent">Download and install with default options. YoloMouse should now be running as indicated by <img src="App.Icon.png" /> icon on your taskbar.</td></tr>
             <tr><td class="ListHeader">2</td><td class="ListContent">Launch a game that uses a mouse cursor (not an FPS with reticle).</td></tr>
             <tr><td class="ListHeader">3</td><td class="ListContent">Get to the part of the game where you see the cursor you want to change.</td></tr>
-            <tr><td class="ListHeader">4</td><td class="ListContent">Hit <i>CTRL SHIFT ALT 1</i> (up to 9) to change that cursor.</td></tr>
+            <tr><td class="ListHeader">4</td><td class="ListContent">Hit <i>CTRL SHIFT ALT 1</i> (up to 9) to change that cursor. Hit same hotkey again to cycle through more cursors</td></tr>
             <tr><td class="ListHeader">5</td><td class="ListContent">Most games have multiple cursors that change according to their context. Repeat steps 3-4 for each cursor you wish to change.</td></tr>
             <tr><td class="ListHeader">6</td><td class="ListContent">To reset a cursor to the game default hit <i>CTRL SHIFT ALT 0</i></td></tr>
             <tr><td class="ListHeader">7</td><td class="ListContent">To decrease or increase cursor size use <i>CTRL SHIFT ALT - or +</i></td></tr>
-            <tr><td class="ListHeader">NOTE</td><td class="ListContent">For some games, like WoW, you may not see the cursor change right away. Hover over something that changes the cursor (like an enemy) then hover back and you should see your new cursor.</td></tr>
+            <tr><td class="ListHeader">NOTE</td><td class="ListContent">
+                <li>For some games, like WoW, you may not see the cursor change right away. Hover over something that changes the cursor (like an enemy) then hover back and you should see your new cursor.
+                <li>Fullscreen mode limits cursor size to 64. If you wish to use larger sizes switch to fullscreen-borderless or windowed.
+            </td></tr>
         </table>
     </div>
 
     <!-- problems -->
-    <div class="Panel" style="width:520px; top:535px; left:5px; background-color:#80f;">
+    <div class="Panel" style="width:520px; top:575px; left:5px; background-color:#80f;">
         <div class="Header" style="background-color:#60d; width:50%;">
             Problems
         </div>
         <table>
             <tr><td class="ListHeader">64 Bit Games</td><td class="ListContent">Many new games are 64 Bit and require the 64 Bit version of YM.</td></tr>
 
-            <tr><td class="ListHeader">Run as Admin</td><td class="ListContent">If a game is running as administrator YM must also run as administrator.</td></tr>
+            <tr><td class="ListHeader">Run as Admin</td><td class="ListContent">If a game is running as administrator YM must also run as administrator. Some games, like Wildstar, require YM to be run as admin.</td></tr>
 
-            <tr><td class="ListHeader">Hotkey Conflicts</td><td class="ListContent">Some games have CTRL SHIFT or ALT bound to change/hide cursor preventing the YM hotkey from assigning the intended cursor. Either rebind those keys in game or in YM.</td></tr>
+            <tr><td class="ListHeader">Hotkey Conflicts</td><td class="ListContent">Some games, like Diablo 3, have CTRL SHIFT or ALT bound to change/hide cursor preventing the YM hotkey from assigning the intended cursor. Either temporarily rebind those keys in that game or in YM.</td></tr>
             
             <tr><td class="ListHeader">DPI Scaling</td><td class="ListContent">If you have this on <b><a href="http://ccm.net/faq/32589-windows-8-1-disable-display-scaling-on-high-dpi-settings">disable it</a></b> for games that don't support it properly like Diablo 3 and Heroes of the Storm.</td></tr>
             
@@ -64,12 +67,11 @@
             <tr><td class="ListHeader">Ctrl Shift Alt 1-9</td><td class="ListContent">Change active game cursor</td></tr>
             <tr><td class="ListHeader">Ctrl Shift Alt 0</td><td class="ListContent">Reset current cursor to the game's default</td></tr>
             <tr><td class="ListHeader">Ctrl Shift Alt - or +</td><td class="ListContent">Decrease or increase cursor size</td></tr>
-            <tr><td class="ListHeader">Ctrl Shift Alt A-Z</td><td class="ListContent">Additional cursor hotkeys</td></tr>
         </table>
     </div>
 
     <!-- system tray menu -->
-    <div class="Panel" style="width:390px; top:290px; left:560px; background-color:#c08;">
+    <div class="Panel" style="width:390px; top:280px; left:560px; background-color:#c08;">
         <div class="Header" style="width:50%; background-color:#a06;">
             System Tray Menu
         </div>
@@ -77,13 +79,13 @@
             When you click that <img src="App.Icon.png" /> icon on your taskbar
         </div>
         <table>
+            <tr><td class="ListHeader">About</td><td class="ListContent">Shows YoloMouse version.</td></tr>
             <tr><td class="ListHeader">Start with Windows</td><td class="ListContent">Controls how YoloMouse starts with your system.</td></tr>
-            <tr><td class="ListHeader">Show Icon</td><td class="ListContent">Hides the <img src="App.Icon.png" /> icon. Edit or delete Settings.ini to get it back.</td></tr>
         </table>
     </div>
 
     <!-- faq -->
-    <div class="Panel" style="width: 400px; top:495px; left:615px; background-color:#556;">
+    <div class="Panel" style="width: 400px; top:465px; left:615px; background-color:#556;">
         <div class="Header" style="background-color:#445; width:50%;">
             FAQ
         </div>
@@ -98,15 +100,15 @@
     </div>
 
     <!-- user cursors -->
-    <div class="Panel" style="width: 350px; top:755px; left:585px; background-color:#5b0;">
+    <div class="Panel" style="width: 390px; top:715px; left:590px; background-color:#5b0;">
         <div class="Header" style="background-color:#380; width:70%;">
             Add Your Own Cursors
         </div>
         <table>
-            <tr><td class="ListHeader">1</td><td class="ListContent">Collect your .CUR or .ANI files and rename them to numbers between 1 and 35 (Example: 12.ANI).</td></tr>
-            <tr><td class="ListHeader">3</td><td class="ListContent">Copy them to YoloMouse/Cursors.</td></tr>
-            <tr><td class="ListHeader">4</td><td class="ListContent">Restart yolomouse.</td></tr>
-            <tr><td class="ListHeader">5</td><td class="ListContent">Test using <i>CTRL SHIFT ALT 1-9 or A-Z</i>. 1-9 is file 1 to 9, Q is 10, W is 11, E is 12...</td></tr>
+            <tr><td class="ListHeader">1</td><td class="ListContent">Collect your .CUR or .ANI files and rename them to numbers between 0 and 89 (Example: 12.ANI).</td></tr>
+            <tr><td class="ListHeader">2</td><td class="ListContent">Copy them to C:\Program Files\YoloMouse\Cursors.</td></tr>
+            <tr><td class="ListHeader">3</td><td class="ListContent">Restart yolomouse.</td></tr>
+            <tr><td class="ListHeader">4</td><td class="ListContent">Test using <i>CTRL SHIFT ALT 1-9</i>. 1 for files 0-9, 2 for files 10-19, etc.</td></tr>
         </table>
     </div>
 
