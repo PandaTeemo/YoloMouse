@@ -8,9 +8,6 @@ namespace YoloMouse
     {
     public:
         /**/
-        static Hash CalculateCursorHash( HCURSOR hcursor );
-
-        /**/
         static Bool BuildTargetId( WCHAR* target_id, ULong limit, HANDLE process );
 
         /**/

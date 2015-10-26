@@ -29,6 +29,13 @@ namespace Core
 
         /**/
         template<typename TYPE>
+        static TYPE Clamp( TYPE value, TYPE min, TYPE max )
+        {
+            return ((value > max) ? (max) : ((value < min) ? (min) : (value)));
+        }
+
+        /**/
+        template<typename TYPE>
         static void MemCopy( TYPE* to, const TYPE* from, ULong count=1 )
         {
             _MemCpy(to, from, count * sizeof(TYPE));

@@ -82,7 +82,7 @@ namespace YoloMouse
         _input_monitor.SetListener(this);
 
         // for each cursor key
-        for( Id id = SETTING_CURSORKEY_1; id <= SETTING_CURSORKEY_LARGER; id++ )
+        for( Id id = SETTING_GROUPKEY_1; id <= SETTING_SIZEKEY_LARGER; id++ )
         {
             // create combo
             _input_monitor.CreateCombo(id, _settings.Get(id));
@@ -97,16 +97,11 @@ namespace YoloMouse
         // enable autostart
         if( _settings.GetBoolean(SETTING_AUTOSTART) )
             _OptionAutoStart(true, false);
-
-        // update cursor size
-        ULong cursor_size = _settings.GetNumber(SETTING_CURSORSIZE);
-        if( cursor_size < CURSOR_SIZE_COUNT )
-            _state.SetCursorSize(static_cast<CursorSize>(cursor_size));
     }
 
     void App::_StartSettings()
     {
-        WCHAR settings_path[STRING_PATH_SIZE];
+        PathString settings_path;
 
         // set settings path
         if(SharedTools::BuildSavePath(settings_path, COUNT(settings_path), PATH_SETTINGS_NAME))
@@ -120,6 +115,9 @@ namespace YoloMouse
     {
         // open shared cursor table as host
         eggs(_state.Open(true));
+
+        // update state path
+        eggs(GetCurrentDirectory(sizeof(PathString), _state.EditPath()) > 0);
     }
 
     void App::_StartSystem()
@@ -193,7 +191,7 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     Bool App::_OptionAutoStart( Bool enable, Bool save )
     {
-        WCHAR path[STRING_PATH_SIZE];
+        PathString path;
 
         // get exec path
         if(GetFullPathName(PATH_LOADER, COUNT(path), path, NULL))
@@ -215,7 +213,7 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool App::_AssignCursor( Index cursor_index )
+    Bool App::_AssignCursor( Index group_index )
     {
         // access active instance
         Instance* instance = _AccessCurrentInstance();
@@ -223,29 +221,18 @@ namespace YoloMouse
             return false;
 
         // notify instance to assign
-        return instance->Notify(NOTIFY_ASSIGN, cursor_index);
+        return instance->Notify(NOTIFY_SETCURSOR, group_index);
     }
 
-    Bool App::_AssignSize( ULong size )
+    Bool App::_AssignSize( Long size_index_delta )
     {
-        // check
-        if( size >= CURSOR_SIZE_COUNT )
-            return false;
-
-        // update cursor size
-        _state.SetCursorSize(static_cast<CursorSize>(size));
-
-        // update settings
-        _settings.SetNumber(SETTING_CURSORSIZE, size);
-        _settings.Save();
-
         // access active instance
         Instance* instance = _AccessCurrentInstance();
         if( instance == NULL )
             return false;
 
         // notify instance to assign
-        return instance->Notify(NOTIFY_REFRESH);
+        return instance->Notify(NOTIFY_SETSIZE, size_index_delta);
     }
 
     //-------------------------------------------------------------------------
@@ -277,14 +264,14 @@ namespace YoloMouse
     void App::OnKeyCombo( Id combo_id )
     {
         // change cursor
-        if( combo_id >= SETTING_CURSORKEY_1 && combo_id <= SETTING_CURSORKEY_35 )
-            _AssignCursor(combo_id - SETTING_CURSORKEY_1);
+        if( combo_id >= SETTING_GROUPKEY_1 && combo_id <= SETTING_GROUPKEY_9 )
+            _AssignCursor(combo_id - SETTING_GROUPKEY_1);
         // reset cursor
-        else if( combo_id == SETTING_CURSORKEY_RESET )
-            _AssignCursor(INVALID_INDEX);
+        else if( combo_id == SETTING_GROUPKEY_RESET )
+            _AssignCursor(CURSOR_SPECIAL_REMOVE);
         // change size
-        else if( combo_id >= SETTING_CURSORKEY_SMALLER && combo_id <= SETTING_CURSORKEY_LARGER )
-            _AssignSize(_state.GetCursorSize() + (combo_id == SETTING_CURSORKEY_SMALLER ? -1 : 1));
+        else if( combo_id >= SETTING_SIZEKEY_SMALLER && combo_id <= SETTING_SIZEKEY_LARGER )
+            _AssignSize(combo_id == SETTING_SIZEKEY_SMALLER ? -1 : 1);
     }
 
     //-------------------------------------------------------------------------

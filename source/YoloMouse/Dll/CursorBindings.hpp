@@ -9,40 +9,38 @@ namespace YoloMouse
     {
     public:
         /**/
-        struct Mapping
+        struct Binding
         {
-            Hash    _hash;  // hash of original cursor image bits
-            Index   _index; // replacement cursor file index
+            Hash    bitmap_hash;    // hash of original cursor image bits
+            Index   resource_index; // cursor resource index
+            Index   size_index;     // size index
 
-            Bool operator==( const Hash& hash ) const;
+            Bool operator==( const Hash& hash_ ) const;
         };
 
-    private:
         /**/
-        typedef FlatArray<Mapping, CURSOR_MAPPING_LIMIT> MapTable;
+        typedef FlatArray<Binding, CURSOR_BINDING_LIMIT> MapTable;
         typedef MapTable::Iterator MapIterator;
 
-    private:
-        MapTable _map;
-
-    public:
         /**/
         CursorBindings();
     
         /**/
-        const Mapping& Get( Index mapping_index ) const;
+        Binding*        GetBinding( Hash cursor_hash ) const;
+        const MapTable& GetMap() const;
 
         /**/
-        Index Add( Hash cursor_hash, Index cursor_index );
+        Binding* Add( Hash cursor_hash, Index resource_index, Index size_index );
 
         /**/
-        void Remove( Index mapping_index );
-
-        /**/
-        Index Find( Hash cursor_hash );
+        void Remove( CursorBindings::Binding& binding );
 
         /**/
         Bool Load( const WCHAR* target_id );
         Bool Save( const WCHAR* target_id );
+
+    private:
+        // fields
+        MapTable _bindings;
     };
 }

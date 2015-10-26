@@ -1,5 +1,5 @@
 #pragma once
-#include <Core/Root.hpp>
+#include <Core/Types.hpp>
 #include <Core/Support/Debug.hpp>
 
 namespace Snoopy

@@ -1,6 +1,7 @@
 #pragma once
 #include <Core/Container/Array.hpp>
 #include <Core/Container/String.hpp>
+#include <Core/Types.hpp>
 
 namespace Core
 {
@@ -19,7 +20,7 @@ namespace Core
 
     private:
         KeyValueCollection  _keyvalues;
-        WCHAR               _path[STRING_PATH_SIZE];
+        PathString          _path;
         Bool                _ready;
         ULong               _accessed;
 

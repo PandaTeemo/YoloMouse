@@ -1,4 +1,4 @@
-#include <YoloMouse/Dll/CursorHook.hpp>
+#include <YoloMouse/Dll/App.hpp>
 #include <YoloMouse/Share/NotifyMessage.hpp>
 using namespace YoloMouse;
 
@@ -13,15 +13,19 @@ YoloNotify( void* arg )
     switch(m.id)
     {
     case NOTIFY_INIT:
-        CursorHook::Load();
+        App::Load();
         break;
 
-    case NOTIFY_ASSIGN:
-        CursorHook::Assign(static_cast<Index>(m.parameter));
+    case NOTIFY_SETCURSOR:
+        App::UpdateCursor(static_cast<Index>(m.parameter));
+        break;
+
+    case NOTIFY_SETSIZE:
+        App::UpdateSize(static_cast<Long>(m.parameter));
         break;
 
     case NOTIFY_REFRESH:
-        CursorHook::Refresh();
+        App::Refresh();
         break;
     }
 }
@@ -34,7 +38,7 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
     switch(fdwReason)
     {
     case DLL_PROCESS_DETACH:
-        CursorHook::Unload();
+        App::Unload();
         break;
     }
 

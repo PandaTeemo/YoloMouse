@@ -154,12 +154,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\YoloMouse\Dll\CursorBindings.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Dll\CursorHook.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Dll\CursorVault.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Dll\HandleCache.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Dll\App.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Dll\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\YoloMouse\Dll\CursorBindings.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Dll\CursorHook.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Dll\CursorVault.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Dll\HandleCache.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Dll\App.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

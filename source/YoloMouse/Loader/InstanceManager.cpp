@@ -53,9 +53,9 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     Bool InstanceManager::IsConfigured( DWORD process_id ) const
     {
-        WCHAR   save_path[STRING_PATH_SIZE];
-        WCHAR   target_id[STRING_PATH_SIZE];
-        Bool    status = false;
+        PathString  save_path;
+        PathString  target_id;
+        Bool        status = false;
 
         // get process
         HANDLE process = OpenProcess(PROCESS_QUERY_INFORMATION|PROCESS_VM_READ, FALSE, process_id);

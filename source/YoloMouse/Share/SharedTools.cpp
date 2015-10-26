@@ -8,45 +8,11 @@ namespace YoloMouse
 {
     // public
     //-------------------------------------------------------------------------
-    Hash SharedTools::CalculateCursorHash( HCURSOR hcursor )
-    {
-        static const ULong HASH_LIMIT = KILOBYTES(8);
-    
-        ICONINFO    iconinfo;
-        LONG        count;
-        Byte        buffer[HASH_LIMIT];
-
-        // require valid
-        if( hcursor == NULL )
-            return 0;
-
-        // get icon info
-        if( GetIconInfo(hcursor, &iconinfo) == FALSE )
-            return 0;
-
-        // get icon bitmap buffer
-        count = GetBitmapBits( iconinfo.hbmColor ? iconinfo.hbmColor : iconinfo.hbmMask, sizeof(buffer), buffer );
-
-        // iconinfo cleanup 
-        if( iconinfo.hbmColor )
-            DeleteObject(iconinfo.hbmColor);
-        if( iconinfo.hbmMask )
-            DeleteObject(iconinfo.hbmMask);
-
-        // fail if no bits read
-        if(count == 0)
-            return 0;
-
-        // generate hash
-        return Tools::Fnv164Hash(buffer, count);
-    }
-
-    //-------------------------------------------------------------------------
     Bool SharedTools::BuildTargetId( WCHAR* target_id, ULong limit, HANDLE process )
     {
         static const ULong SLASH_LIMIT = 4;
-        Bool status = false;
-        WCHAR path[STRING_PATH_SIZE] = {0};
+        Bool        status = false;
+        PathString  path = {0};
 
         // get executable path and build target id string
         if( GetProcessImageFileName(process, path, COUNT(path)) == 0 )
@@ -94,8 +60,8 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     Bool SharedTools::BuildSavePath( WCHAR* path, ULong limit, const WCHAR* name )
     {
-        WCHAR   save_path[STRING_PATH_SIZE];
-        WCHAR   wpath[MAX_PATH];
+        PathString  save_path;
+        PathString  wpath;
 
         // get appdata folder
         if( SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA|CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, wpath) != S_OK )

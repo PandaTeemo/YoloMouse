@@ -55,8 +55,8 @@ namespace YoloMouse
         Bool _OptionAutoStart( Bool enable, Bool save );
 
         /**/
-        Bool _AssignCursor( Index cursor_index );
-        Bool _AssignSize( ULong size );
+        Bool _AssignCursor( Index group_index );
+        Bool _AssignSize( Long size_index_delta );
 
         /**/
         Instance* _AccessCurrentInstance();

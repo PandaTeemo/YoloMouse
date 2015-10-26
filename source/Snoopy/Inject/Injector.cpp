@@ -144,7 +144,7 @@ namespace Snoopy
 
         // load symbols for new dll
         _inject_base = _LoadSymbolModule(pdll_name);
-        if(_inject_base == 0)
+        if( _inject_base == 0 )
             return false;
 
         return true;
