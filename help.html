@@ -8,7 +8,7 @@
     <div class="TitlePanel">
         <div class="TitleHeader">
             <img src="Title.png"/>
-            <div class="TitleVersion">0.6.0 <b style="color:red">BETA</b></div>
+            <div class="TitleVersion">0.6.1 <b style="color:red">BETA</b></div>
         </div>
         <div class="TitleDescription">
             Game Cursor Changer
@@ -33,15 +33,11 @@
             <tr><td class="ListHeader">5</td><td class="ListContent">Most games have multiple cursors that change according to their context. Repeat steps 3-4 for each cursor you wish to change.</td></tr>
             <tr><td class="ListHeader">6</td><td class="ListContent">To reset a cursor to the game default hit <i>CTRL SHIFT ALT 0</i></td></tr>
             <tr><td class="ListHeader">7</td><td class="ListContent">To decrease or increase cursor size use <i>CTRL SHIFT ALT - or +</i></td></tr>
-            <tr><td class="ListHeader">NOTE</td><td class="ListContent">
-                <li>For some games, like WoW, you may not see the cursor change right away. Hover over something that changes the cursor (like an enemy) then hover back and you should see your new cursor.
-                <li>Fullscreen mode limits cursor size to 64. If you wish to use larger sizes switch to fullscreen-borderless or windowed.
-            </td></tr>
         </table>
     </div>
 
     <!-- problems -->
-    <div class="Panel" style="width:520px; top:575px; left:5px; background-color:#80f;">
+    <div class="Panel" style="width:520px; top:505px; left:5px; background-color:#80f;">
         <div class="Header" style="background-color:#60d; width:50%;">
             Problems
         </div>
@@ -55,7 +51,11 @@
             <tr><td class="ListHeader">DPI Scaling</td><td class="ListContent">If you have this on <b><a href="http://ccm.net/faq/32589-windows-8-1-disable-display-scaling-on-high-dpi-settings">disable it</a></b> for games that don't support it properly like Diablo 3 and Heroes of the Storm.</td></tr>
             
             <tr><td class="ListHeader">Hardware Cursor</td><td class="ListContent">If the <i>hardware cursor</i> setting is available in your game, ensure it is ON. This is standard in all modern games.</td></tr>
-        </table>
+
+            <tr><td class="ListHeader">New Cursor Disappears</td><td class="ListContent">Some games, like Path of Exile, require you to restart the game after using YM with them for the first time.</td></tr>
+
+            <tr><td class="ListHeader">Fullscreen mode</td><td class="ListContent">Increasing cursor size over 64 is not support in fullscreen mode. If you wish to use larger sizes switch to fullscreen-windowed or windowed.</td></tr>
+            </table>
     </div>
 
     <!-- hotkeys -->
@@ -71,7 +71,7 @@
     </div>
 
     <!-- system tray menu -->
-    <div class="Panel" style="width:390px; top:280px; left:560px; background-color:#c08;">
+    <div class="Panel" style="width:390px; top:265px; left:560px; background-color:#c08;">
         <div class="Header" style="width:50%; background-color:#a06;">
             System Tray Menu
         </div>
@@ -81,11 +81,12 @@
         <table>
             <tr><td class="ListHeader">About</td><td class="ListContent">Shows YoloMouse version.</td></tr>
             <tr><td class="ListHeader">Start with Windows</td><td class="ListContent">Controls how YoloMouse starts with your system.</td></tr>
+            <tr><td class="ListHeader">Run as Administrator</td><td class="ListContent">Restarts YoloMouse with administrator privileges.</td></tr>
         </table>
     </div>
 
     <!-- faq -->
-    <div class="Panel" style="width: 400px; top:465px; left:615px; background-color:#556;">
+    <div class="Panel" style="width: 400px; top:470px; left:615px; background-color:#556;">
         <div class="Header" style="background-color:#445; width:50%;">
             FAQ
         </div>
