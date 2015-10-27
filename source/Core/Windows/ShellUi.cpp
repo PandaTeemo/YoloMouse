@@ -340,4 +340,9 @@ namespace Core
             DispatchMessage(&msg); 
         }
     }
+
+    void ShellUi::Exit()
+    {
+        PostMessage( _hwnd, WM_CLOSE, 0, 0 );
+    }
 }

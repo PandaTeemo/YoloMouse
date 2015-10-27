@@ -33,6 +33,7 @@ namespace YoloMouse
 
     enum
     {
+        MENU_OPTION_RUNASADMIN,
         MENU_OPTION_AUTOSTART,
         MENU_OPTION_ABOUT,
         MENU_OPTION_COUNT
@@ -70,7 +71,7 @@ namespace YoloMouse
     extern const WCHAR* APP_MENU_STRINGS[];
     static const WCHAR* APP_NAME =                  L"YoloMouse";
     static const Char*  APP_NAMEC =                 "YoloMouse";
-    static const Char*  APP_ABOUT =                 "Version 0.6.0\nBy HaPpY :)";
+    static const Char*  APP_ABOUT =                 "Version 0.6.1\nBy HaPpY :)";
 
     static const WCHAR* PATH_LOADER =               L"YoloMouse.exe";
     static const CHAR*  PATH_DLL32 =                "Yolo32.dll";

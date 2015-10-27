@@ -14,18 +14,12 @@ namespace YoloMouse
         public SystemMonitor::IListener,
         public ShellUi::IListener
     {
-    private:
-        InstanceManager _instance_manager;
-        SharedState&    _state;
-
-        ShellUi&        _ui;
-        InputMonitor    _input_monitor;
-        SystemMonitor&  _system_monitor;
-        Settings        _settings;
-
     public:
         /**/
         App();
+
+        /**/
+        Bool GetElevate() const;
 
         /**/
         void Start();
@@ -52,6 +46,7 @@ namespace YoloMouse
         void _StopUi();
 
         /**/
+        Bool _OptionRunAsAdmin();
         Bool _OptionAutoStart( Bool enable, Bool save );
 
         /**/
@@ -69,5 +64,15 @@ namespace YoloMouse
 
         /**/
         Bool OnMenuOption( Id id, Bool enabled );
+
+        // fields
+        InstanceManager _instance_manager;
+        SharedState&    _state;
+
+        ShellUi&        _ui;
+        InputMonitor    _input_monitor;
+        SystemMonitor&  _system_monitor;
+        Settings        _settings;
+        Bool            _elevate;
     };
 }

@@ -5,6 +5,7 @@ namespace YoloMouse
     //------------------------------------------------------------------------
     const WCHAR* APP_MENU_STRINGS[MENU_OPTION_COUNT] =
     {
+        L"Run as administrator",
         L"Start with Windows",
         L"About",
     };

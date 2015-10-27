@@ -46,5 +46,6 @@ namespace Core
 
         /**/
         void Run();
+        void Exit();
     };
 }

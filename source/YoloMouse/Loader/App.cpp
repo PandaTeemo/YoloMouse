@@ -3,8 +3,7 @@
 #include <YoloMouse/Loader/Resource/resource.h>
 #include <YoloMouse/Share/Constants.hpp>
 #include <YoloMouse/Share/SharedTools.hpp>
-
-#include <psapi.h>
+#include <Shlobj.h>
 
 namespace YoloMouse
 {
@@ -15,11 +14,18 @@ namespace YoloMouse
         _ui             (ShellUi::Instance()),
         _input_monitor  (_ui),
         _system_monitor (SystemMonitor::Instance()),
-        _settings       (SETTINGS_ITEMS)
+        _settings       (SETTINGS_ITEMS),
+        _elevate        (false)
     {
         // init ui
         _ui.SetName(APP_NAME);
         _ui.SetIcon(IDI_ICONAPP);
+    }
+
+    //-------------------------------------------------------------------------
+    Bool App::GetElevate() const
+    {
+        return _elevate;
     }
 
     //-------------------------------------------------------------------------
@@ -137,10 +143,16 @@ namespace YoloMouse
         // add menu
         _ui.AddMenu();
 
-        // add menu options
+        // add menu break
         _ui.AddMenuBreak();
-        _ui.AddMenuOption(MENU_OPTION_AUTOSTART,    APP_MENU_STRINGS[MENU_OPTION_AUTOSTART],    _settings.GetBoolean(SETTING_AUTOSTART));
-        _ui.AddMenuOption(MENU_OPTION_ABOUT,        APP_MENU_STRINGS[MENU_OPTION_ABOUT],        false);
+
+        // add run-as-administrator option if not already admin
+        if( !IsUserAnAdmin() )
+            _ui.AddMenuOption(MENU_OPTION_RUNASADMIN, APP_MENU_STRINGS[MENU_OPTION_RUNASADMIN], false);
+        // add start-with-windows option
+        _ui.AddMenuOption(MENU_OPTION_AUTOSTART, APP_MENU_STRINGS[MENU_OPTION_AUTOSTART], _settings.GetBoolean(SETTING_AUTOSTART));
+        // add about dialog
+        _ui.AddMenuOption(MENU_OPTION_ABOUT, APP_MENU_STRINGS[MENU_OPTION_ABOUT], false);
 
         // register events
         _ui.AddListener(*this);
@@ -210,6 +222,17 @@ namespace YoloMouse
         }
 
         return false;
+    }
+
+    Bool App::_OptionRunAsAdmin()
+    {
+        // exit current process
+        ShellUi::Instance().Exit();
+
+        // set elevate state
+        _elevate = true;
+
+        return true;
     }
 
     //-------------------------------------------------------------------------
@@ -311,6 +334,11 @@ namespace YoloMouse
     {
         switch(id)
         {
+        // run as administrator
+        case MENU_OPTION_RUNASADMIN:
+            _OptionRunAsAdmin();
+            return true;
+
         // auto start
         case MENU_OPTION_AUTOSTART:
             // toggle auto start

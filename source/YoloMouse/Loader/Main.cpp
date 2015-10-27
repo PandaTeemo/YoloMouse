@@ -4,9 +4,19 @@
 
 namespace YoloMouse
 {
+    // types
+    //-------------------------------------------------------------------------
+    enum ExitStatus
+    {
+        EXIT_NORMAL,
+        EXIT_ELEVATE,
+        EXIT_ERROR,
+        EXIT_PLATFORM,
+    };
+
     // main
     //-------------------------------------------------------------------------
-    static void Main()
+    static ExitStatus Main()
     {
         App app;
 
@@ -18,6 +28,9 @@ namespace YoloMouse
 
         // stop
         app.Stop();
+
+        // return exit status
+        return app.GetElevate() ? EXIT_ELEVATE : EXIT_NORMAL;
     }
 
     // debugging
@@ -36,50 +49,66 @@ int WINAPI WinMain(
     int         iCmdShow)
 {
     using namespace Core;
-    int status;
 
     //YoloMouse::_UnitTest(); return 0;
 
-    // create duplicate instance prevention mutex
-    HANDLE instance_mutex = CreateMutex( NULL, TRUE, YoloMouse::IPC_MUTEX_NAME );
-
-    // if failed to create
-    if( instance_mutex == NULL )
-        status = 3;
-    else
+    // restart loop
+    while( true )
     {
-        // if duplicate instance
-        if( GetLastError() == ERROR_ALREADY_EXISTS )
-            status = 2;
-        // else good to go
+        // default exit status
+        int status = YoloMouse::EXIT_NORMAL;
+
+        // create duplicate instance prevention mutex
+        HANDLE instance_mutex = CreateMutex( NULL, TRUE, YoloMouse::IPC_MUTEX_NAME );
+
+        // if failed to create
+        if( instance_mutex == NULL )
+            status = YoloMouse::EXIT_PLATFORM + 0;
         else
         {
-            PathString path;
-
-            // ensure working directory is that of the main executable
-            if(SystemTools::GetProcessDirectory(path, COUNT(path)) && SetCurrentDirectory(path))
-            {
-                // run main
-                try
-                {
-                    YoloMouse::Main();
-                    status = 0;
-                }
-                // catch eggs
-                catch( const Char* error )
-                {
-                    YoloMouse::SharedTools::ErrorMessage(error);
-                    status = 1;
-                }
-            }
-            // path change failed
+            // if duplicate instance
+            if( GetLastError() == ERROR_ALREADY_EXISTS )
+                status = YoloMouse::EXIT_PLATFORM + 2;
+            // else good to go
             else
-                status = 4;
+            {
+                PathString path;
+
+                // ensure working directory is that of the main executable
+                if(SystemTools::GetProcessDirectory(path, COUNT(path)) && SetCurrentDirectory(path))
+                {
+                    // run main
+                    try
+                    {
+                        status = YoloMouse::Main();
+                    }
+                    // catch eggs
+                    catch( const Char* error )
+                    {
+                        YoloMouse::SharedTools::ErrorMessage(error);
+                        status = YoloMouse::EXIT_PLATFORM + 1;
+                    }
+                }
+                // path change failed
+                else
+                    status = YoloMouse::EXIT_PLATFORM + 4;
+            }
+
+            // cleanup
+            CloseHandle( instance_mutex );
         }
 
-        // cleanup
-        CloseHandle( instance_mutex );
-    }
+        // if elevate requested relaunch as administrator
+        if( status == YoloMouse::EXIT_ELEVATE )
+        {
+            // relaunch self as administrator. return value over 32 indicates success
+            if( (Long)ShellExecute(NULL, L"runas", YoloMouse::PATH_LOADER, L"", NULL, SW_SHOWNORMAL) > 32 )
+                return 0;
 
-    return status;
+            // else restart current process
+        }
+        // normal exit
+        else
+            return status;
+    }
 }
