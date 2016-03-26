@@ -28,5 +28,6 @@ namespace Core
     //-------------------------------------------------------------------------
     static const ULong STRING_SHORT_SIZE =  16;
     static const ULong STRING_MEDIUM_SIZE = 64;
-    static const ULong STRING_PATH_SIZE =   512;
+    static const ULong STRING_MAX_SIZE =    512;
+    static const ULong STRING_PATH_SIZE =   STRING_MAX_SIZE;
 }

@@ -24,6 +24,10 @@ YoloNotify( void* arg )
         App::UpdateSize(static_cast<Long>(m.parameter));
         break;
 
+    case NOTIFY_SETDEFAULT:
+        App::UpdateDefault();
+        break;
+
     case NOTIFY_REFRESH:
         App::Refresh();
         break;

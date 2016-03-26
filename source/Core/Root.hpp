@@ -99,5 +99,5 @@ namespace Core
 
     /**/
     extern void LogFile( const Char* format, ... );
-    #define xlog LogFile
+    #define dlog LogFile
 }

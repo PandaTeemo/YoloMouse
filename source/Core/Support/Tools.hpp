@@ -74,6 +74,7 @@ namespace Core
 
         /**/
         static ULong CStrLen( const Char* string );
+        static CHAR* WToCString( const WCHAR* wstring );
 
         /**/
         static Bool StripFileName( WCHAR* path );

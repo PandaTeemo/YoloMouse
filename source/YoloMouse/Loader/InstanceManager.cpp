@@ -1,6 +1,7 @@
 #include <Core/Windows/SystemTools.hpp>
 #include <YoloMouse/Loader/InstanceManager.hpp>
 #include <YoloMouse/Share/SharedTools.hpp>
+#include <YoloMouse/Share/SharedState.hpp>
 
 namespace YoloMouse
 {
@@ -31,7 +32,10 @@ namespace YoloMouse
         // find free instance
         Instance* instance = Find(0);
         if( instance == NULL )
+        {
+            elog("InstanceManager.Load.Find");
             return NULL;
+        }
 
         // load instance
         if( !instance->Load(process_id) )
@@ -65,15 +69,19 @@ namespace YoloMouse
             if( SharedTools::BuildTargetId(target_id, COUNT(target_id), process))
             {
                 // build save path
-                if(SharedTools::BuildSavePath(save_path, COUNT(save_path), target_id))
+                if( SharedTools::BuildUserPath(save_path, COUNT(save_path), target_id, EXTENSION_INI, process) )
                 {
                     // success if save file exists
                     status = Tools::DoesFileExist(save_path);
                 }
+                else
+                    elog("InstanceManager.IsConfigured.BuildUserPath: %s", Tools::WToCString(target_id));
 
                 // close process
                 CloseHandle(process);
             }
+            else
+                elog("InstanceManager.IsConfigured.BuildTargetId");
         }
 
         return status;

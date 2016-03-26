@@ -219,7 +219,7 @@ namespace Snoopy
             // if created
             if( handle != INVALID_HANDLE_VALUE )
             {
-                DWORD64 base_address;
+                DWORD64 base_address = 0;
 
                 // init
                 me.dwSize = sizeof(me);

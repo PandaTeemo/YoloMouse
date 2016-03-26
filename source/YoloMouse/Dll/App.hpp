@@ -20,6 +20,7 @@ namespace YoloMouse
         /**/
         static Bool UpdateCursor( Index resource_index );
         static Bool UpdateSize( Long size_index_delta );
+        static Bool UpdateDefault();
 
         /**/
         static Bool Refresh();
@@ -42,6 +43,9 @@ namespace YoloMouse
         /**/
         static Bool _OnUpdateGroup( HCURSOR hcursor );
         static Bool _OnUpdateSize( HCURSOR hcursor );
+        static void _OnUpdateDefault();
+
+        /**/
         static Bool _OnCursorChanging( HCURSOR hcursor );
         static void _OnCursorHook( HCURSOR& new_cursor, HCURSOR old_cursor );
 
@@ -56,6 +60,7 @@ namespace YoloMouse
         static HandleCache      _cache;
         static HCURSOR          _last_cursor;
         static HCURSOR          _replace_cursor;
+        static CursorBindings::Binding* _current_binding;
         static Method           _method;
         static PathString       _target_id;
         static Bool             _refresh_ready;
@@ -63,6 +68,7 @@ namespace YoloMouse
         // fields: input
         static Index            _update_group;
         static Long             _update_size;
+        static Bool             _update_default;
 
         // fields: hooks
         static Hook             _hook_setcursor;

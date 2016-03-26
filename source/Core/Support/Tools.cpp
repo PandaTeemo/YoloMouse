@@ -1,3 +1,4 @@
+#include <Core/Constants.hpp>
 #include <Core/Support/Tools.hpp>
 #include <stdio.h>
 #include <string.h>
@@ -7,6 +8,21 @@ namespace Core
 {
     // public
     //-------------------------------------------------------------------------
+    ULong Tools::CStrLen( const Char* string )
+    {
+        assert(string);
+        return (ULong)strlen(string);
+    }
+
+    CHAR* Tools::WToCString( const WCHAR* wstring )
+    {
+        static CHAR cstring[STRING_MAX_SIZE];
+
+        eggs(WideCharToMultiByte( CP_ACP, 0, wstring, -1, cstring, sizeof(cstring), NULL, NULL ) > 0);
+
+        return cstring;
+    }
+
     Bool Tools::StripFileName( WCHAR* path )
     {
         WCHAR* end = path + wcslen(path);
@@ -29,29 +45,6 @@ namespace Core
         return false;
     }
 
-    // private
-    //-------------------------------------------------------------------------
-    void Tools::_MemSet( void* memory, Byte value, ULong size )
-    {
-        ::memset(memory, value, size);
-    }
-
-    void Tools::_MemCpy( void* to, const void* from, ULong size )
-    {
-        ::memcpy(to, from, size);
-    }
-
-    Long Tools::_MemCmp( const void* a, const void* b, ULong size )
-    {
-        return ::memcmp(a, b, size);
-    }
-
-    ULong Tools::CStrLen( const Char* string )
-    {
-        assert(string);
-        return (ULong)strlen(string);
-    }
-
     Hash Tools::Fnv164Hash( const void* memory, ULong count )
     {
         const Byte* bmemory = reinterpret_cast<const Byte*>(memory);
@@ -67,5 +60,22 @@ namespace Core
         }
 
         return hash;
+    }
+
+    // private
+    //-------------------------------------------------------------------------
+    void Tools::_MemSet( void* memory, Byte value, ULong size )
+    {
+        ::memset(memory, value, size);
+    }
+
+    void Tools::_MemCpy( void* to, const void* from, ULong size )
+    {
+        ::memcpy(to, from, size);
+    }
+
+    Long Tools::_MemCmp( const void* a, const void* b, ULong size )
+    {
+        return ::memcmp(a, b, size);
     }
 }

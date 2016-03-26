@@ -204,6 +204,9 @@ namespace Core
         // if valid
         if( key < 0xff )
         {
+            // translate key
+            key = _TranslateKey(key);
+
             // if state changed
             if( _state[key] != down )
             {
@@ -244,5 +247,11 @@ namespace Core
         }
 
         return NULL;
+    }
+
+    //------------------------------------------------------------------------=
+    ULong InputMonitor::_TranslateKey( ULong key )
+    {
+        return key;
     }
 }

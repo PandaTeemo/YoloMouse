@@ -5,9 +5,10 @@ namespace YoloMouse
     //------------------------------------------------------------------------
     const WCHAR* APP_MENU_STRINGS[MENU_OPTION_COUNT] =
     {
-        L"Run as administrator",
-        L"Start with Windows",
-        L"About",
+        L"Run as administrator",    //MENU_OPTION_RUNASADMIN
+        L"Start with Windows",      //MENU_OPTION_AUTOSTART
+        L"Errors",                  //MENU_OPTION_ERRORS
+        L"About",                   //MENU_OPTION_ABOUT
     };
 
     const ULong CURSOR_SIZE_TABLE[CURSOR_SIZE_COUNT] =
@@ -39,8 +40,9 @@ namespace YoloMouse
         { "CursorKeyReset",     "CONTROL ALT SHIFT 0" },
         { "CursorKeySmaller",   "CONTROL ALT SHIFT -" },
         { "CursorKeyLarger",    "CONTROL ALT SHIFT =" },
-        { "CursorSize",         "2" },
+        { "CursorKeyDefault",   "CONTROL ALT SHIFT D" },
         { "AutoStart",          "1" },
+        { "ShowMenu",           "1" },
     };
     Settings::KeyValueCollection SETTINGS_ITEMS(_settings, COUNT(_settings));
 }

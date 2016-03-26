@@ -64,5 +64,8 @@ namespace Core
 
         /**/
         Combo* _FindCombo();
+
+        /**/
+        ULong _TranslateKey( ULong key );
     };
 }

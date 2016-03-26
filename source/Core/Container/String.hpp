@@ -27,7 +27,12 @@ namespace Core
         /**/
         Char* GetZ()
         {
-            xassert(_memory[_count] == 0);
+            if( _memory[_count] != 0 )
+            {
+                xassert(_count < _limit);
+                _memory[_count] = 0;
+            }
+
             return _memory;
         }
 
@@ -98,7 +103,7 @@ namespace Core
     };
 
     /**/
-    typedef BaseString<BaseArray<Char, PointerArrayTraits<Char>>>   String;
+    typedef BaseString<BaseArray<Char, PointerArrayTraits<Char>>> String;
 
     /**/
     template<class ARRAY>
@@ -131,5 +136,5 @@ namespace Core
     /**/
     typedef FixedString<FixedArray<Char, STRING_SHORT_SIZE>>    ShortString;
     typedef FixedString<FixedArray<Char, STRING_MEDIUM_SIZE>>   MediumString;
+    typedef FixedString<FixedArray<Char, STRING_MAX_SIZE>>      MaxString;
 }
-

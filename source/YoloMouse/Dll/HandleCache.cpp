@@ -1,4 +1,5 @@
 #include <YoloMouse/Dll/HandleCache.hpp>
+#include <YoloMouse/Share/SharedState.hpp>
 
 namespace YoloMouse
 {
@@ -52,11 +53,17 @@ namespace YoloMouse
 
         // require valid
         if( hcursor == NULL )
+        {
+            elog("HandleCache.CalculateHash.CursorIsNull");
             return 0;
+        }
 
         // get icon info
         if( GetIconInfo(hcursor, &iconinfo) == FALSE )
+        {
+            elog("HandleCache.CalculateHash.GetIconInfo");
             return 0;
+        }
 
         // get icon bitmap buffer
         count = GetBitmapBits( iconinfo.hbmColor ? iconinfo.hbmColor : iconinfo.hbmMask, sizeof(buffer), buffer );
@@ -68,8 +75,11 @@ namespace YoloMouse
             DeleteObject(iconinfo.hbmMask);
 
         // fail if no bits read
-        if(count == 0)
+        if( count == 0 )
+        {
+            elog("HandleCache.CalculateHash.GetBitmapBits");
             return 0;
+        }
 
         // generate hash
         return Tools::Fnv164Hash(buffer, count);

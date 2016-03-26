@@ -21,6 +21,10 @@ namespace YoloMouse
         // update state
         _host = host;
 
+        // initialize log
+        if( host )
+            _shared->log.Intialize();
+
         return true;
     }
 
@@ -28,6 +32,12 @@ namespace YoloMouse
     {
         // close shared memory
         _shared.Close();
+    }
+
+    //-------------------------------------------------------------------------
+    SharedLog& SharedState::GetLog() const
+    {
+        return _shared->log;
     }
 
     //-------------------------------------------------------------------------

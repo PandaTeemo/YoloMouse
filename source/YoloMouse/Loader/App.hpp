@@ -46,12 +46,14 @@ namespace YoloMouse
         void _StopUi();
 
         /**/
+        void _OptionErrors();
         Bool _OptionRunAsAdmin();
         Bool _OptionAutoStart( Bool enable, Bool save );
 
         /**/
         Bool _AssignCursor( Index group_index );
         Bool _AssignSize( Long size_index_delta );
+        Bool _AssignDefault();
 
         /**/
         Instance* _AccessCurrentInstance();

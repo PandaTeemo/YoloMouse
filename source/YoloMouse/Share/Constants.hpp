@@ -11,6 +11,7 @@ namespace YoloMouse
         NOTIFY_INIT,
         NOTIFY_SETCURSOR,
         NOTIFY_SETSIZE,
+        NOTIFY_SETDEFAULT,
         NOTIFY_REFRESH,
     };
 
@@ -28,13 +29,16 @@ namespace YoloMouse
         SETTING_GROUPKEY_RESET,
         SETTING_SIZEKEY_SMALLER,
         SETTING_SIZEKEY_LARGER,
+        SETTING_DEFAULTKEY,
         SETTING_AUTOSTART,
+        SETTING_SHOWMENU,
     };
 
     enum
     {
         MENU_OPTION_RUNASADMIN,
         MENU_OPTION_AUTOSTART,
+        MENU_OPTION_ERRORS,
         MENU_OPTION_ABOUT,
         MENU_OPTION_COUNT
     };
@@ -58,6 +62,8 @@ namespace YoloMouse
 
     // numeric
     //-------------------------------------------------------------------------
+    static const ULong LOG_MEMORY_LIMIT =           KILOBYTES(8);
+    static const ULong APP_NAME_LIMIT =             64;
     static const ULong LOADER_TARGET_LIMIT =        20;
     static const ULong CURSOR_BINDING_LIMIT =       100;
     static const ULong CURSOR_GROUP_SIZE =          10;
@@ -71,7 +77,6 @@ namespace YoloMouse
     extern const WCHAR* APP_MENU_STRINGS[];
     static const WCHAR* APP_NAME =                  L"YoloMouse";
     static const Char*  APP_NAMEC =                 "YoloMouse";
-    static const Char*  APP_ABOUT =                 "Version 0.6.1\nBy HaPpY :)";
 
     static const WCHAR* PATH_LOADER =               L"YoloMouse.exe";
     static const CHAR*  PATH_DLL32 =                "Yolo32.dll";
@@ -79,6 +84,9 @@ namespace YoloMouse
     static const WCHAR* PATH_SETTINGS_NAME =        L"Settings";
     static const WCHAR* PATH_CURSORS_CUSTOM =       L"Cursors";
     static const WCHAR* PATH_CURSORS_DEFAULT =      L"Cursors\\Default";
+    static const WCHAR* PATH_ERRORS =               L"errors";
+    static const WCHAR* EXTENSION_INI =             L"ini";
+    static const WCHAR* EXTENSION_LOG =             L"txt";
     static const WCHAR* EXTENSION_STATIC =          L"cur";
     static const WCHAR* EXTENSION_ANIMATED =        L"ani";
 
@@ -86,6 +94,9 @@ namespace YoloMouse
 
     static const WCHAR* IPC_MUTEX_NAME =            L"YoloMouseMutex";
     static const WCHAR* IPC_MEMORY_NAME =           L"YoloMouseMemory";
+
+    static const Char*  TEXT_ABOUT =                "Version 0.7.0\nBy HaPpY :)";
+    static const Char*  TEXT_NOERRORS =             "No errors found... Yay! :D";
 
     // tables
     //-------------------------------------------------------------------------

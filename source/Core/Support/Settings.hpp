@@ -9,6 +9,7 @@ namespace Core
     class Settings
     {
     public:
+        // types
         struct KeyValue
         {
             MediumString    key;
@@ -18,13 +19,6 @@ namespace Core
         typedef Array<KeyValue>                 KeyValueCollection;
         typedef KeyValueCollection::Iterator    KeyValueIterator;
 
-    private:
-        KeyValueCollection  _keyvalues;
-        PathString          _path;
-        Bool                _ready;
-        ULong               _accessed;
-
-    public:
         /**/
         Settings( KeyValueCollection& items );
 
@@ -48,5 +42,12 @@ namespace Core
 
         /**/
         Id Find( String key );
+
+    private:
+        // fields
+        KeyValueCollection  _keyvalues;
+        PathString          _path;
+        Bool                _ready;
+        ULong               _accessed;
     };
 }

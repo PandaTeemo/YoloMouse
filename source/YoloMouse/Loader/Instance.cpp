@@ -1,6 +1,7 @@
 #include <Core/Windows/SystemTools.hpp>
 #include <YoloMouse/Loader/Instance.hpp>
 #include <YoloMouse/Share/Constants.hpp>
+#include <YoloMouse/Share/SharedState.hpp>
 
 namespace YoloMouse
 {
@@ -53,13 +54,19 @@ namespace YoloMouse
                             _process_id = process_id;
                             return true;
                         }
+                        else
+                            elog("Instance.Load.RegisterWaitForSingleObject");
                     }
                 }
+                else
+                    elog("Instance.Load.Injector.Load: %s", inject_dll);
             }
 
             // unload
             Unload();
         }
+        else
+            elog("Instance.Load.OpenProcess");
 
         return false;
     }
@@ -95,7 +102,11 @@ namespace YoloMouse
         m.parameter = parameter;
 
         // call remote notify handler
-        return _injector.CallNotify(&m, sizeof(m));
+        if( _injector.CallNotify(&m, sizeof(m)) )
+            return true;
+
+        elog("Instance.Notify.Injector.CallNotify: %d", id);
+        return false;
     }
 
     // private
@@ -111,6 +122,7 @@ namespace YoloMouse
         if( bitness == BITNESS_64 )
             return PATH_DLL64;
 
+        elog("Instance.ChooseInjectDll.GetProcessBitness");
         return NULL;
     }
 

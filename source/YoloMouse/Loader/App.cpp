@@ -4,6 +4,7 @@
 #include <YoloMouse/Share/Constants.hpp>
 #include <YoloMouse/Share/SharedTools.hpp>
 #include <Shlobj.h>
+#include <io.h>
 
 namespace YoloMouse
 {
@@ -31,11 +32,11 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     void App::Start()
     {
-        // start settings
-        _StartSettings();
-
         // start shared state
         _StartState();
+
+        // start settings
+        _StartSettings();
 
         // start ui
         _StartUi();
@@ -64,11 +65,11 @@ namespace YoloMouse
         // stop ui
         _StopUi();
 
-        // stop shared state
-        _StopState();
-
         // stop settings
         _StopSettings();
+
+        // stop shared state
+        _StopState();
     }
 
     //-------------------------------------------------------------------------
@@ -88,10 +89,13 @@ namespace YoloMouse
         _input_monitor.SetListener(this);
 
         // for each cursor key
-        for( Id id = SETTING_GROUPKEY_1; id <= SETTING_SIZEKEY_LARGER; id++ )
+        for( Id id = SETTING_GROUPKEY_1; id <= SETTING_DEFAULTKEY; id++ )
         {
+            String format = _settings.Get(id);
+
             // create combo
-            _input_monitor.CreateCombo(id, _settings.Get(id));
+            if( !_input_monitor.CreateCombo(id, format) )
+                elog("App.StartInput.CreateCombo: %d:%s", id, format.GetZ());
         }
 
         // start input monitor
@@ -110,11 +114,14 @@ namespace YoloMouse
         PathString settings_path;
 
         // set settings path
-        if(SharedTools::BuildSavePath(settings_path, COUNT(settings_path), PATH_SETTINGS_NAME))
+        if( SharedTools::BuildUserPath(settings_path, COUNT(settings_path), PATH_SETTINGS_NAME, EXTENSION_INI, NULL) )
             _settings.SetPath(settings_path);
+        else
+            elog("App.StartSettings.BuildUserPath: %s", Tools::WToCString(PATH_SETTINGS_NAME));
 
         // load settings
-        _settings.Load();
+        if( !_settings.Load() )
+            elog("App.StartSettings.Load: %s", Tools::WToCString(settings_path));
     }
 
     void App::_StartState()
@@ -140,19 +147,25 @@ namespace YoloMouse
         // start ui
         eggs(_ui.Start());
 
-        // add menu
-        _ui.AddMenu();
+        // if showmenu enabled
+        if( _settings.GetBoolean(SETTING_SHOWMENU) )
+        {
+            // add menu
+            _ui.AddMenu();
 
-        // add menu break
-        _ui.AddMenuBreak();
+            // add menu break
+            _ui.AddMenuBreak();
 
-        // add run-as-administrator option if not already admin
-        if( !IsUserAnAdmin() )
-            _ui.AddMenuOption(MENU_OPTION_RUNASADMIN, APP_MENU_STRINGS[MENU_OPTION_RUNASADMIN], false);
-        // add start-with-windows option
-        _ui.AddMenuOption(MENU_OPTION_AUTOSTART, APP_MENU_STRINGS[MENU_OPTION_AUTOSTART], _settings.GetBoolean(SETTING_AUTOSTART));
-        // add about dialog
-        _ui.AddMenuOption(MENU_OPTION_ABOUT, APP_MENU_STRINGS[MENU_OPTION_ABOUT], false);
+            // add run-as-administrator option if not already admin
+            if( !IsUserAnAdmin() )
+                _ui.AddMenuOption(MENU_OPTION_RUNASADMIN, APP_MENU_STRINGS[MENU_OPTION_RUNASADMIN], false);
+            // add start-with-windows option
+            _ui.AddMenuOption(MENU_OPTION_AUTOSTART, APP_MENU_STRINGS[MENU_OPTION_AUTOSTART], _settings.GetBoolean(SETTING_AUTOSTART));
+            // add debug log
+            _ui.AddMenuOption(MENU_OPTION_ERRORS, APP_MENU_STRINGS[MENU_OPTION_ERRORS], false);
+            // add about dialog
+            _ui.AddMenuOption(MENU_OPTION_ABOUT, APP_MENU_STRINGS[MENU_OPTION_ABOUT], false);
+        }
 
         // register events
         _ui.AddListener(*this);
@@ -201,27 +214,40 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool App::_OptionAutoStart( Bool enable, Bool save )
+    void App::_OptionErrors()
     {
-        PathString path;
+        FILE*       file;
+        PathString  error_path;
+        SharedLog&  log = SharedState::Instance().GetLog();
 
-        // get exec path
-        if(GetFullPathName(PATH_LOADER, COUNT(path), path, NULL))
+        // if empty
+        if( log.IsEmpty() )
         {
-            // update settings
-            if( save )
-            {
-                _settings.SetBoolean(SETTING_AUTOSTART, enable);
-                _settings.Save();
-            }
-
-            // enable or disable autostart
-            SystemTools::EnableAutoStart( APP_NAME, path, enable );
-
-            return true;
+            SharedTools::MessagePopup(false, TEXT_NOERRORS);
+            return;
         }
 
-        return false;
+        // get error path
+        if( !SharedTools::BuildUserPath(error_path, COUNT(error_path), PATH_ERRORS, EXTENSION_LOG, NULL) )
+            return;
+
+        // open file
+        if( _wfopen_s(&file, error_path, L"wt") == 0 )
+        {
+            SharedLog&  log = SharedState::Instance().GetLog();
+            Index       index = INVALID_INDEX;
+            MaxString   line;
+
+            // read memory log and write to file
+            while( log.Read(index, line) )
+                fprintf(file, "%s\n", line.GetZ());
+
+            // close file
+            fclose(file);
+
+            // open in default text editor
+            ShellExecute(NULL, L"open", error_path, L"", NULL, SW_SHOWNORMAL);
+        }
     }
 
     Bool App::_OptionRunAsAdmin()
@@ -233,6 +259,36 @@ namespace YoloMouse
         _elevate = true;
 
         return true;
+    }
+
+    Bool App::_OptionAutoStart( Bool enable, Bool save )
+    {
+        PathString path;
+
+        // get exec path
+        if(GetFullPathName(PATH_LOADER, COUNT(path), path, NULL))
+        {
+            // update settings
+            if( save )
+            {
+                _settings.SetBoolean(SETTING_AUTOSTART, enable);
+                if( !_settings.Save() )
+                    elog("App.OptionAutoStart.Save");
+            }
+
+            // enable or disable autostart
+            if( !SystemTools::EnableAutoStart( APP_NAME, path, enable ) )
+            {
+                elog("App.OptionAutoStart.EnableAutoStart: %s", Tools::WToCString(path));
+                return false;
+            }
+
+            return true;
+        }
+        else
+            elog("App.OptionAutoStart.GetFullPathName");
+
+        return false;
     }
 
     //-------------------------------------------------------------------------
@@ -258,6 +314,17 @@ namespace YoloMouse
         return instance->Notify(NOTIFY_SETSIZE, size_index_delta);
     }
 
+    Bool App::_AssignDefault()
+    {
+        // access active instance
+        Instance* instance = _AccessCurrentInstance();
+        if( instance == NULL )
+            return false;
+
+        // notify instance to assign
+        return instance->Notify(NOTIFY_SETDEFAULT);
+    }
+
     //-------------------------------------------------------------------------
     Instance* App::_AccessCurrentInstance()
     {
@@ -266,11 +333,17 @@ namespace YoloMouse
         // get active window
         HWND hwnd = GetForegroundWindow();
         if( hwnd == NULL )
+        {
+            elog("App.AccessCurrentInstance.GetForegroundWindow");
             return NULL;
+        }
 
         // get its process id
         if( GetWindowThreadProcessId(hwnd, &process_id) == 0 )
+        {
+            elog("App.AccessCurrentInstance.GetWindowThreadProcessId");
             return NULL;
+        }
 
         // find instance if one exists
         Instance* instance = _instance_manager.Find(process_id);
@@ -295,6 +368,9 @@ namespace YoloMouse
         // change size
         else if( combo_id >= SETTING_SIZEKEY_SMALLER && combo_id <= SETTING_SIZEKEY_LARGER )
             _AssignSize(combo_id == SETTING_SIZEKEY_SMALLER ? -1 : 1);
+        // assign default
+        else if( combo_id == SETTING_DEFAULTKEY )
+            _AssignDefault();
     }
 
     //-------------------------------------------------------------------------
@@ -325,7 +401,7 @@ namespace YoloMouse
         // catch eggs
         catch( const Char* error )
         {
-            SharedTools::ErrorMessage(error);
+            SharedTools::MessagePopup(true, error);
         }
     }
 
@@ -346,9 +422,14 @@ namespace YoloMouse
                 _ui.SetMenuOption(id, !enabled);
             return true;
 
+        // show debug log
+        case MENU_OPTION_ERRORS:
+            _OptionErrors();
+            return true;
+
         // show menu
         case MENU_OPTION_ABOUT:
-            MessageBoxA(NULL, APP_ABOUT, APP_NAMEC, MB_OK|MB_ICONINFORMATION);
+            SharedTools::MessagePopup(false, TEXT_ABOUT);
             return true;
 
         default:

@@ -1,4 +1,3 @@
-#pragma once
 #include <Core/Support/Settings.hpp>
 #include <stdio.h>
 

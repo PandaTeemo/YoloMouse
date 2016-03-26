@@ -12,6 +12,11 @@ namespace YoloMouse
         EXIT_ELEVATE,
         EXIT_ERROR,
         EXIT_PLATFORM,
+        EXIT_PLATFORM_MUTEX,
+        EXIT_PLATFORM_DUPLICATE,
+        EXIT_PLATFORM_MAIN,
+        EXIT_PLATFORM_PATH,
+        EXIT_PLATFORM_RUNASADMIN,
     };
 
     // main
@@ -49,6 +54,7 @@ int WINAPI WinMain(
     int         iCmdShow)
 {
     using namespace Core;
+    using namespace YoloMouse;
 
     //YoloMouse::_UnitTest(); return 0;
 
@@ -56,19 +62,19 @@ int WINAPI WinMain(
     while( true )
     {
         // default exit status
-        int status = YoloMouse::EXIT_NORMAL;
+        int status = EXIT_NORMAL;
 
         // create duplicate instance prevention mutex
-        HANDLE instance_mutex = CreateMutex( NULL, TRUE, YoloMouse::IPC_MUTEX_NAME );
+        HANDLE instance_mutex = CreateMutex( NULL, TRUE, IPC_MUTEX_NAME );
 
         // if failed to create
         if( instance_mutex == NULL )
-            status = YoloMouse::EXIT_PLATFORM + 0;
+            status = EXIT_PLATFORM_MUTEX;
         else
         {
             // if duplicate instance
             if( GetLastError() == ERROR_ALREADY_EXISTS )
-                status = YoloMouse::EXIT_PLATFORM + 2;
+                status = EXIT_PLATFORM_DUPLICATE;
             // else good to go
             else
             {
@@ -80,18 +86,18 @@ int WINAPI WinMain(
                     // run main
                     try
                     {
-                        status = YoloMouse::Main();
+                        status = Main();
                     }
                     // catch eggs
                     catch( const Char* error )
                     {
-                        YoloMouse::SharedTools::ErrorMessage(error);
-                        status = YoloMouse::EXIT_PLATFORM + 1;
+                        SharedTools::MessagePopup(true, error);
+                        status = EXIT_PLATFORM_MAIN;
                     }
                 }
                 // path change failed
                 else
-                    status = YoloMouse::EXIT_PLATFORM + 4;
+                    status = EXIT_PLATFORM_PATH;
             }
 
             // cleanup
@@ -99,16 +105,25 @@ int WINAPI WinMain(
         }
 
         // if elevate requested relaunch as administrator
-        if( status == YoloMouse::EXIT_ELEVATE )
+        if( status == EXIT_ELEVATE )
         {
             // relaunch self as administrator. return value over 32 indicates success
-            if( (Long)ShellExecute(NULL, L"runas", YoloMouse::PATH_LOADER, L"", NULL, SW_SHOWNORMAL) > 32 )
+            if( (Long)ShellExecute(NULL, L"runas", PATH_LOADER, L"", NULL, SW_SHOWNORMAL) > 32 )
                 return 0;
-
-            // else restart current process
+            else
+            {
+                SharedTools::MessagePopup(true, "Run As Administrator Failed");
+                return EXIT_PLATFORM_RUNASADMIN;
+            }
         }
         // normal exit
         else
+        {
+            // report exit error except duplicate
+            if( status && status != EXIT_PLATFORM_DUPLICATE )
+                SharedTools::MessagePopup(true, "Start Error: %d", status);
+
             return status;
+        }
     }
 }

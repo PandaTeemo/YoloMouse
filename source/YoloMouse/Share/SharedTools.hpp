@@ -11,9 +11,9 @@ namespace YoloMouse
         static Bool BuildTargetId( WCHAR* target_id, ULong limit, HANDLE process );
 
         /**/
-        static Bool BuildSavePath( WCHAR* path, ULong limit, const WCHAR* name );
+        static Bool BuildUserPath( WCHAR* path, ULong limit, const WCHAR* name, const WCHAR* extension, HANDLE process );
 
         /**/
-        static void ErrorMessage( const Char* message );
+        static void MessagePopup( Bool error, const Char* format, ... );
     };
 }

@@ -176,6 +176,7 @@ namespace YoloMouse
         // mark failed to avoid attempting again
         entry.state = RESOURCE_FAILED;
 
+        elog("CursorVault.CacheInit.NotFound: %d", resource_index);
         return false;
     }
 
@@ -215,7 +216,10 @@ namespace YoloMouse
             // load cursor
             resource.handle = reinterpret_cast<HCURSOR>(LoadImage(NULL, entry.path, IMAGE_CURSOR, width, height, entry.loadimage_flags));
             if( resource.handle == NULL )
+            {
+                elog("CursorVault.CacheLoad.LoadImage: %s %d %d %x", Tools::WToCString(entry.path), width, height, entry.loadimage_flags);
                 return false;
+            }
         }
 
         // increment referenced

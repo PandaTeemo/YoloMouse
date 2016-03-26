@@ -15,6 +15,14 @@ namespace YoloMouse
             Index   resource_index; // cursor resource index
             Index   size_index;     // size index
 
+            /**/
+            Binding();
+            Binding( Hash bitmap_hash_, Index resource_index_, Index size_index_ );
+
+            /**/
+            Bool Isvalid() const;
+
+            /**/
             Bool operator==( const Hash& hash_ ) const;
         };
 
@@ -30,6 +38,9 @@ namespace YoloMouse
         const MapTable& GetMap() const;
 
         /**/
+        Binding& EditDefault();
+
+        /**/
         Binding* Add( Hash cursor_hash, Index resource_index, Index size_index );
 
         /**/
@@ -42,5 +53,6 @@ namespace YoloMouse
     private:
         // fields
         MapTable _bindings;
+        Binding  _default;
     };
 }
