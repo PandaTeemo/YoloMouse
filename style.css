@@ -34,6 +34,11 @@ a:link, a:visited
     text-decoration: none;
 }
 
+a:hover
+{
+    background-color: rgba(0,0,0,.4);
+}
+
 /*---------------------------------------------------------------------------*/
 .Section
 {
@@ -74,7 +79,7 @@ a:link, a:visited
 /*---------------------------------------------------------------------------*/
 .Header, .TitleHeader
 {
-    padding: 3px 20px 3px 20px;
+    padding: 3px 6px 3px 20px;
     font-size: 24px;
     box-shadow: 2px 2px 0px rgba(0,0,0,.3);
     text-shadow: 0 1px 0 rgba(0,0,0,.3);
@@ -85,10 +90,10 @@ a:link, a:visited
 /*---------------------------------------------------------------------------*/
 .TitlePanel
 {
-    width: 435px;
+    width: 465px;
     background-color: #445;
     top: 70px;
-    left: 45px;
+    left: 0px;
     z-index: 3;
 }
 
