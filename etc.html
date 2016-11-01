@@ -8,7 +8,7 @@
     <div class="TitlePanel">
         <div class="TitleHeader">
             <img src="Title.png"/>
-            <div class="TitleVersion">0.7.0 <b style="color:red">BETA</b></div>
+            <div class="TitleVersion">0.8.0 <b style="color:red">BETA</b></div>
         </div>
         <div class="TitleDescription">
             Game Cursor Changer
@@ -28,8 +28,20 @@
             Change Log
         </div>
         <div class="Section">
+            0.8.0
+            <li> numpad keys are now detected as regular 1-9,-,+ keys (if numlock is on) in consideration of various foreign keyboards
+            <li> added 32/64 bit version to about menu
+            <li> added "open settings folder" option
+            <li> default hotkeys are now CTRL ALT 1-9. SHIFT removed since it conflicts with numpad.
+            <li> Windows XP support is discontinued.
+            <li> improved support for various games like path of exile and overwatch and apps like bluestacks
+            <li> changed window detection from the foreground one to the one at the cursor. hopefully this fixes issues with various overlays getting in the way.
+            <li> possibly fixed mysterious D: drive access. thx shagv@reddit for the find :)
+            <li> fixed handling of game using an invalid cursor. fixes stellaris.
+        </div>
+        <div class="Section">
             0.7.0
-            <li> added default cursor hotkey (CTRL-ALT-SHIFT-D). will make all other game cursors use currently active YM cursor.
+            <li> added default cursor hotkey (CTRL-ALT-D). will make all other game cursors use currently active YM cursor.
             <li> added error log. access this from system tray menu and copy/paste me when things dont work!
             <li> readded option to hide system tray icon but only in Settings.ini as ShowMenu=0
             <li> widened crosshair cursors

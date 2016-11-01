@@ -14,21 +14,21 @@
                 { header:'Overlay Apps', text:'Overlays installed (overwolf, curse, etc).' },
                 { header:'Antivirus', text:'Which antivirus is running. Does YM work with it disabled?' },
                 { header:'Privileges', text:'Is YM runnin as administrator?' },
-                { header:'Other Gmaes', text:'Does it work for other games (important!)?' },
+                { header:'Other Games', text:'Does it work for other games (important!)?' },
                 { header:'Workarounds', text:'Have you found a workaround? Please report how. This way I can either update YM to automate a fix or add it to this support page.' },
                 { header:'Other', text:'Anything else you think may help (like something unusual about your system).' }
             ]},
             {title:'General Problems', content:[
                 { header:'64 Bit Games', text:'Many new games are 64 Bit and require the 64 Bit version of YM.' },
-                { header:'Run as Administrator', text:'If a game is running as administrator YM must also run as administrator. Some games, require YM to be run as administrator.' },
-                { header:'Hotkey Conflicts', text:'Some games have CTRL SHIFT or ALT bound to change/hide cursor preventing the default YM hotkey from assigning the intended cursor. Either temporarily rebind those keys in that game or in YM.' },
+                { header:'Run as Administrator', text:'If a game is running as administrator YM must also run as administrator. Some games require YM to be run as administrator.' },
+                { header:'Hotkey Conflicts', text:'Some games have CTRL or ALT bound to change/hide the game cursor preventing the YM hotkey from assigning the intended cursor. Either temporarily rebind those keys in that game or in YM.' },
                 { header:'Hardware Cursor', text:'If the <i>hardware cursor</i> setting is available in your game, ensure it is ON. This should be  standard in all modern games.' },
-                { header:'Large Cursors', text:'Increasing cursor size over 64x64 is not supported in fullscreen mode. If you wish to use larger sizes switch to fullscreen-windowed or windowed. This is a Windows restriction.' }
+                { header:'Large Cursors', text:'Increasing cursor size over 64x64 is not supported in fullscreen mode. If you wish to use larger sizes switch to fullscreen-windowed or windowed. This is a Windows restriction.' },
+                { header:'Overlays', text:'Overlays like Overwolf which may on occassion interfere with YM. Try disabling them if you have YM problems.' }
             ]},
             {title:'Diablo 3', content:[
                 { header:'Doesn\'t work', text:'Ensure you have <b><a href="http://ccm.net/faq/32589-windows-8-1-disable-display-scaling-on-high-dpi-settings">DPI scaling</a></b> disabled.' },
-                { header:'Can\'t assign to animated cursor', text:'The best workaround is to use CTRL-ALT-SHIFT-D to set a default cursor first and assign others.' },
-                { header:'SHIFT Key', text:'Diablo 3 has SHIFT bound by default to change the cursor preventing the default YM hotkey from assigning the intended cursor. Either temporarily rebind this key in game or in YM.' }
+                { header:'Can\'t assign to animated cursor', text:'The best workaround is to use CTRL-ALT-D to set a default cursor first and assign others.' },
             ]},
             {title:'Guild Wars 2', content:[
                 { header:'64 Bit', text:'Ensure you have 64Bit YM installed for the 64Bit GW2 client.' },
@@ -37,16 +37,12 @@
             {title:'Heroes of the Storm', content:[
                 { header:'64 Bit', text:'Ensure you have 64Bit YM installed for the 64Bit HotS client.' }
             ]},
-            {title:'Path of Exile', content:[
-                { header:'Cursor disappears when assigned', text:'I\'m still investigating this one but the workaround is to assign the cursor, then restart the game. Seems like each new PoE patch you\'ll have to repeat this process.' }
-            ]},
             {title:'Wildstar', content:[
                 { header:'64 Bit', text:'Ensure you have 64Bit YM installed.' },
                 { header:'Run as Admin', text:'Wildstar requires YM to be run as administrator.' }
             ]},
             {title:'World of Warcraft', content:[
-                { header:'64 Bit', text:'Ensure you have 64Bit YM installed for the 64Bit WoW client.' },
-                { header:'Cursor disappears when assigned', text:'Mouse around to something that changes the cursor (like an enemy) then mouse back.' }
+                { header:'64 Bit', text:'Ensure you have 64Bit YM installed for the 64Bit WoW client.' }
             ]},
         ];
 
@@ -80,7 +76,7 @@
     <div class="TitlePanel">
         <div class="TitleHeader">
             <img src="Title.png"/>
-            <div class="TitleVersion">0.7.0 <b style="color:red">BETA</b></div>
+            <div class="TitleVersion">0.8.0 <b style="color:red">BETA</b></div>
         </div>
         <div class="TitleDescription">
             Game Cursor Changer
