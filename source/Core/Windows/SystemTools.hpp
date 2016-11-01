@@ -11,6 +11,9 @@ namespace Core
         static Bitness GetProcessBitness( HANDLE process );
 
         /**/
+        static HWND GetFocusWindow();
+
+        /**/
         static OsVersion GetOsVersion();
 
         /**/

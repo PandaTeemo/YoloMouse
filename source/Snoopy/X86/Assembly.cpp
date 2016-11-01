@@ -212,7 +212,7 @@ namespace Snoopy { namespace x86
         eggs(::abs((Byte*)address - _source_address) < 0x7ffffff0);
 
         // calculate relative 32bit address
-        Long rel32 = (Long)address - (Long)(_source_address + _code.GetCount()) - sizeof(Long);
+        Long rel32 = (Long)(Huge)address - (Long)(Huge)(_source_address + _code.GetCount()) - sizeof(Long);
 
         // write
         _code.AddRaw(rel32);

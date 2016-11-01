@@ -26,12 +26,6 @@ namespace YoloMouse
         static Bool Refresh();
 
     private:
-        enum Method
-        {
-            METHOD_SETCURSOR,
-            METHOD_SETCLASSLONG,
-        };
-
         /**/
         static Bool _LoadHooks();
         static void _UnloadHooks();
@@ -61,7 +55,6 @@ namespace YoloMouse
         static HCURSOR          _last_cursor;
         static HCURSOR          _replace_cursor;
         static CursorBindings::Binding* _current_binding;
-        static Method           _method;
         static PathString       _target_id;
         static Bool             _refresh_ready;
 

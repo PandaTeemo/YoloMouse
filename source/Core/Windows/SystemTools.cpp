@@ -94,6 +94,19 @@ namespace Core
     }
 
     //-------------------------------------------------------------------------
+    HWND SystemTools::GetFocusWindow()
+    {
+        POINT point;
+
+        // get cursor position
+        if( !GetCursorPos( &point ) )
+            return false;
+
+        // get window at cursor position
+        return WindowFromPoint(point);
+    }
+
+    //-------------------------------------------------------------------------
     OsVersion SystemTools::GetOsVersion()
     {
         // build comparison mask

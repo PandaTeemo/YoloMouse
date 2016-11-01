@@ -25,6 +25,7 @@ namespace Core
             fclose(file);
         }
     }
+
     void LogAssert( const char* message, const char *file, unsigned line )
     {
         // log
@@ -34,6 +35,7 @@ namespace Core
         abort();
     }
 
+    //------------------------------------------------------------------------
     void ExceptionMessage( const char* message, const char *file, unsigned line )
     {
         static Char buffer[0x100];

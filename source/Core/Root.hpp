@@ -28,7 +28,7 @@
 #define MAKEHUGE(low, high)     ((unsigned long long)(low) | ((unsigned long long)(high) << 32))
 
 // defines
-#define LOG_PATH                "debug.log"
+#define LOG_PATH                "d:\\debug.log"//!!!
 #define INVALID_ID              (~0)
 #define INVALID_INDEX           (~0)
 

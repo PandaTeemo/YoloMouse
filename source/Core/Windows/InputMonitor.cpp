@@ -204,9 +204,6 @@ namespace Core
         // if valid
         if( key < 0xff )
         {
-            // translate key
-            key = _TranslateKey(key);
-
             // if state changed
             if( _state[key] != down )
             {
@@ -238,8 +235,8 @@ namespace Core
             KeyCollection& keys = combo->keys;
             KeyIterator key = keys.Begin();
 
-            // for each key
-            for(; key != keys.End() && _state[*key]; ++key );
+            // for each key or translated key
+            for(; key != keys.End() && (_state[*key] || _state[_GetAlternateKey(*key)]); ++key );
 
             // success if all matched
             if( key == keys.End() )
@@ -250,8 +247,36 @@ namespace Core
     }
 
     //------------------------------------------------------------------------=
-    ULong InputMonitor::_TranslateKey( ULong key )
+    ULong InputMonitor::_GetAlternateKey( ULong key )
     {
+        switch( key )
+        {
+        case '0':
+            return VK_NUMPAD0;
+        case '1':
+            return VK_NUMPAD1;
+        case '2':
+            return VK_NUMPAD2;
+        case '3':
+            return VK_NUMPAD3;
+        case '4':
+            return VK_NUMPAD4;
+        case '5':
+            return VK_NUMPAD5;
+        case '6':
+            return VK_NUMPAD6;
+        case '7':
+            return VK_NUMPAD7;
+        case '8':
+            return VK_NUMPAD8;
+        case '9':
+            return VK_NUMPAD9;
+        case VK_OEM_MINUS:
+            return VK_SUBTRACT;
+        case VK_OEM_PLUS:
+            return VK_ADD;
+        }
+
         return key;
     }
 }

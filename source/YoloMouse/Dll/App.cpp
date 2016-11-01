@@ -1,5 +1,6 @@
 #include <YoloMouse/Dll/App.hpp>
 #include <YoloMouse/Share/SharedTools.hpp>
+#include <Core/Windows/SystemTools.hpp>
 
 namespace YoloMouse
 {
@@ -12,7 +13,6 @@ namespace YoloMouse
     HCURSOR         App::_last_cursor        (NULL);
     HCURSOR         App::_replace_cursor     (NULL);
     CursorBindings::Binding* App::_current_binding(NULL);
-    App::Method     App::_method             (App::METHOD_SETCURSOR);
     PathString      App::_target_id;
     Bool            App::_refresh_ready      (false);
 
@@ -159,8 +159,13 @@ namespace YoloMouse
         // get last cursor
         HCURSOR refresh_cursor = _last_cursor;
 
-        // get active window
-        HWND hwnd = GetForegroundWindow();
+        // get target window
+        HWND hwnd = SystemTools::GetFocusWindow();
+        if( hwnd == NULL )
+        {
+            elog("DllApp.Refresh.GetFocusWindow");
+            return false;
+        }
 
         // get thread and process id of this window
         DWORD hwnd_thread_id = GetWindowThreadProcessId(hwnd, &process_id);
@@ -196,24 +201,20 @@ namespace YoloMouse
             // set refresh state
             _refresh_ready = true;
 
-            // refresh according to method
-            if( _method == METHOD_SETCLASSLONG )
-            {
-                // set current cursor to force update
-            #if CPU_64
-                SetClassLongPtrA(hwnd, GCLP_HCURSOR, (LONG_PTR)refresh_cursor);
-            #else
-                SetClassLongA(hwnd, GCL_HCURSOR, (LONG)refresh_cursor);
-            #endif
-            }
-            else
-            {
-                // set current cursor to force update
-                SetCursor(refresh_cursor);
+            // set current cursor to force update using SetClassLong method
+        #if CPU_64
+            SetClassLongPtrA(hwnd, GCLP_HCURSOR, (LONG_PTR)refresh_cursor);
+        #else
+            SetClassLongA(hwnd, GCL_HCURSOR, (LONG)refresh_cursor);
+        #endif
 
-                // then trigger application to call SetCursor with its own cursor
-                PostMessage(hwnd, WM_SETCURSOR, (WPARAM)hwnd, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
-            }
+            // next use SetCursor/PostMassage method in case SetClassLong method doesn't work
+
+            // set current cursor to force update
+            SetCursor(refresh_cursor);
+
+            // then trigger application to call SetCursor with its own cursor
+            PostMessage(hwnd, WM_SETCURSOR, (WPARAM)hwnd, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
 
             // detach from window thread
             AttachThreadInput(hwnd_thread_id, current_thread_id, FALSE);
@@ -536,8 +537,8 @@ namespace YoloMouse
         if( old_cursor != _last_cursor )
             _refresh_ready = true;
 
-        // set new last cursor
-        _last_cursor = old_cursor;
+        // clear last cursor
+        _last_cursor = NULL;
 
         // if updating new cursor
         if( _update_group != INVALID_INDEX )
@@ -583,6 +584,9 @@ namespace YoloMouse
         if( _replace_cursor == NULL )
             return;
         
+        // set new last cursor
+        _last_cursor = old_cursor;
+
         // return replacement cursor
         new_cursor = _replace_cursor;
     }
@@ -603,9 +607,6 @@ namespace YoloMouse
         if((int)arguments[2] == GCL_HCURSOR)
     #endif
         {
-            // change method
-            _method = METHOD_SETCLASSLONG;
-
             // update cursor
             _OnCursorHook((HCURSOR&)arguments[3], (HCURSOR)arguments[3]);
         }

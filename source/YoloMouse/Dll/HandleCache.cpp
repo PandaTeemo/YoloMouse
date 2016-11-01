@@ -32,11 +32,13 @@ namespace YoloMouse
 
         // calculate hash of cursor
         Hash hash = _CalculateHash(handle);
-
-        // create entry
-        Entry& entry = _cache[_next_index++];
-        entry.handle = handle;
-        entry.hash = hash;
+        if( hash )
+        {
+            // create entry
+            Entry& entry = _cache[_next_index++];
+            entry.handle = handle;
+            entry.hash = hash;
+        }
 
         return hash;
     }

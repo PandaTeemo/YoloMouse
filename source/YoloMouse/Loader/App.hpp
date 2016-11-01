@@ -48,7 +48,9 @@ namespace YoloMouse
         /**/
         void _OptionErrors();
         Bool _OptionRunAsAdmin();
+        void _OptionSettingsFolder();
         Bool _OptionAutoStart( Bool enable, Bool save );
+        void _OptionAbout();
 
         /**/
         Bool _AssignCursor( Index group_index );

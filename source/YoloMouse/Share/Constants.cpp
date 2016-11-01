@@ -7,6 +7,7 @@ namespace YoloMouse
     {
         L"Run as administrator",    //MENU_OPTION_RUNASADMIN
         L"Start with Windows",      //MENU_OPTION_AUTOSTART
+        L"Open settings folder",    //MENU_OPTION_SETTINGS
         L"Errors",                  //MENU_OPTION_ERRORS
         L"About",                   //MENU_OPTION_ABOUT
     };
@@ -28,19 +29,19 @@ namespace YoloMouse
     //------------------------------------------------------------------------
     static Settings::KeyValue _settings[] =
     {
-        { "CursorKey1",         "CONTROL ALT SHIFT 1" },
-        { "CursorKey2",         "CONTROL ALT SHIFT 2" },
-        { "CursorKey3",         "CONTROL ALT SHIFT 3" },
-        { "CursorKey4",         "CONTROL ALT SHIFT 4" },
-        { "CursorKey5",         "CONTROL ALT SHIFT 5" },
-        { "CursorKey6",         "CONTROL ALT SHIFT 6" },
-        { "CursorKey7",         "CONTROL ALT SHIFT 7" },
-        { "CursorKey8",         "CONTROL ALT SHIFT 8" },
-        { "CursorKey9",         "CONTROL ALT SHIFT 9" },
-        { "CursorKeyReset",     "CONTROL ALT SHIFT 0" },
-        { "CursorKeySmaller",   "CONTROL ALT SHIFT -" },
-        { "CursorKeyLarger",    "CONTROL ALT SHIFT =" },
-        { "CursorKeyDefault",   "CONTROL ALT SHIFT D" },
+        { "CursorKey1",         "CONTROL ALT 1" },
+        { "CursorKey2",         "CONTROL ALT 2" },
+        { "CursorKey3",         "CONTROL ALT 3" },
+        { "CursorKey4",         "CONTROL ALT 4" },
+        { "CursorKey5",         "CONTROL ALT 5" },
+        { "CursorKey6",         "CONTROL ALT 6" },
+        { "CursorKey7",         "CONTROL ALT 7" },
+        { "CursorKey8",         "CONTROL ALT 8" },
+        { "CursorKey9",         "CONTROL ALT 9" },
+        { "CursorKeyReset",     "CONTROL ALT 0" },
+        { "CursorKeySmaller",   "CONTROL ALT -" },
+        { "CursorKeyLarger",    "CONTROL ALT =" },
+        { "CursorKeyDefault",   "CONTROL ALT D" },
         { "AutoStart",          "1" },
         { "ShowMenu",           "1" },
     };

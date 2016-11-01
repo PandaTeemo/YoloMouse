@@ -2,22 +2,22 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Resource">
-      <UniqueIdentifier>{3c28461a-436c-4a06-be85-21d27396a617}</UniqueIdentifier>
+      <UniqueIdentifier>{3fc71d19-ad34-4636-be23-0246263e31d8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\YoloMouse\Loader\App.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Loader\Main.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Instance.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\InstanceManager.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\YoloMouse\Loader\App.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Instance.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\InstanceManager.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Resource\resource.h">
       <Filter>Resource</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\YoloMouse\Loader\Instance.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Loader\InstanceManager.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\source\YoloMouse\Loader\Resource\AppIcon.ico">

@@ -108,7 +108,7 @@ int WINAPI WinMain(
         if( status == EXIT_ELEVATE )
         {
             // relaunch self as administrator. return value over 32 indicates success
-            if( (Long)ShellExecute(NULL, L"runas", PATH_LOADER, L"", NULL, SW_SHOWNORMAL) > 32 )
+            if( (Long)(Huge)ShellExecute(NULL, L"runas", PATH_LOADER, L"", NULL, SW_SHOWNORMAL) > 32 )
                 return 0;
             else
             {

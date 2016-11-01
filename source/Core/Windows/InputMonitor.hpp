@@ -66,6 +66,6 @@ namespace Core
         Combo* _FindCombo();
 
         /**/
-        ULong _TranslateKey( ULong key );
+        ULong _GetAlternateKey( ULong key );
     };
 }

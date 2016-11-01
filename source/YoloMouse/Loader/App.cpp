@@ -159,8 +159,10 @@ namespace YoloMouse
             // add run-as-administrator option if not already admin
             if( !IsUserAnAdmin() )
                 _ui.AddMenuOption(MENU_OPTION_RUNASADMIN, APP_MENU_STRINGS[MENU_OPTION_RUNASADMIN], false);
-            // add start-with-windows option
+            // add autostart option
             _ui.AddMenuOption(MENU_OPTION_AUTOSTART, APP_MENU_STRINGS[MENU_OPTION_AUTOSTART], _settings.GetBoolean(SETTING_AUTOSTART));
+            // add show settings
+            _ui.AddMenuOption(MENU_OPTION_SETTINGS, APP_MENU_STRINGS[MENU_OPTION_SETTINGS], false);
             // add debug log
             _ui.AddMenuOption(MENU_OPTION_ERRORS, APP_MENU_STRINGS[MENU_OPTION_ERRORS], false);
             // add about dialog
@@ -261,6 +263,18 @@ namespace YoloMouse
         return true;
     }
 
+    void App::_OptionSettingsFolder()
+    {
+        PathString settings_path;
+
+        // get settings path
+        if( !SharedTools::BuildUserPath(settings_path, COUNT(settings_path), NULL, NULL, NULL) )
+            return;
+
+        // open in default text editor
+        ShellExecute(NULL, L"open", settings_path, L"", NULL, SW_SHOWNORMAL);
+    }
+
     Bool App::_OptionAutoStart( Bool enable, Bool save )
     {
         PathString path;
@@ -289,6 +303,22 @@ namespace YoloMouse
             elog("App.OptionAutoStart.GetFullPathName");
 
         return false;
+    }
+
+    void App::_OptionAbout()
+    {
+        MediumString about_text;
+
+        // generate about text
+        about_text.Format( TEXT_ABOUT,
+            APP_VERSION[0],         // version major
+            APP_VERSION[1],         // version minor
+            APP_VERSION[2],         // version patch
+            CPU_64 ? 64 : 32    // bitness
+        );
+
+        // show about dialog
+        SharedTools::MessagePopup(false, about_text.GetMemory());
     }
 
     //-------------------------------------------------------------------------
@@ -330,11 +360,11 @@ namespace YoloMouse
     {
         DWORD process_id = 0;
 
-        // get active window
-        HWND hwnd = GetForegroundWindow();
+        // get focus window
+        HWND hwnd = SystemTools::GetFocusWindow();
         if( hwnd == NULL )
         {
-            elog("App.AccessCurrentInstance.GetForegroundWindow");
+            elog("App.AccessCurrentInstance.GetFocusWindow");
             return NULL;
         }
 
@@ -422,6 +452,11 @@ namespace YoloMouse
                 _ui.SetMenuOption(id, !enabled);
             return true;
 
+        // open settings folder
+        case MENU_OPTION_SETTINGS:
+            _OptionSettingsFolder();
+            return true;
+
         // show debug log
         case MENU_OPTION_ERRORS:
             _OptionErrors();
@@ -429,7 +464,7 @@ namespace YoloMouse
 
         // show menu
         case MENU_OPTION_ABOUT:
-            SharedTools::MessagePopup(false, TEXT_ABOUT);
+            _OptionAbout();
             return true;
 
         default:

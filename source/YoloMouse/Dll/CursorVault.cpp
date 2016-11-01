@@ -9,6 +9,7 @@ namespace YoloMouse
         handle      (NULL),
         referenced  (0)
     {
+        GetVersion();
     }
 
     // CacheEntry

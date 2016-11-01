@@ -2,6 +2,7 @@
 #include <Core/Constants.hpp>
 #include <Core/Container/Array.hpp>
 #include <Core/Support/Tools.hpp>
+#include <stdarg.h>
 
 namespace Core
 {
@@ -60,6 +61,19 @@ namespace Core
             token.SetCount(count);
 
             return true;
+        }
+
+        /**/
+        void Format( const Char* format, ... )
+        {
+            va_list vargs;
+            xassert(format != nullptr);
+
+            va_start(vargs, format);
+            vsnprintf(_memory, _limit, format, vargs);
+            va_end(vargs);
+
+            _count = Tools::CStrLen( _memory ) + 1;
         }
 
         /**/

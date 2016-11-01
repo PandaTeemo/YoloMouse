@@ -2,16 +2,16 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\..\source\YoloMouse\Share\Constants.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Share\SharedLog.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Share\SharedState.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Share\SharedTools.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Share\SharedLog.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\YoloMouse\Share\Constants.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Share\NotifyMessage.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\Root.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Share\SharedLog.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\SharedState.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\SharedTools.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Share\NotifyMessage.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Share\SharedLog.hpp" />
   </ItemGroup>
 </Project>

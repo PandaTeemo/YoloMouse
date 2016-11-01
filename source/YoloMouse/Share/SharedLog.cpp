@@ -1,5 +1,6 @@
 #include <YoloMouse/Share/SharedLog.hpp>
 #include <Core/Support/Tools.hpp>
+#include <Core/Windows/SystemTools.hpp>
 #include <stdio.h>
 
 namespace YoloMouse
@@ -43,7 +44,7 @@ namespace YoloMouse
         *pmessage = 0;
 
         // get current window name
-        HWND hwnd = GetForegroundWindow();
+        HWND hwnd = SystemTools::GetFocusWindow();
         if( hwnd )
         {
             Long count = GetWindowTextA(hwnd, message, APP_NAME_LIMIT);

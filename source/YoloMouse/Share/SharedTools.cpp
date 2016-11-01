@@ -84,11 +84,17 @@ namespace YoloMouse
             // ensure save path exists
             CreateDirectory(save_path, NULL);
 
-            // build save path
-            eggs(swprintf_s(path, limit, L"%s\\%s.%s",
-                save_path,
-                name,
-                extension) > 0);
+            // build save path including file
+            if( name != NULL && extension != NULL )
+            {
+                eggs( swprintf_s( path, limit, L"%s\\%s.%s",
+                    save_path,
+                    name,
+                    extension ) > 0 );
+            }
+            // else use just path
+            else
+                wcsncpy_s( path, limit, save_path, COUNT(save_path) );
 
             status = true;
         }
