@@ -321,11 +321,18 @@ namespace Core
 
     void ShellUi::Stop()
     {
-        // destroy window
-        DestroyWindow(_hwnd);
+        // if window created
+        if( _hwnd != NULL )
+        {
+            // destroy window
+            DestroyWindow(_hwnd);
 
-        // unregister class
-        UnregisterClass(_name, _hinstance);
+            // unregister class
+            UnregisterClass(_name, _hinstance);
+
+            // clear state
+            _hwnd = NULL;
+        }
     }
 
     //--------------------------------------------------------------------------

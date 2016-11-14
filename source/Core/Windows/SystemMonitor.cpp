@@ -40,12 +40,23 @@ namespace Core
     //-------------------------------------------------------------------------
     Bool SystemMonitor::Start()
     {
-        return 
-            SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, NULL, _WinEvent, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS) != 0;
+        // set window event hook
+        _handle = SetWinEventHook( EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, NULL, _WinEvent, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS );
+
+        return _handle != NULL;
     }
 
     //-------------------------------------------------------------------------
     void SystemMonitor::Stop()
     {
+        // if window event hook set
+        if( _handle != NULL )
+        {
+            // destroy window event hook
+            UnhookWinEvent(_handle);
+
+            // clear state
+            _handle = NULL;
+        }
     }
 }

@@ -63,7 +63,7 @@ namespace YoloMouse
 
     // numeric
     //-------------------------------------------------------------------------
-    static const ULong APP_VERSION[] =              { 0, 8, 0 };
+    static const ULong APP_VERSION[] =              { 0, 8, 1 };
     static const ULong APP_NAME_LIMIT =             64;
     static const ULong LOG_MEMORY_LIMIT =           KILOBYTES(8);
     static const ULong LOADER_TARGET_LIMIT =        20;

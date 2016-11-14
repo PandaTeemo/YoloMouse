@@ -20,5 +20,8 @@ namespace Core
         /**/
         Bool Start();
         void Stop();
+
+        // fields
+        HWINEVENTHOOK _handle = NULL;
     };
 }

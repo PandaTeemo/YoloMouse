@@ -49,6 +49,7 @@ namespace YoloMouse
 
         // fields: state
         static Bool             _active;
+        static HWND             _hwnd;
         static CursorBindings   _bindings;
         static CursorVault      _vault;
         static HandleCache      _cache;

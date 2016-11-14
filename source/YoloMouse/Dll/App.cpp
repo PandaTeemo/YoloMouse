@@ -7,6 +7,7 @@ namespace YoloMouse
     // fields
     //-------------------------------------------------------------------------
     Bool            App::_active             (false);
+    HWND            App::_hwnd =             NULL;
     CursorBindings  App::_bindings;
     CursorVault     App::_vault;
     HandleCache     App::_cache;
@@ -177,6 +178,9 @@ namespace YoloMouse
             return false;
         }
 
+        // update active window
+        _hwnd = hwnd;
+
         // get thread id of this thread (the one Loader's CreateRemoteThread created).
         DWORD current_thread_id = GetCurrentThreadId();
 
@@ -201,17 +205,8 @@ namespace YoloMouse
             // set refresh state
             _refresh_ready = true;
 
-            // set current cursor to force update using SetClassLong method
-        #if CPU_64
-            SetClassLongPtrA(hwnd, GCLP_HCURSOR, (LONG_PTR)refresh_cursor);
-        #else
-            SetClassLongA(hwnd, GCL_HCURSOR, (LONG)refresh_cursor);
-        #endif
-
-            // next use SetCursor/PostMassage method in case SetClassLong method doesn't work
-
             // set current cursor to force update
-            SetCursor(refresh_cursor);
+            SetCursor( refresh_cursor );
 
             // then trigger application to call SetCursor with its own cursor
             PostMessage(hwnd, WM_SETCURSOR, (WPARAM)hwnd, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
@@ -594,8 +589,16 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     VOID HOOK_CALL App::_OnHookSetCursor( Native* arguments )
     {
-        // update cursor
-        _OnCursorHook((HCURSOR&)arguments[1], (HCURSOR)arguments[1]);
+        // update cursor using setclasslong method first
+    #if CPU_64
+        SetClassLongPtrA( _hwnd, GCLP_HCURSOR, (LONG_PTR)arguments[1] );
+    #else
+        SetClassLongA( _hwnd, GCL_HCURSOR, (LONG)arguments[1] );
+    #endif
+
+        // if replacement cursor was set pass it out to setcursor method
+        if( _replace_cursor != NULL )
+            arguments[1] = (Native)_replace_cursor;
     }
 
     VOID HOOK_CALL App::_OnHookSetClassLong( Native* arguments )

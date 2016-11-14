@@ -23,22 +23,41 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     static ExitStatus Main()
     {
-        App app;
+        App         app;
+        ExitStatus  status;
 
-        // start
-        app.Start();
+        // run main
+        try
+        {
+            // start
+            app.Start();
 
-        // run
-        app.Run();
+            // run
+            app.Run();
 
-        // stop
-        app.Stop();
+            // stop
+            app.Stop();
 
-        // return exit status
-        return app.GetElevate() ? EXIT_ELEVATE : EXIT_NORMAL;
+            // normal or elevated exit
+            status = app.GetElevate() ? EXIT_ELEVATE : EXIT_NORMAL;
+        }
+        // catch eggs
+        catch( const Char* error )
+        {
+            // show error message
+            SharedTools::MessagePopup(true, error);
+
+            // stop
+            app.Stop();
+
+            // error exit
+            status = EXIT_PLATFORM_MAIN;
+        }
+
+        return status;
     }
 
-    // debugging
+    // unit testing area
     //-------------------------------------------------------------------------
     void _UnitTest()
     {
@@ -84,16 +103,7 @@ int WINAPI WinMain(
                 if(SystemTools::GetProcessDirectory(path, COUNT(path)) && SetCurrentDirectory(path))
                 {
                     // run main
-                    try
-                    {
-                        status = Main();
-                    }
-                    // catch eggs
-                    catch( const Char* error )
-                    {
-                        SharedTools::MessagePopup(true, error);
-                        status = EXIT_PLATFORM_MAIN;
-                    }
+                    status = Main();
                 }
                 // path change failed
                 else
