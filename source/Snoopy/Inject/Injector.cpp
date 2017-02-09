@@ -12,7 +12,8 @@ namespace Snoopy
         // constants
         const ULong LOADSYMBOLMODULE_RETRIES =      10;
         const ULong LOADSYMBOLMODULE_RETRYDELAY =   20;     //ms
-        const ULong LOAD_WAIT_DELAY =               3000;   //ms
+        const ULong LOAD_WAIT_DELAY =               500;    //ms
+        const ULong LOAD_ATTEMPT_COUNT =            8;
     }
 
     // Function
@@ -51,9 +52,14 @@ namespace Snoopy
     {
         xassert(_process == NULL);
 
-        // wait until ready
-        if( WaitForInputIdle(process, LOAD_WAIT_DELAY) == 0 )
+        // attempt loop
+        for( Index attempt = 0; attempt < LOAD_ATTEMPT_COUNT; ++attempt )
         {
+            // wait until ready. this doesnt work in all cases, therefore ignore
+            // return value and rely on following code and multiple attempts to 
+            // qualify a succcessful injection.
+            WaitForInputIdle(process, LOAD_WAIT_DELAY);
+
             // initialize symbol loader
             if( SymInitialize(process, NULL, FALSE) )
             {

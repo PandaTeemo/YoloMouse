@@ -143,6 +143,9 @@ namespace Core
         {
             Id key;
 
+            // conversions
+            token.ToUpper();
+
             // match to key string
             if(!_KEY_STRINGS.GetKey(key, token) || combo.keys.IsFull())
             {

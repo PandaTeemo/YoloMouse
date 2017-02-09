@@ -100,7 +100,7 @@ namespace Core
 
         // get cursor position
         if( !GetCursorPos( &point ) )
-            return false;
+            return NULL;
 
         // get window at cursor position
         return WindowFromPoint(point);
