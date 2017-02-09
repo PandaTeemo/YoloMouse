@@ -5,18 +5,13 @@
     <script src="jquery-2.2.2.min.js"></script>
     <script>
         var help = [
-            {title:'Reporting Bugs',
-                description:'I\'m actively trying to track down various bugs reported across reddit and other forums. However its a bit difficult with the limited information provided. If you find a bug, plz report with the following to one of the contact methods provided above.',
-                content:[
-                { header:'Description', text:'Nature of the bug (crashes game? can\'t assigning cursor? etc).' },
-                { header:'Your System', text:'Windows version and mouse type.' },
-                { header:'Error Log', text:'Copy/paste contents of YM error log (click systray YM icon/Errors).' },
-                { header:'Overlay Apps', text:'Overlays installed (overwolf, curse, etc).' },
-                { header:'Antivirus', text:'Which antivirus is running. Does YM work with it disabled?' },
-                { header:'Privileges', text:'Is YM runnin as administrator?' },
-                { header:'Other Games', text:'Does it work for other games (important!)?' },
-                { header:'Workarounds', text:'Have you found a workaround? Please report how. This way I can either update YM to automate a fix or add it to this support page.' },
-                { header:'Other', text:'Anything else you think may help (like something unusual about your system).' }
+            {title:'FAQ', content:[
+                { header:'how work?', text:'It hooks the OS part of game memory and intercepts call to SetCursor' },
+                { header:'sounds like a BAN!', text:'It does no more than what <a href="http://www.fraps.com/">FRAPS</a> and <a href="http://www.overwolf.com/">Overwolf</a> do. If those wont get you banned this shouldnt either.' },
+                { header:'I want to change hotkeys and other settings!', text:'click systray icon option "Open settings folder" and edit Settings.ini. then restart yolomouse.' },
+                { header:'whats with the dumb app name lol', text:'i suck at naming things and uh... yolo!? :D' },
+                { header:'how do i make my own cursors?', text:'use a cursor editor like <b><a href="http://www.rw-designer.com/cursor-maker">RealWorld Cursor Editor</a></b> or use this <b><a href="http://www.telegraphics.com.au/svn/icoformat/trunk/dist/README.html">plugin</a></b> with photoshop.' },
+                { header:'any progress on YOLOMOUSE for mac client?', text:'sorry just have no time for this. itd be easier if it wasnt such a windows specific hack. plus i have 0 experience with mac development so thatd take a bit to learn too. the code is open for someone to port though.' },
             ]},
             {title:'General Problems', content:[
                 { header:'64 Bit Games', text:'Many new games are 64 Bit and require the 64 Bit version of YM.' },
@@ -24,6 +19,8 @@
                 { header:'Hotkey Conflicts', text:'Some games have CTRL or ALT bound to change/hide the game cursor preventing the YM hotkey from assigning the intended cursor. Either temporarily rebind those keys in that game or in YM.' },
                 { header:'Hardware Cursor', text:'If the <i>hardware cursor</i> setting is available in your game, ensure it is ON. This should be  standard in all modern games.' },
                 { header:'Large Cursors', text:'Increasing cursor size over 64x64 is not supported in fullscreen mode. If you wish to use larger sizes switch to fullscreen-windowed or windowed. This is a Windows restriction.' },
+                { header:'Unbindable animated cursors.', text:'If your game uses an animated cursor thats not replaceable try using CTRL ALT D to set a default instead.' },
+                { header:'Multiple monitors.', text:'YM has not been tested much with multiple monitor setups and some users report issues under certain conditions. Please report these in detail :)' },
                 { header:'Overlays', text:'Overlays like Overwolf which may on occassion interfere with YM. Try disabling them if you have YM problems.' },
                 { header:'GeForce Experience', text:'This can block hotkeys for YM and other apps. Rebind in GFE or uninstall (it\'s useless bloatware imo).' }
             ]},
@@ -44,6 +41,19 @@
             ]},
             {title:'World of Warcraft', content:[
                 { header:'64 Bit', text:'Ensure you have 64Bit YM installed for the 64Bit WoW client.' }
+            ]},
+            {title:'Reporting Bugs',
+                description:'I\'m actively trying to track down various bugs reported across reddit and other forums. However its a bit difficult with the limited information provided. If you find a bug, plz report with the following to one of the contact methods provided above.',
+                content:[
+                { header:'Description', text:'Nature of the bug (crashes game? can\'t assigning cursor? etc).' },
+                { header:'Your System', text:'Windows version and mouse type.' },
+                { header:'Error Log', text:'Copy/paste contents of YM error log (click systray YM icon/Errors).' },
+                { header:'Overlay Apps', text:'Overlays installed (overwolf, curse, etc).' },
+                { header:'Antivirus', text:'Which antivirus is running. Does YM work with it disabled?' },
+                { header:'Privileges', text:'Is YM runnin as administrator?' },
+                { header:'Other Games', text:'Does it work for other games (important!)?' },
+                { header:'Workarounds', text:'Have you found a workaround? Please report how. This way I can either update YM to automate a fix or add it to this support page.' },
+                { header:'Other', text:'Anything else you think may help (like something unusual about your system).' }
             ]},
         ];
 
@@ -68,7 +78,7 @@
 
         $(document).ready(function() 
         {
-            OpenHelp(1);
+            OpenHelp(0);
         });
     </script>
 </head>
@@ -77,7 +87,7 @@
     <div class="TitlePanel">
         <div class="TitleHeader">
             <img src="Title.png"/>
-            <div class="TitleVersion">0.8.1 <b style="color:red">BETA</b></div>
+            <div class="TitleVersion">0.8.2 <b style="color:red">BETA</b></div>
         </div>
         <div class="TitleDescription">
             Game Cursor Changer
@@ -85,7 +95,6 @@
         <div class="TitleMenu">
             <a href="index.html">Home</a> &bull;
             <a href="help.html">Help</a> &bull;
-            <a href="faq.html">FAQ</a> &bull;
             Support &bull;
             <a href="etc.html">Etc</a>
         </div>
