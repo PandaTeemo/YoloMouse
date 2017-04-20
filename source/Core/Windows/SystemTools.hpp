@@ -14,9 +14,6 @@ namespace Core
         static HWND GetFocusWindow();
 
         /**/
-        static OsVersion GetOsVersion();
-
-        /**/
         static Bool EnableAutoStart( const WCHAR* name, const WCHAR* path, Bool enable );
 
         /**/

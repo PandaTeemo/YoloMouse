@@ -9,7 +9,6 @@ namespace YoloMouse
         handle      (NULL),
         referenced  (0)
     {
-        GetVersion();
     }
 
     // CacheEntry
@@ -137,13 +136,6 @@ namespace YoloMouse
                     search_path,
                     resource_index,
                     EXTENSIONS[extension_index]);
-
-                // if windows version older than vista force default size
-                if( SystemTools::GetOsVersion() < OSVERSION_WINVISTA )
-                {
-                    entry.loadimage_flags |= LR_DEFAULTSIZE;
-                    resizable = false;
-                }
 
                 // load cursor
                 hcursor = reinterpret_cast<HCURSOR>(LoadImage(NULL, entry.path, IMAGE_CURSOR, 0, 0, entry.loadimage_flags));

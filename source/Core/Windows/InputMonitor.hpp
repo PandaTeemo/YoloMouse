@@ -11,9 +11,10 @@ namespace Core
     {
     public:
         /**/
-        static const ULong STATE_LIMIT =    0xff;
-        static const ULong KEY_LIMIT =      4;
-        static const ULong COMBO_LIMIT =    50;
+        static const ULong STATE_LIMIT =        0xff;
+        static const ULong KEY_LIMIT =          4;
+        static const ULong COMBO_LIMIT =        50;
+        static const ULong COMBO_EXPIRATION =   3000;
 
         /**/
         struct IListener
@@ -22,26 +23,6 @@ namespace Core
             virtual void OnKeyCombo( Id id ) {}
         };
 
-    private:
-        typedef FixedArray<Bool, STATE_LIMIT>   StateTable;
-        typedef FixedArray<ULong, KEY_LIMIT>    KeyCollection;
-        typedef KeyCollection::Iterator         KeyIterator;
-
-        struct Combo
-        {
-            Id              id;
-            KeyCollection   keys;
-        };
-
-        typedef FixedArray<Combo, COMBO_LIMIT>  ComboCollection;
-        typedef ComboCollection::Iterator       ComboIterator;
-
-    private:
-        ShellUi&        _ui;
-        StateTable      _state;
-        ComboCollection _combos;
-
-    public:
         /**/
         InputMonitor( ShellUi& ui );
 
@@ -56,6 +37,20 @@ namespace Core
         Bool CreateCombo( Id id, String format );
 
     private:
+        // types
+        typedef FixedArray<Bool, STATE_LIMIT>   StateTable;
+        typedef FixedArray<ULong, KEY_LIMIT>    KeyCollection;
+        typedef KeyCollection::Iterator         KeyIterator;
+
+        struct Combo
+        {
+            Id              id;
+            KeyCollection   keys;
+        };
+
+        typedef FixedArray<Combo, COMBO_LIMIT>  ComboCollection;
+        typedef ComboCollection::Iterator       ComboIterator;
+
         /**/
         Bool OnMessage( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam );
 
@@ -67,5 +62,12 @@ namespace Core
 
         /**/
         ULong _GetAlternateKey( ULong key );
+
+        // fields
+        ShellUi&        _ui;
+        StateTable      _state;
+        ComboCollection _combos;
+        ULONGLONG       _combo_time;
+        Bool            _combo_success;
     };
 }

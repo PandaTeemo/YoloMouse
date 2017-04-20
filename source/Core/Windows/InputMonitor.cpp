@@ -90,8 +90,10 @@ namespace Core
     // public
     //-------------------------------------------------------------------------
     InputMonitor::InputMonitor( ShellUi& ui ):
-        _ui(ui),
-        _state(STATE_LIMIT)
+        _ui             (ui),
+        _state          (STATE_LIMIT),
+        _combo_time     (0),
+        _combo_success  (false)
     {
         _state.Zero();
     }
@@ -207,6 +209,17 @@ namespace Core
         // if valid
         if( key < 0xff )
         {
+            // get current uptime
+            ULONGLONG current_time = GetTickCount64();
+
+            // if key is up and successful combo expired reset input state. this is a ghetto 
+            // workaround to some windows hotkeys like CTRL ALT DEL not notifying rawinput.
+            if( _combo_success && !down && (current_time - _combo_time) > COMBO_EXPIRATION )
+            {
+                _state.Zero();
+                _combo_success = false;
+            }
+
             // if state changed
             if( _state[key] != down )
             {
@@ -222,6 +235,10 @@ namespace Core
                 {
                     // if combo notify
                     _listener->OnKeyCombo(combo->id);
+
+                    // update combo time and success state
+                    _combo_time = current_time;
+                    _combo_success = true;
                 }
             }
         }
@@ -229,7 +246,7 @@ namespace Core
         return true;
     }
 
-    //------------------------------------------------------------------------=
+    //-------------------------------------------------------------------------
     InputMonitor::Combo* InputMonitor::_FindCombo()
     {
         // for each combo
@@ -249,7 +266,7 @@ namespace Core
         return NULL;
     }
 
-    //------------------------------------------------------------------------=
+    //-------------------------------------------------------------------------
     ULong InputMonitor::_GetAlternateKey( ULong key )
     {
         switch( key )

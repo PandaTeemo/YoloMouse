@@ -107,16 +107,6 @@ namespace Core
     }
 
     //-------------------------------------------------------------------------
-    OsVersion SystemTools::GetOsVersion()
-    {
-        // build comparison mask
-        DWORD version = GetVersion();
-
-        // extra major and minor
-        return (OsVersion)((LOBYTE(LOWORD(version)) << 8) | HIBYTE(LOWORD(version)));
-    }
-
-    //-------------------------------------------------------------------------
     Bool SystemTools::EnableAutoStart( const WCHAR* name, const WCHAR* path, Bool enable )
     {
         const WCHAR* REGISTRY_PATH = L"Software\\Microsoft\\Windows\\CurrentVersion\\Run";
