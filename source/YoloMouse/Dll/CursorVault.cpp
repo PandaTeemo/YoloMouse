@@ -1,5 +1,6 @@
 #include <Core/Windows/SystemTools.hpp>
 #include <YoloMouse/Dll/CursorVault.hpp>
+#include <stdio.h>
 
 namespace YoloMouse
 {
@@ -71,7 +72,7 @@ namespace YoloMouse
         for( Index i = 0; i < _table.GetCount(); ++i )
         {
             // for each handle by size
-            for( Index j = 0; j < CURSOR_SIZE_COUNT; ++j )
+            for( Index j = 0; j < CURSOR_INDEX_COUNT; ++j )
             {
                 // unload
                 Unload(i, j);
@@ -98,7 +99,7 @@ namespace YoloMouse
             const ResourceTable& resources = _table[i].resources;
 
             // for each size
-            for( Index j = 0; j < CURSOR_SIZE_COUNT; ++j )
+            for( Index j = 0; j < CURSOR_INDEX_COUNT; ++j )
             {
                 // success if found
                 if( hcursor == resources[j].handle )
@@ -184,20 +185,12 @@ namespace YoloMouse
             ULong height;
 
             // if resizable
-            if( entry.resizable && size_index != CURSOR_SIZE_ORIGINAL )
+            if( entry.resizable && size_index != CURSOR_INDEX_ORIGINAL )
             {
                 xassert(entry.width > 0 && entry.height > 0);
-                width = entry.width;
-                height = entry.height;
 
-                // get target size
-                ULong target_size = CURSOR_SIZE_TABLE[size_index];
-
-                // calculate threshold
-                ULong threshold = size_index > 0 ? (target_size - CURSOR_SIZE_TABLE[size_index - 1]) >> 1 : 2;
-
-                // calculate ideal size for closest to target
-                _IdealResize(width, height, target_size, threshold);
+                // get size from table
+                width = height = CURSOR_SIZE_TABLE[size_index];
             }
             // else use original size
             else
@@ -221,7 +214,6 @@ namespace YoloMouse
         return true;
     }
 
-
     void CursorVault::_CacheUnload( CacheEntry& entry, Index size_index )
     {
         CursorResource& resource = entry.resources[entry.resizable ? size_index : 0];
@@ -240,44 +232,6 @@ namespace YoloMouse
 
                 // reset
                 resource.handle = NULL;
-            }
-        }
-    }
-
-    //-------------------------------------------------------------------------
-    void CursorVault::_IdealResize( ULong& out_width, ULong& out_height, ULong target_height, ULong threshold )
-    {
-        ULong div_w = out_width;
-        ULong div_h = out_height;
-
-        // double until over target
-        while( out_height < target_height )
-        {
-            out_width <<= 1;
-            out_height <<= 1;
-        }
-
-        // until ideal found
-        while( true )
-        {
-            // break if within threshold
-            if( abs(static_cast<Long>(target_height - out_height)) <= static_cast<Long>(threshold) )
-                break;
-
-            // iterate adjustment
-            div_w >>= 1;
-            div_h >>= 1;
-
-            // adjust size
-            if( out_height > target_height )
-            {
-                out_width -= div_w;
-                out_height -= div_h;
-            }
-            else
-            {
-                out_width += div_w;
-                out_height += div_h;
             }
         }
     }

@@ -1,6 +1,5 @@
 #pragma once
 #include <Core/Root.hpp>
-#include <Core/Support/Debug.hpp>
 #include <Core/Support/Tools.hpp>
 #include <stdio.h>
 
@@ -33,6 +32,29 @@ namespace Core
 
         // the end!
         abort();
+    }
+
+    void LogConsole( const Char* format, ... )
+    {
+        static Bool open = false;
+        va_list vargs;
+
+        // only once
+        if(!open)
+        {
+            FILE* file;
+
+            AllocConsole();
+            freopen_s(&file, "conin$", "r", stdin);
+            freopen_s(&file, "conout$", "w", stdout);
+            freopen_s(&file, "conout$", "w", stderr);
+            open = true;
+        }
+
+        xassert(format != NULL);
+        va_start(vargs, format);
+        vfprintf(stdout, format, vargs); fputs("", stdout);
+        va_end(vargs);
     }
 
     //------------------------------------------------------------------------

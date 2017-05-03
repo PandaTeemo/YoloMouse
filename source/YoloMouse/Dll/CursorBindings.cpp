@@ -2,6 +2,7 @@
 #include <YoloMouse/Share/SharedTools.hpp>
 #include <YoloMouse/Share/SharedState.hpp>
 #include <io.h>
+#include <stdio.h>
 #include <wchar.h>
 
 namespace YoloMouse
@@ -73,7 +74,7 @@ namespace YoloMouse
             elog("CursorBindings.Add.ResourceIndexOverLimit: %d", resource_index);
             return NULL;
         }
-        if( size_index >= CURSOR_SIZE_COUNT )
+        if( size_index >= CURSOR_INDEX_COUNT )
         {
             elog("CursorBindings.Add.SizeIndexOverLimit: %d", size_index);
             return NULL;
@@ -129,11 +130,14 @@ namespace YoloMouse
         // for each line
         while( true )
         {
-            Index size_index = CURSOR_SIZE_DEFAULT;
+            Index size = CURSOR_INDEX_DEFAULT;
 
             // read line
-            if( fscanf_s(file, "%u=%I64u,%u\n", &resource_index, &bitmap_hash, &size_index) < 2 )
+            if( fscanf_s(file, "%u=%I64u,%u\n", &resource_index, &bitmap_hash, &size) < 2 )
                 break;
+
+            // get size index from size
+            Index size_index = _GetSizeIndex(size);
 
             // set default
             if( bitmap_hash == 0 )
@@ -173,7 +177,7 @@ namespace YoloMouse
         if( _default.Isvalid() )
         {
             // write default entry
-            fprintf_s(file, "%u=0,%u\n", _default.resource_index, _default.size_index);
+            fprintf_s(file, "%u=0,%u\n", _default.resource_index, CURSOR_SIZE_TABLE[_default.size_index]);
             written++;
         }
 
@@ -183,7 +187,7 @@ namespace YoloMouse
             // write valid entry
             if( binding->bitmap_hash != 0 )
             {
-                fprintf_s(file, "%u=%I64u,%u\n", binding->resource_index, binding->bitmap_hash, binding->size_index);
+                fprintf_s(file, "%u=%I64u,%u\n", binding->resource_index, binding->bitmap_hash, CURSOR_SIZE_TABLE[binding->size_index]);
                 written++;
             }
         }
@@ -196,5 +200,32 @@ namespace YoloMouse
             _wunlink(save_path);
 
         return true;
+    }
+
+    //-------------------------------------------------------------------------
+    Index CursorBindings::_GetSizeIndex( ULong size )
+    {
+        // if original size
+        if( size == CURSOR_INDEX_ORIGINAL )
+            return 0;
+
+        // if old table (size is index)
+        if( size < CURSOR_SIZE_TABLE[1] )
+        {
+            // get size from old table
+            if( size < COUNT( CURSOR_SIZE_TABLE_V_0_8_3 ) )
+                size = CURSOR_SIZE_TABLE_V_0_8_3[size];
+            // else return default index
+            else
+                return CURSOR_INDEX_DEFAULT;
+        }
+
+        // locate size index nearest requested size
+        for( Index i = 0; i < CURSOR_INDEX_COUNT; ++i )
+            if( size <= CURSOR_SIZE_TABLE[i] )
+                return i;
+
+        // use default
+        return CURSOR_INDEX_DEFAULT;
     }
 }

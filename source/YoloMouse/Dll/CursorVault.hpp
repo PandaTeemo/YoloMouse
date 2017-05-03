@@ -42,7 +42,7 @@ namespace YoloMouse
 
             CursorResource();
         };
-        typedef FlatArray<CursorResource, CURSOR_SIZE_COUNT> ResourceTable;
+        typedef FlatArray<CursorResource, CURSOR_INDEX_COUNT> ResourceTable;
 
         struct CacheEntry
         {
@@ -62,9 +62,6 @@ namespace YoloMouse
         Bool _CacheInit( CacheEntry& entry, Index resource_index );
         Bool _CacheLoad( CacheEntry& entry, Index size_index );
         void _CacheUnload( CacheEntry& entry, Index size_index );
-
-        /**/
-        void _IdealResize( ULong& out_width, ULong& out_height, Index target_height, ULong threshold );
 
         // fields
         CacheTable   _table;

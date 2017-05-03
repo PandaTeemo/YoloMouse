@@ -90,10 +90,10 @@ namespace Core
     // public
     //-------------------------------------------------------------------------
     InputMonitor::InputMonitor( ShellUi& ui ):
-        _ui             (ui),
-        _state          (STATE_LIMIT),
-        _combo_time     (0),
-        _combo_success  (false)
+        _ui           (ui),
+        _state        (STATE_LIMIT),
+        _input_time   (0),
+        _combo_pressed(false)
     {
         _state.Zero();
     }
@@ -112,7 +112,7 @@ namespace Core
         // create keyboard device
         kb.usUsagePage =    0x01;
         kb.usUsage =        0x06;
-        kb.dwFlags =        RIDEV_NOLEGACY|RIDEV_INPUTSINK;
+        kb.dwFlags =        RIDEV_NOLEGACY|RIDEV_INPUTSINK|RIDEV_APPKEYS|RIDEV_NOHOTKEYS;
         kb.hwndTarget =     _ui.GetHwnd();
 
         // register keyboard device
@@ -203,26 +203,32 @@ namespace Core
     //-------------------------------------------------------------------------
     Bool InputMonitor::_OnInputKeyboard( const RAWKEYBOARD& kb )
     {
-        ULong   key = kb.VKey;
-        Bool    down = ( kb.Flags & RI_KEY_BREAK ) == 0;
+        ULong key =  kb.VKey;
+        Bool  down = ( kb.Flags & RI_KEY_BREAK ) == 0;
 
-        // if valid
-        if( key < 0xff )
+        // if valid and changed
+        if( key < 0xff && _state[key] != down )
         {
-            // get current uptime
+            // get current time
             ULONGLONG current_time = GetTickCount64();
-
-            // if key is up and successful combo expired reset input state. this is a ghetto 
-            // workaround to some windows hotkeys like CTRL ALT DEL not notifying rawinput.
-            if( _combo_success && !down && (current_time - _combo_time) > COMBO_EXPIRATION )
+            
+            // if unbuffered
+            if( current_time > _input_time )
             {
-                _state.Zero();
-                _combo_success = false;
-            }
+                // this is a ghetto  workaround to some windows hotkeys like CTRL ALT DEL
+                // not notifying rawinput and therefore getting stuck in down state
+                if( down )
+                {
+                    ULONGLONG dtime = current_time - _input_time;
 
-            // if state changed
-            if( _state[key] != down )
-            {
+                    // expire input state if over time limit
+                    if( (_combo_pressed && dtime > COMBO_EXPIRATION) || (!_combo_pressed && dtime > NONCOMBO_EXPIRATION) )
+                        _state.Zero();
+
+                    // update input time
+                    _input_time = current_time;
+                }
+
                 // notify
                 _listener->OnKey(key, down);
 
@@ -236,11 +242,19 @@ namespace Core
                     // if combo notify
                     _listener->OnKeyCombo(combo->id);
 
-                    // update combo time and success state
-                    _combo_time = current_time;
-                    _combo_success = true;
+                    // update input time with buffer time to avoided unwanted queued up input
+                    _input_time = GetTickCount64() + QUEUED_EXPIRATION;
+
+                    // set combo pressed state
+                    _combo_pressed = true;
                 }
+                // clear combo pressed state
+                else if( down )
+                    _combo_pressed = false; 
             }
+            // else clear input state on up
+            else if( !down )
+                _state[key] = false;
         }
 
         return true;

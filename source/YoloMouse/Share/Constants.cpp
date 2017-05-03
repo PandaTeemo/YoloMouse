@@ -12,7 +12,27 @@ namespace YoloMouse
         L"About",                   //MENU_OPTION_ABOUT
     };
 
-    const ULong CURSOR_SIZE_TABLE[CURSOR_SIZE_COUNT] =
+    const ULong CURSOR_SIZE_TABLE[CURSOR_INDEX_COUNT] =
+    {
+        0,
+        16,
+        24,
+        32,
+        40,
+        48,
+        56,
+        64,
+        72,
+        80,
+        88,
+        96,
+        104,
+        112,
+        120,
+        128,
+    };
+
+    const ULong CURSOR_SIZE_TABLE_V_0_8_3[] =
     {
         0,
         16,

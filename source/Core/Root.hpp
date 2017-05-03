@@ -100,4 +100,8 @@ namespace Core
     /**/
     extern void LogFile( const Char* format, ... );
     #define dlog LogFile
+
+    /**/
+    extern void LogConsole( const Char* format, ... );
+    #define clog LogConsole
 }

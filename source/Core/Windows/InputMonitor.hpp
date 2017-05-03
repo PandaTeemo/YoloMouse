@@ -10,11 +10,13 @@ namespace Core
         public ShellUi::IListener
     {
     public:
-        /**/
-        static const ULong STATE_LIMIT =        0xff;
-        static const ULong KEY_LIMIT =          4;
-        static const ULong COMBO_LIMIT =        50;
-        static const ULong COMBO_EXPIRATION =   3000;
+        // constants
+        static const ULong STATE_LIMIT =            0xff;
+        static const ULong KEY_LIMIT =              4;
+        static const ULong COMBO_LIMIT =            50;
+        static const ULong COMBO_EXPIRATION =       6000;
+        static const ULong NONCOMBO_EXPIRATION =    2000;
+        static const ULong QUEUED_EXPIRATION =      10;
 
         /**/
         struct IListener
@@ -67,7 +69,7 @@ namespace Core
         ShellUi&        _ui;
         StateTable      _state;
         ComboCollection _combos;
-        ULONGLONG       _combo_time;
-        Bool            _combo_success;
+        ULONGLONG       _input_time;
+        Bool            _combo_pressed;
     };
 }

@@ -3,6 +3,7 @@
 #include <YoloMouse/Share/SharedState.hpp>
 #include <Psapi.h>
 #include <Shlobj.h>
+#include <stdio.h>
 
 namespace YoloMouse
 {

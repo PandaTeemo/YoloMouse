@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="YoloMouse" Language="1033" Version="0.8.3.0" Manufacturer="HaPpY" UpgradeCode="69ce184e-a676-4169-a124-e1ee073bd0e6">
+  <Product Id="*" Name="YoloMouse" Language="1033" Version="0.9.0.0" Manufacturer="HaPpY" UpgradeCode="69ce184e-a676-4169-a124-e1ee073bd0e6">
 
     <Package Id="*" InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" InstallScope="perMachine" Platform="x64"/>
     <WixVariable Id="WixUILicenseRtf" Value="$(var.SolutionDir)\..\etc\Eula.rtf" />
@@ -133,6 +133,37 @@
       </Component>
       <Component Id="DefaultCursor29" Guid="{C1576D32-39C4-42FF-8FF0-5067DDF7A945}" Win64="yes">
         <File Id="DefaultCursor29" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Default\29.cur" KeyPath="yes" />
+      </Component>
+
+      <Component Id="DefaultCursor30" Guid="{1A979B48-B2E9-4D94-8B13-CE395AA66659}" Win64="yes">
+        <File Id="DefaultCursor30" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Default\30.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="DefaultCursor31" Guid="{2FB5FCB0-0BA7-4E54-9268-446023799285}" Win64="yes">
+        <File Id="DefaultCursor31" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Default\31.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="DefaultCursor32" Guid="{CE2A784F-502C-4432-BAA8-83A43AFBE11F}" Win64="yes">
+        <File Id="DefaultCursor32" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Default\32.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="DefaultCursor33" Guid="{F96313B3-60EE-48DF-8BB2-A2B3CC9AAE90}" Win64="yes">
+        <File Id="DefaultCursor33" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Default\33.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="DefaultCursor34" Guid="{0C18A3DA-719B-4565-9182-D252F741A087}" Win64="yes">
+        <File Id="DefaultCursor34" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Default\34.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="DefaultCursor35" Guid="{22CAACDB-F7A1-4805-B803-847912F4F1CB}" Win64="yes">
+        <File Id="DefaultCursor35" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Default\35.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="DefaultCursor36" Guid="{595DF46A-154A-49EC-A9C7-29BB53C3756C}" Win64="yes">
+        <File Id="DefaultCursor36" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Default\36.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="DefaultCursor37" Guid="{FFDD97A2-DA3B-4D2B-86E1-0ADF2CD23144}" Win64="yes">
+        <File Id="DefaultCursor37" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Default\37.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="DefaultCursor38" Guid="{E955F2FB-11CC-4C31-B421-ED100ADF2776}" Win64="yes">
+        <File Id="DefaultCursor38" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Default\38.cur" KeyPath="yes" />
+      </Component>
+      <Component Id="DefaultCursor39" Guid="{AEEE2D23-B015-4AF6-AFF8-FDA43B06DE17}" Win64="yes">
+        <File Id="DefaultCursor39" Source="$(var.YoloMouse.Loader.TargetDir)\Cursors\Default\39.cur" KeyPath="yes" />
       </Component>
 
       <Component Id="DefaultCursor80" Guid="{B6693082-6BFF-48B9-8E30-D9864E09E70B}" Win64="yes">

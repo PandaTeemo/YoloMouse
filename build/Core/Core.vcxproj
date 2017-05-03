@@ -23,7 +23,6 @@
     <ClInclude Include="..\..\source\Core\Container\Array.hpp" />
     <ClInclude Include="..\..\source\Core\Container\String.hpp" />
     <ClInclude Include="..\..\source\Core\Root.hpp" />
-    <ClInclude Include="..\..\source\Core\Support\Debug.hpp" />
     <ClInclude Include="..\..\source\Core\Support\Enum.hpp" />
     <ClInclude Include="..\..\source\Core\Support\Settings.hpp" />
     <ClInclude Include="..\..\source\Core\Support\Singleton.hpp" />
@@ -37,7 +36,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Core\Root.cpp" />
-    <ClCompile Include="..\..\source\Core\Support\Debug.cpp" />
     <ClCompile Include="..\..\source\Core\Support\Settings.cpp" />
     <ClCompile Include="..\..\source\Core\Support\Tools.cpp" />
     <ClCompile Include="..\..\source\Core\Windows\InputMonitor.cpp" />
@@ -110,6 +108,9 @@
     <Link>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <Lib>
+      <AdditionalDependencies>Wtsapi32.lib</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

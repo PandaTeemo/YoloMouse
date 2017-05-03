@@ -51,6 +51,9 @@ namespace YoloMouse
         Bool Save( const WCHAR* target_id );
 
     private:
+        /**/
+        static Index _GetSizeIndex( ULong size );
+
         // fields
         MapTable _bindings;
         Binding  _default;

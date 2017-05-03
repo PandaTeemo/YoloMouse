@@ -3,8 +3,9 @@
 #include <YoloMouse/Loader/Resource/resource.h>
 #include <YoloMouse/Share/Constants.hpp>
 #include <YoloMouse/Share/SharedTools.hpp>
-#include <Shlobj.h>
 #include <io.h>
+#include <Shlobj.h>
+#include <stdio.h>
 
 namespace YoloMouse
 {

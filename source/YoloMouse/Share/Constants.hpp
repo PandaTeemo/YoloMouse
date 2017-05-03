@@ -44,32 +44,18 @@ namespace YoloMouse
         MENU_OPTION_COUNT
     };
 
-    enum
-    {
-        CURSOR_SIZE_ORIGINAL,
-        CURSOR_SIZE_16,
-        CURSOR_SIZE_24,
-        CURSOR_SIZE_32,
-        CURSOR_SIZE_48,
-        CURSOR_SIZE_64,
-        CURSOR_SIZE_80,
-        CURSOR_SIZE_96,
-        CURSOR_SIZE_112,
-        CURSOR_SIZE_128,
-        CURSOR_SIZE_COUNT,
-
-        CURSOR_SIZE_DEFAULT = CURSOR_SIZE_64
-    };
-
     // numeric
     //-------------------------------------------------------------------------
-    static const ULong APP_VERSION[] =              { 0, 8, 3 };
+    static const ULong APP_VERSION[] =              { 0, 9, 0 };
     static const ULong APP_NAME_LIMIT =             64;
     static const ULong LOG_MEMORY_LIMIT =           KILOBYTES(8);
     static const ULong LOADER_TARGET_LIMIT =        20;
     static const ULong CURSOR_BINDING_LIMIT =       100;
     static const ULong CURSOR_GROUP_SIZE =          10;
     static const ULong CURSOR_GROUP_COUNT =         9;
+    static const ULong CURSOR_INDEX_ORIGINAL =      0;
+    static const ULong CURSOR_INDEX_DEFAULT =       7;
+    static const ULong CURSOR_INDEX_COUNT =         16;
     static const ULong CURSOR_RESOURCE_LIMIT =      CURSOR_GROUP_COUNT * CURSOR_GROUP_SIZE;
     static const Index CURSOR_SPECIAL_REMOVE =      9999;
     static const ULong CURSOR_CACHE_LIMIT =         50;
@@ -103,5 +89,6 @@ namespace YoloMouse
     // tables
     //-------------------------------------------------------------------------
     extern Settings::KeyValueCollection SETTINGS_ITEMS;
-    extern const ULong                  CURSOR_SIZE_TABLE[CURSOR_SIZE_COUNT];
+    extern const ULong                  CURSOR_SIZE_TABLE[CURSOR_INDEX_COUNT];
+    extern const ULong                  CURSOR_SIZE_TABLE_V_0_8_3[10];
 }

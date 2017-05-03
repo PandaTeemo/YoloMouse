@@ -18,9 +18,6 @@
     <ClInclude Include="..\..\source\Core\Container\String.hpp">
       <Filter>Container</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Core\Support\Debug.hpp">
-      <Filter>Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Core\Support\Enum.hpp">
       <Filter>Support</Filter>
     </ClInclude>
@@ -53,9 +50,6 @@
     <ClInclude Include="..\..\source\Core\Types.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\Core\Support\Debug.cpp">
-      <Filter>Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\Core\Support\Settings.cpp">
       <Filter>Support</Filter>
     </ClCompile>

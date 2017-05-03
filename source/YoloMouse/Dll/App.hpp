@@ -47,6 +47,10 @@ namespace YoloMouse
         static VOID HOOK_CALL _OnHookSetCursor( Native* arguments );
         static VOID HOOK_CALL _OnHookSetClassLong( Native* arguments );
 
+        static void _SetCursorClassLong( Native value );
+        static void _SaveCursorClassLong();
+        static void _RestoreCursorClassLong();
+
         // fields: state
         static Bool             _active;
         static HWND             _hwnd;
@@ -58,6 +62,8 @@ namespace YoloMouse
         static CursorBindings::Binding* _current_binding;
         static PathString       _target_id;
         static Bool             _refresh_ready;
+        static Native           _classlong_original;
+        static Native           _classlong_last;
 
         // fields: input
         static Index            _update_group;

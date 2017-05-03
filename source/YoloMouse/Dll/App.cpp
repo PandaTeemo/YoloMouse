@@ -6,28 +6,30 @@ namespace YoloMouse
 {
     // fields
     //-------------------------------------------------------------------------
-    Bool            App::_active             (false);
-    HWND            App::_hwnd =             NULL;
+    Bool            App::_active                (false);
+    HWND            App::_hwnd =                NULL;
     CursorBindings  App::_bindings;
     CursorVault     App::_vault;
     HandleCache     App::_cache;
-    HCURSOR         App::_last_cursor        (NULL);
-    HCURSOR         App::_replace_cursor     (NULL);
+    HCURSOR         App::_last_cursor           (NULL);
+    HCURSOR         App::_replace_cursor        (NULL);
     CursorBindings::Binding* App::_current_binding(NULL);
     PathString      App::_target_id;
-    Bool            App::_refresh_ready      (false);
+    Bool            App::_refresh_ready         (false);
+    Native          App::_classlong_original =  0;
+    Native          App::_classlong_last =      0;
 
-    Index           App::_update_group       (INVALID_INDEX);
-    Long            App::_update_size        (0);
-    Bool            App::_update_default     (false);
+    Index           App::_update_group          (INVALID_INDEX);
+    Long            App::_update_size           (0);
+    Bool            App::_update_default        (false);
 
-    Hook            App::_hook_setcursor     (SetCursor, App::_OnHookSetCursor, Hook::BEFORE);
+    Hook            App::_hook_setcursor        (SetCursor, App::_OnHookSetCursor, Hook::BEFORE);
 #if CPU_64
-    Hook            App::_hook_setclasslonga (SetClassLongPtrA, App::_OnHookSetClassLong, Hook::BEFORE);
-    Hook            App::_hook_setclasslongw (SetClassLongPtrW, App::_OnHookSetClassLong, Hook::BEFORE);
+    Hook            App::_hook_setclasslonga    (SetClassLongPtrA, App::_OnHookSetClassLong, Hook::BEFORE);
+    Hook            App::_hook_setclasslongw    (SetClassLongPtrW, App::_OnHookSetClassLong, Hook::BEFORE);
 #else
-    Hook            App::_hook_setclasslonga (SetClassLongA, App::_OnHookSetClassLong, Hook::BEFORE);
-    Hook            App::_hook_setclasslongw (SetClassLongW, App::_OnHookSetClassLong, Hook::BEFORE);
+    Hook            App::_hook_setclasslonga    (SetClassLongA, App::_OnHookSetClassLong, Hook::BEFORE);
+    Hook            App::_hook_setclasslongw    (SetClassLongW, App::_OnHookSetClassLong, Hook::BEFORE);
 #endif
 
      // public
@@ -50,6 +52,9 @@ namespace YoloMouse
             elog("DllApp.Load.BuildTargetId");
             return false;
         }
+
+        // backup class long value
+        _SaveCursorClassLong();
 
         // load hooks
         if( !_LoadHooks() )
@@ -80,6 +85,9 @@ namespace YoloMouse
 
         // unload hooks
         _UnloadHooks();
+
+        // restore original classlong
+        _RestoreCursorClassLong();
 
         // unload state
         state.Close();
@@ -303,8 +311,8 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     Bool App::_OnUpdateGroup( HCURSOR hcursor )
     {
-        Index size_index = CURSOR_SIZE_DEFAULT;
-        Index group_index = _update_group;
+        Index size_index =          CURSOR_INDEX_DEFAULT;
+        Index group_index =         _update_group;
         Index last_resource_index = INVALID_INDEX;
 
         // clear state
@@ -433,7 +441,7 @@ namespace YoloMouse
         _vault.Unload(binding->resource_index, binding->size_index);
 
         // calculate new size index
-        Index size_index = Tools::Clamp<Long>(binding->size_index + size_index_delta, 0, CURSOR_SIZE_COUNT - 1);
+        Index size_index = Tools::Clamp<Long>(binding->size_index + size_index_delta, 0, CURSOR_INDEX_COUNT - 1);
         
         // load cursor with new size
         if( !_vault.Load(binding->resource_index, size_index) )
@@ -589,12 +597,11 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     VOID HOOK_CALL App::_OnHookSetCursor( Native* arguments )
     {
+        // backup class long value
+        _SaveCursorClassLong();
+
         // update cursor using setclasslong method first
-    #if CPU_64
-        SetClassLongPtrA( _hwnd, GCLP_HCURSOR, (LONG_PTR)arguments[1] );
-    #else
-        SetClassLongA( _hwnd, GCL_HCURSOR, (LONG)arguments[1] );
-    #endif
+        _SetCursorClassLong( arguments[1] );
 
         // if replacement cursor was set pass it out to setcursor method
         if( _replace_cursor != NULL )
@@ -612,6 +619,49 @@ namespace YoloMouse
         {
             // update cursor
             _OnCursorHook((HCURSOR&)arguments[3], (HCURSOR)arguments[3]);
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    void App::_SetCursorClassLong( Native value )
+    {
+        // set class long value
+    #if CPU_64
+        SetClassLongPtrA( _hwnd, GCLP_HCURSOR, (LONG_PTR)value );
+    #else
+        SetClassLongA( _hwnd, GCL_HCURSOR, (LONG)value );
+    #endif
+
+        // set last class long value
+        _classlong_last = value;
+    }
+
+    void App::_SaveCursorClassLong()
+    {
+        Native current_value;
+
+        // get current class long value
+    #if CPU_64
+        current_value = (Native)GetClassLongPtrA( _hwnd, GCLP_HCURSOR );
+    #else
+        current_value = (Native)GetClassLongA( _hwnd, GCL_HCURSOR );
+    #endif
+
+        // if not last then update as original value
+        if( current_value != _classlong_last )
+            _classlong_original = current_value;
+    }
+
+    void App::_RestoreCursorClassLong()
+    {
+        // if any changes made
+        if( _classlong_last )
+        {
+            // get current original class long
+            _SaveCursorClassLong();
+
+            // restore original class long
+            _SetCursorClassLong( _classlong_original );
         }
     }
 }
