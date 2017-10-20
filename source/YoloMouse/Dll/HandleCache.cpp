@@ -47,11 +47,13 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     Hash HandleCache::_CalculateHash( HCURSOR hcursor )
     {
-        static const ULong HASH_BUFFER_LIMIT = KILOBYTES(8);
-    
         ICONINFO    iconinfo = {0};
         LONG        count;
-        Byte        buffer[HASH_BUFFER_LIMIT];
+        HBITMAP     hbitmap;
+        BITMAP      bitmap;
+        ULong       bufferLimit;
+        Byte*       buffer;
+        Hash        hash;
 
         // require valid
         if( hcursor == NULL )
@@ -66,9 +68,20 @@ namespace YoloMouse
             elog("HandleCache.CalculateHash.GetIconInfo");
             return 0;
         }
+        hbitmap = iconinfo.hbmColor ? iconinfo.hbmColor : iconinfo.hbmMask;
+
+        // get buffer size
+        if( GetObject(hbitmap, sizeof(BITMAP), &bitmap) == 0 )
+        {
+            elog("HandleCache.CalculateHash.GetObject");
+            return 0;
+        }
+
+        bufferLimit = bitmap.bmWidthBytes * bitmap.bmHeight;
+        buffer = new Byte[bufferLimit];
 
         // get icon bitmap buffer
-        count = GetBitmapBits( iconinfo.hbmColor ? iconinfo.hbmColor : iconinfo.hbmMask, sizeof(buffer), buffer );
+        count = GetBitmapBits( hbitmap, bufferLimit, buffer );
 
         // iconinfo cleanup 
         if( iconinfo.hbmColor )
@@ -84,6 +97,11 @@ namespace YoloMouse
         }
 
         // generate hash
-        return Tools::Fnv164Hash(buffer, count);
+        hash = Tools::Fnv164Hash(buffer, count);
+
+        // buffer cleanup
+        delete[] buffer;
+
+        return hash;
     }
 }
