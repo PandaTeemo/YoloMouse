@@ -534,7 +534,10 @@ namespace YoloMouse
     {
         // ignore null cursor
         if( old_cursor == NULL )
+        {
+            _replace_cursor = NULL;
             return;
+        }
 
         // if cursor changing set refresh state
         if( old_cursor != _last_cursor )

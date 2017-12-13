@@ -47,11 +47,12 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     Hash HandleCache::_CalculateHash( HCURSOR hcursor )
     {
-        static const ULong HASH_BUFFER_LIMIT = KILOBYTES(8);
-    
         ICONINFO    iconinfo = {0};
-        LONG        count;
-        Byte        buffer[HASH_BUFFER_LIMIT];
+        LONG        buffer_limit;
+        Byte*       buffer;
+        BITMAP      bitmap;
+        HBITMAP     hbitmap;
+        Hash        hash = 0;
 
         // require valid
         if( hcursor == NULL )
@@ -67,23 +68,51 @@ namespace YoloMouse
             return 0;
         }
 
-        // get icon bitmap buffer
-        count = GetBitmapBits( iconinfo.hbmColor ? iconinfo.hbmColor : iconinfo.hbmMask, sizeof(buffer), buffer );
+        // select color else mask bitmap
+        hbitmap = iconinfo.hbmColor ? iconinfo.hbmColor : iconinfo.hbmMask;
 
-        // iconinfo cleanup 
+        // get icon bitmap object
+        if( GetObject(hbitmap, sizeof(BITMAP), &bitmap) == 0 )
+        {
+            elog("HandleCache.CalculateHash.GetObject");
+            return 0;
+        }
+
+        // allocate buffer
+        buffer_limit = bitmap.bmWidthBytes * bitmap.bmHeight;
+        /*
+            TODO: this is a temporary hack added to 0.9.1 to make earlier 8k buffer
+            limit cursors semi backward compatible. remove in 2019.
+        */
+        //HACK:begin
+        if( buffer_limit > KILOBYTES( 8 ) && buffer_limit <= KILOBYTES( 12 ) )
+            buffer_limit = KILOBYTES( 8 );
+        //HACK:end
+        buffer = new Byte[buffer_limit];
+
+        // if buffer created
+        if( buffer != nullptr )
+        {
+            // read icon bitmap pixel data
+            ULong buffer_count = GetBitmapBits( hbitmap, buffer_limit, buffer );
+
+            // log if failed
+            if( buffer_count == 0 )
+                elog("HandleCache.CalculateHash.GetBitmapBits");
+            // else generate hash
+            else
+                hash = Tools::Fnv164Hash(buffer, buffer_count);
+
+            // cleanup buffer
+            delete[] buffer;
+        }
+
+        // cleanup  icon info
         if( iconinfo.hbmColor )
             DeleteObject(iconinfo.hbmColor);
         if( iconinfo.hbmMask )
             DeleteObject(iconinfo.hbmMask);
 
-        // fail if no bits read
-        if( count == 0 )
-        {
-            elog("HandleCache.CalculateHash.GetBitmapBits");
-            return 0;
-        }
-
-        // generate hash
-        return Tools::Fnv164Hash(buffer, count);
+        return hash;
     }
 }
