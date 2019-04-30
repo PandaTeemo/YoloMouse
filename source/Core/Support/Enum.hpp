@@ -52,7 +52,7 @@ namespace Core
         {
             String s;
 
-            for( KeyValueIterator i = _items.Begin(); i != _items.End(); ++i )
+            for( KeyValueIterator i = _items.begin(); i != _items.end(); ++i )
             {
                 if( value == i->value )
                 {

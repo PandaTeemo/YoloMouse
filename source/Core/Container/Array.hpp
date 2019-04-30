@@ -252,20 +252,20 @@ namespace Core
         }
 
         /**/
-        const Iterator Begin() const
+        const Iterator begin() const
         {
             return const_cast<Iterator>(_memory);
         }
-        const Iterator End() const
+        const Iterator end() const
         {
             return const_cast<Iterator>(_memory + _count);
         }
 
-        Iterator Begin()
+        Iterator begin()
         {
             return _memory;
         }
-        Iterator End()
+        Iterator end()
         {
             return _memory + _count;
         }
@@ -299,7 +299,7 @@ namespace Core
         template<typename OBJECT>
         Iterator Find( const OBJECT& o ) const
         {
-            for( Iterator i = Begin(); i != End(); ++i )
+            for( Iterator i = begin(); i != end(); ++i )
                 if(*i == o)
                     return i;
 
@@ -338,9 +338,9 @@ namespace Core
                 return false;
             else
             {
-                Iterator i = Begin(), j = other.Begin();
-                for(; i != End() && *i == *j; i++, j++ );
-                return i == End();
+                Iterator i = begin(), j = other.begin();
+                for(; i != end() && *i == *j; i++, j++ );
+                return i == end();
             }
         }
 

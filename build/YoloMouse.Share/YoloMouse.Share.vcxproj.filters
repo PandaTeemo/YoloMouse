@@ -13,5 +13,6 @@
     <ClInclude Include="..\..\source\YoloMouse\Share\SharedLog.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\SharedState.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\SharedTools.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Share\Enums.hpp" />
   </ItemGroup>
 </Project>

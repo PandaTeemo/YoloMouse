@@ -1,64 +1,26 @@
 #pragma once
 #include <Core/Support/Settings.hpp>
-#include <YoloMouse/Share/Root.hpp>
+#include <YoloMouse/Share/Enums.hpp>
 
 namespace YoloMouse
 {
-    // enums
-    //-------------------------------------------------------------------------
-    enum NotifyId
-    {
-        NOTIFY_INIT,
-        NOTIFY_SETCURSOR,
-        NOTIFY_SETSIZE,
-        NOTIFY_SETDEFAULT,
-        NOTIFY_REFRESH,
-    };
-
-    enum
-    {
-        SETTING_GROUPKEY_1,
-        SETTING_GROUPKEY_2,
-        SETTING_GROUPKEY_3,
-        SETTING_GROUPKEY_4,
-        SETTING_GROUPKEY_5,
-        SETTING_GROUPKEY_6,
-        SETTING_GROUPKEY_7,
-        SETTING_GROUPKEY_8,
-        SETTING_GROUPKEY_9,
-        SETTING_GROUPKEY_RESET,
-        SETTING_SIZEKEY_SMALLER,
-        SETTING_SIZEKEY_LARGER,
-        SETTING_DEFAULTKEY,
-        SETTING_AUTOSTART,
-        SETTING_SHOWMENU,
-    };
-
-    enum
-    {
-        MENU_OPTION_RUNASADMIN,
-        MENU_OPTION_AUTOSTART,
-        MENU_OPTION_SETTINGS,
-        MENU_OPTION_ERRORS,
-        MENU_OPTION_ABOUT,
-        MENU_OPTION_COUNT
-    };
-
     // numeric
     //-------------------------------------------------------------------------
-    static const ULong APP_VERSION[] =              { 0, 9, 1 };
-    static const ULong APP_NAME_LIMIT =             64;
-    static const ULong LOG_MEMORY_LIMIT =           KILOBYTES(8);
-    static const ULong LOADER_TARGET_LIMIT =        20;
-    static const ULong CURSOR_BINDING_LIMIT =       100;
-    static const ULong CURSOR_GROUP_SIZE =          10;
-    static const ULong CURSOR_GROUP_COUNT =         9;
-    static const ULong CURSOR_INDEX_ORIGINAL =      0;
-    static const ULong CURSOR_INDEX_DEFAULT =       7;
-    static const ULong CURSOR_INDEX_COUNT =         16;
-    static const ULong CURSOR_RESOURCE_LIMIT =      CURSOR_GROUP_COUNT * CURSOR_GROUP_SIZE;
-    static const Index CURSOR_SPECIAL_REMOVE =      9999;
-    static const ULong CURSOR_CACHE_LIMIT =         50;
+    static const ULong APP_VERSION[] =                      { 0, 10, 0 };
+    static const ULong APP_NAME_LIMIT =                     64;
+    static const ULong LOG_MEMORY_LIMIT =                   KILOBYTES(8);
+    static const ULong LOADER_TARGET_LIMIT =                20;
+    static const ULong CURSOR_BINDING_LIMIT =               100;
+    static const ULong CURSOR_SIZE_INDEX_ORIGINAL =         0;
+    static const ULong CURSOR_SIZE_INDEX_DEFAULT =          7;
+    static const ULong CURSOR_SIZE_INDEX_COUNT =            16;
+    static const ULong CURSOR_RESOURCE_PRESET_MINOR_COUNT = 10;
+    static const ULong CURSOR_RESOURCE_PRESET_MAJOR_COUNT = 9;
+    static const ULong CURSOR_RESOURCE_PRESET_COUNT =       CURSOR_RESOURCE_PRESET_MINOR_COUNT* CURSOR_RESOURCE_PRESET_MAJOR_COUNT;
+    static const ULong CURSOR_RESOURCE_IDENTITY_LIMIT =     50;
+    static const Index CURSOR_SPECIAL_REMOVE =              9999;
+    static const ULong CURSOR_CACHE_LIMIT =                 50;
+    static const ULong INI_LINE_LIMIT =                     256;
 
     // strings
     //-------------------------------------------------------------------------
@@ -75,8 +37,8 @@ namespace YoloMouse
     static const WCHAR* PATH_ERRORS =               L"errors";
     static const WCHAR* EXTENSION_INI =             L"ini";
     static const WCHAR* EXTENSION_LOG =             L"txt";
-    static const WCHAR* EXTENSION_STATIC =          L"cur";
-    static const WCHAR* EXTENSION_ANIMATED =        L"ani";
+    static const WCHAR* EXTENSION_STATIC_CURSOR =   L"cur";
+    static const WCHAR* EXTENSION_ANIMATED_CURSOR = L"ani";
 
     static const CHAR*  INJECT_NOTIFY_FUNCTION =    "YoloNotify";
 
@@ -89,6 +51,6 @@ namespace YoloMouse
     // tables
     //-------------------------------------------------------------------------
     extern Settings::KeyValueCollection SETTINGS_ITEMS;
-    extern const ULong                  CURSOR_SIZE_TABLE[CURSOR_INDEX_COUNT];
+    extern const ULong                  CURSOR_SIZE_TABLE[CURSOR_SIZE_INDEX_COUNT];
     extern const ULong                  CURSOR_SIZE_TABLE_V_0_8_3[10];
 }

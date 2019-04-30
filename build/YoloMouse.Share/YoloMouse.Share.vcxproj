@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\YoloMouse\Share\Constants.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Share\Enums.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\NotifyMessage.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\Root.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\SharedLog.hpp" />

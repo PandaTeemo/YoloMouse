@@ -31,6 +31,7 @@
 #define LOG_PATH                "debug.log"
 #define INVALID_ID              (~0)
 #define INVALID_INDEX           (~0)
+#define INVALID_HANDLE          (~0)
 
 namespace Core
 {

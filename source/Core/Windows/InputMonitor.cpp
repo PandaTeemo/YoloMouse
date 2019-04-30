@@ -264,16 +264,16 @@ namespace Core
     InputMonitor::Combo* InputMonitor::_FindCombo()
     {
         // for each combo
-        for( ComboIterator combo = _combos.Begin(); combo != _combos.End(); ++combo )
+        for( ComboIterator combo = _combos.begin(); combo != _combos.end(); ++combo )
         {
             KeyCollection& keys = combo->keys;
-            KeyIterator key = keys.Begin();
+            KeyIterator key = keys.begin();
 
             // for each key or translated key
-            for(; key != keys.End() && (_state[*key] || _state[_GetAlternateKey(*key)]); ++key );
+            for(; key != keys.end() && (_state[*key] || _state[_GetAlternateKey(*key)]); ++key );
 
             // success if all matched
-            if( key == keys.End() )
+            if( key == keys.end() )
                 return combo;
         }
 

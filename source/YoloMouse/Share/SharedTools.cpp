@@ -124,4 +124,57 @@ namespace YoloMouse
         // show message
         MessageBoxA(NULL, message, APP_NAMEC, MB_OK|(error ? MB_ICONERROR : MB_ICONINFORMATION));
     }
+
+    //-------------------------------------------------------------------------
+    Index SharedTools::CursorSizeToSizeIndex( ULong size )
+    {
+        // if original size
+        if( size == CURSOR_SIZE_INDEX_ORIGINAL )
+            return 0;
+
+        // if old table (size is index)
+        if( size < CURSOR_SIZE_TABLE[1] )
+        {
+            // get size from old table
+            if( size < COUNT( CURSOR_SIZE_TABLE_V_0_8_3 ) )
+                size = CURSOR_SIZE_TABLE_V_0_8_3[size];
+            // else return default index
+            else
+                return CURSOR_SIZE_INDEX_DEFAULT;
+        }
+
+        // locate size index nearest requested size
+        for( Index i = 0; i < CURSOR_SIZE_INDEX_COUNT; ++i )
+            if( size <= CURSOR_SIZE_TABLE[i] )
+                return i;
+
+        // use default
+        return CURSOR_SIZE_INDEX_DEFAULT;
+    }
+
+    ULong SharedTools::CursorToSize( HCURSOR hcursor )
+    {
+        ICONINFO icon_info;
+        BITMAP   bitmap = { 0 };
+ 
+        // get base icon info
+        if( GetIconInfo(hcursor, &icon_info) == FALSE )
+            return 0;
+
+        // select bitmap handle to get bitmap from
+        HBITMAP hbitmap = icon_info.hbmColor ? icon_info.hbmColor : icon_info.hbmMask;
+
+        // if either bitmap handle exists get base icon bitmap object
+        if( hbitmap != NULL )
+            GetObject( hbitmap, sizeof( BITMAP ), &bitmap );
+
+        // cleanup temporary resources
+        if( icon_info.hbmColor != NULL )
+            DeleteObject(icon_info.hbmColor);
+        if( icon_info.hbmMask != NULL )
+            DeleteObject(icon_info.hbmMask);
+
+        // return size as bitmap height (will be 0 if failed)
+        return bitmap.bmHeight;
+    }
 }

@@ -18,9 +18,8 @@ namespace YoloMouse
         static void Unload();
 
         /**/
-        static Bool UpdateCursor( Index resource_index );
+        static Bool UpdatePreset( Index preset_major_index );
         static Bool UpdateSize( Long size_index_delta );
-        static Bool UpdateDefault();
 
         /**/
         static Bool Refresh();
@@ -35,9 +34,13 @@ namespace YoloMouse
         static void _UnloadCursors();
 
         /**/
-        static Bool _OnUpdateGroup( HCURSOR hcursor );
+        static Bool _LoadCursorByBinding( const CursorBindings::Binding& binding, HCURSOR hcursor=NULL );
+        static void _UnloadCursorByBinding( const CursorBindings::Binding& binding );
+        static Bool _GetCursorByBinding( HCURSOR& hcursor, const CursorBindings::Binding& binding );
+
+        /**/
+        static Bool _OnUpdatePreset( HCURSOR hcursor );
         static Bool _OnUpdateSize( HCURSOR hcursor );
-        static void _OnUpdateDefault();
 
         /**/
         static Bool _OnCursorChanging( HCURSOR hcursor );
@@ -47,9 +50,10 @@ namespace YoloMouse
         static VOID HOOK_CALL _OnHookSetCursor( Native* arguments );
         static VOID HOOK_CALL _OnHookSetClassLong( Native* arguments );
 
-        static void _SetCursorClassLong( Native value );
-        static void _SaveCursorClassLong();
-        static void _RestoreCursorClassLong();
+        static HCURSOR  _GetClassCursor();
+        static void     _SetClassCursor( Native value );
+        static void     _SaveClassCursor();
+        static void     _RestoreClassCursor();
 
         // fields: state
         static Bool             _active;
@@ -62,13 +66,12 @@ namespace YoloMouse
         static CursorBindings::Binding* _current_binding;
         static PathString       _target_id;
         static Bool             _refresh_ready;
-        static Native           _classlong_original;
-        static Native           _classlong_last;
+        static Bool             _setclasslong_self;
+        static Native           _classlong_save;
 
         // fields: input
-        static Index            _update_group;
-        static Long             _update_size;
-        static Bool             _update_default;
+        static Index            _update_preset_major_index;
+        static Long             _update_size_delta;
 
         // fields: hooks
         static Hook             _hook_setcursor;

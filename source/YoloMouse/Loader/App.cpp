@@ -17,7 +17,8 @@ namespace YoloMouse
         _input_monitor  (_ui),
         _system_monitor (SystemMonitor::Instance()),
         _settings       (SETTINGS_ITEMS),
-        _elevate        (false)
+        _elevate        (false),
+        _games_only     (false)
     {
         // init ui
         _ui.SetName(APP_NAME);
@@ -90,7 +91,7 @@ namespace YoloMouse
         _input_monitor.SetListener(this);
 
         // for each cursor key
-        for( Id id = SETTING_GROUPKEY_1; id <= SETTING_DEFAULTKEY; id++ )
+        for( Id id = SETTING_GROUPKEY_1; id <= SETTING_SIZEKEY_LARGER; id++ )
         {
             String format = _settings.Get(id);
 
@@ -108,6 +109,9 @@ namespace YoloMouse
         // enable autostart
         if( _settings.GetBoolean(SETTING_AUTOSTART) )
             _OptionAutoStart(true, false);
+
+        // update "games only" option
+        _OptionGamesOnly(_settings.GetBoolean(SETTING_GAMESONLY), false);
     }
 
     void App::_StartSettings()
@@ -156,14 +160,21 @@ namespace YoloMouse
 
             // add menu break
             _ui.AddMenuBreak();
-
+            // add show settings
+            _ui.AddMenuOption(MENU_OPTION_SETTINGSFOLDER, APP_MENU_STRINGS[MENU_OPTION_SETTINGSFOLDER], false);
             // add run-as-administrator option if not already admin
             if( !IsUserAnAdmin() )
                 _ui.AddMenuOption(MENU_OPTION_RUNASADMIN, APP_MENU_STRINGS[MENU_OPTION_RUNASADMIN], false);
+
+            // add menu break
+            _ui.AddMenuBreak();
             // add autostart option
             _ui.AddMenuOption(MENU_OPTION_AUTOSTART, APP_MENU_STRINGS[MENU_OPTION_AUTOSTART], _settings.GetBoolean(SETTING_AUTOSTART));
-            // add show settings
-            _ui.AddMenuOption(MENU_OPTION_SETTINGS, APP_MENU_STRINGS[MENU_OPTION_SETTINGS], false);
+            // add games only option
+            _ui.AddMenuOption(MENU_OPTION_GAMESONLY, APP_MENU_STRINGS[MENU_OPTION_GAMESONLY], _settings.GetBoolean(SETTING_GAMESONLY));
+
+            // add menu break
+            _ui.AddMenuBreak();
             // add debug log
             _ui.AddMenuOption(MENU_OPTION_ERRORS, APP_MENU_STRINGS[MENU_OPTION_ERRORS], false);
             // add about dialog
@@ -217,6 +228,22 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
+    void App::_OptionAbout()
+    {
+        MediumString about_text;
+
+        // generate about text
+        about_text.Format( TEXT_ABOUT,
+            APP_VERSION[0],         // version major
+            APP_VERSION[1],         // version minor
+            APP_VERSION[2],         // version patch
+            CPU_64 ? 64 : 32    // bitness
+        );
+
+        // show about dialog
+        SharedTools::MessagePopup(false, about_text.GetMemory());
+    }
+
     void App::_OptionErrors()
     {
         FILE*       file;
@@ -253,27 +280,18 @@ namespace YoloMouse
         }
     }
 
-    Bool App::_OptionRunAsAdmin()
+    void App::_OptionGamesOnly( Bool enable, Bool save )
     {
-        // exit current process
-        ShellUi::Instance().Exit();
+        // update games only state
+        _games_only = enable;
 
-        // set elevate state
-        _elevate = true;
-
-        return true;
-    }
-
-    void App::_OptionSettingsFolder()
-    {
-        PathString settings_path;
-
-        // get settings path
-        if( !SharedTools::BuildUserPath(settings_path, COUNT(settings_path), NULL, NULL, NULL) )
-            return;
-
-        // open in default text editor
-        ShellExecute(NULL, L"open", settings_path, L"", NULL, SW_SHOWNORMAL);
+        // update settings
+        if( save )
+        {
+            _settings.SetBoolean(SETTING_GAMESONLY, enable);
+            if( !_settings.Save() )
+                elog("App.OptionGamesOnly.Save");
+        }
     }
 
     Bool App::_OptionAutoStart( Bool enable, Bool save )
@@ -306,20 +324,27 @@ namespace YoloMouse
         return false;
     }
 
-    void App::_OptionAbout()
+    Bool App::_OptionRunAsAdmin()
     {
-        MediumString about_text;
+        // exit current process
+        ShellUi::Instance().Exit();
 
-        // generate about text
-        about_text.Format( TEXT_ABOUT,
-            APP_VERSION[0],         // version major
-            APP_VERSION[1],         // version minor
-            APP_VERSION[2],         // version patch
-            CPU_64 ? 64 : 32    // bitness
-        );
+        // set elevate state
+        _elevate = true;
 
-        // show about dialog
-        SharedTools::MessagePopup(false, about_text.GetMemory());
+        return true;
+    }
+
+    void App::_OptionSettingsFolder()
+    {
+        PathString settings_path;
+
+        // get settings path
+        if( !SharedTools::BuildUserPath(settings_path, COUNT(settings_path), NULL, NULL, NULL) )
+            return;
+
+        // open in default text editor
+        ShellExecute(NULL, L"open", settings_path, L"", NULL, SW_SHOWNORMAL);
     }
 
     //-------------------------------------------------------------------------
@@ -331,7 +356,7 @@ namespace YoloMouse
             return false;
 
         // notify instance to assign
-        return instance->Notify(NOTIFY_SETCURSOR, group_index);
+        return instance->Notify(NOTIFY_UPDATEPRESET, group_index);
     }
 
     Bool App::_AssignSize( Long size_index_delta )
@@ -342,18 +367,7 @@ namespace YoloMouse
             return false;
 
         // notify instance to assign
-        return instance->Notify(NOTIFY_SETSIZE, size_index_delta);
-    }
-
-    Bool App::_AssignDefault()
-    {
-        // access active instance
-        Instance* instance = _AccessCurrentInstance();
-        if( instance == NULL )
-            return false;
-
-        // notify instance to assign
-        return instance->Notify(NOTIFY_SETDEFAULT);
+        return instance->Notify(NOTIFY_UPDATESIZE, size_index_delta);
     }
 
     //-------------------------------------------------------------------------
@@ -380,6 +394,17 @@ namespace YoloMouse
         Instance* instance = _instance_manager.Find(process_id);
         if( instance == NULL )
         {
+            // if games only option enabled
+            if( _games_only )
+            {
+                // fail if game window test fails
+                if( !SystemTools::TestGameWindow( hwnd ) )
+                {
+                    elog("App.AccessCurrentInstance.TestGameWindow");
+                    return NULL;
+                }
+            }
+
             // allocate new instance
             instance = _instance_manager.Load(process_id);
         }
@@ -399,9 +424,6 @@ namespace YoloMouse
         // change size
         else if( combo_id >= SETTING_SIZEKEY_SMALLER && combo_id <= SETTING_SIZEKEY_LARGER )
             _AssignSize(combo_id == SETTING_SIZEKEY_SMALLER ? -1 : 1);
-        // assign default
-        else if( combo_id == SETTING_DEFAULTKEY )
-            _AssignDefault();
     }
 
     //-------------------------------------------------------------------------
@@ -441,21 +463,9 @@ namespace YoloMouse
     {
         switch(id)
         {
-        // run as administrator
-        case MENU_OPTION_RUNASADMIN:
-            _OptionRunAsAdmin();
-            return true;
-
-        // auto start
-        case MENU_OPTION_AUTOSTART:
-            // toggle auto start
-            if(_OptionAutoStart(!enabled, true))
-                _ui.SetMenuOption(id, !enabled);
-            return true;
-
-        // open settings folder
-        case MENU_OPTION_SETTINGS:
-            _OptionSettingsFolder();
+        // show menu
+        case MENU_OPTION_ABOUT:
+            _OptionAbout();
             return true;
 
         // show debug log
@@ -463,9 +473,28 @@ namespace YoloMouse
             _OptionErrors();
             return true;
 
-        // show menu
-        case MENU_OPTION_ABOUT:
-            _OptionAbout();
+        // games only
+        case MENU_OPTION_GAMESONLY:
+            // toggle games only
+            _OptionGamesOnly( !enabled, true );
+            _ui.SetMenuOption(MENU_OPTION_GAMESONLY, !enabled);
+            return true;
+
+        // auto start
+        case MENU_OPTION_AUTOSTART:
+            // toggle auto start
+            if( _OptionAutoStart(!enabled, true) )
+                _ui.SetMenuOption(MENU_OPTION_AUTOSTART, !enabled);
+            return true;
+
+        // run as administrator
+        case MENU_OPTION_RUNASADMIN:
+            _OptionRunAsAdmin();
+            return true;
+
+        // open settings folder
+        case MENU_OPTION_SETTINGSFOLDER:
+            _OptionSettingsFolder();
             return true;
 
         default:

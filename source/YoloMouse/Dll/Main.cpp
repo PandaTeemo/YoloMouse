@@ -16,16 +16,12 @@ YoloNotify( void* arg )
         App::Load();
         break;
 
-    case NOTIFY_SETCURSOR:
-        App::UpdateCursor(static_cast<Index>(m.parameter));
+    case NOTIFY_UPDATEPRESET:
+        App::UpdatePreset(static_cast<Index>(m.parameter));
         break;
 
-    case NOTIFY_SETSIZE:
+    case NOTIFY_UPDATESIZE:
         App::UpdateSize(static_cast<Long>(m.parameter));
-        break;
-
-    case NOTIFY_SETDEFAULT:
-        App::UpdateDefault();
         break;
 
     case NOTIFY_REFRESH:

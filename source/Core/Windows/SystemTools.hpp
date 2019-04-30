@@ -22,5 +22,21 @@ namespace Core
         /**/
         static HANDLE OpenDebugPrivileges();
         static void CloseDebugPrivileges( HANDLE handle );
+
+        /**/
+        static Bool TestGameWindow( HWND hwnd );
+
+        /**/
+        static Bool IsValidGameWindowSize( const SIZE& size );
+
+        /**/
+        static Bool TestFramesUpdating( const RECT& region, HWND hwnd, ULong test_count=1 );
+
+        /**/
+        static SIZE RectToSize( const RECT& rect );
+
+    private:
+        /**/
+        static Bool _TestFramesUpdating( const RECT& region, HDC hdc );
     };
 }

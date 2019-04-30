@@ -6,30 +6,29 @@ namespace YoloMouse
 {
     // fields
     //-------------------------------------------------------------------------
-    Bool            App::_active                (false);
-    HWND            App::_hwnd =                NULL;
+    Bool            App::_active =                      false;
+    HWND            App::_hwnd =                        NULL;
     CursorBindings  App::_bindings;
     CursorVault     App::_vault;
     HandleCache     App::_cache;
-    HCURSOR         App::_last_cursor           (NULL);
-    HCURSOR         App::_replace_cursor        (NULL);
-    CursorBindings::Binding* App::_current_binding(NULL);
+    HCURSOR         App::_last_cursor =                 NULL;
+    HCURSOR         App::_replace_cursor =              NULL;
+    CursorBindings::Binding* App::_current_binding =    NULL;
     PathString      App::_target_id;
-    Bool            App::_refresh_ready         (false);
-    Native          App::_classlong_original =  0;
-    Native          App::_classlong_last =      0;
+    Bool            App::_refresh_ready =               false;
+    Bool            App::_setclasslong_self =           false;
+    Native          App::_classlong_save =              INVALID_HANDLE;
 
-    Index           App::_update_group          (INVALID_INDEX);
-    Long            App::_update_size           (0);
-    Bool            App::_update_default        (false);
+    Index           App::_update_preset_major_index =   INVALID_INDEX;
+    Long            App::_update_size_delta =           0;
 
-    Hook            App::_hook_setcursor        (SetCursor, App::_OnHookSetCursor, Hook::BEFORE);
+    Hook            App::_hook_setcursor                (SetCursor, App::_OnHookSetCursor, Hook::BEFORE);
 #if CPU_64
-    Hook            App::_hook_setclasslonga    (SetClassLongPtrA, App::_OnHookSetClassLong, Hook::BEFORE);
-    Hook            App::_hook_setclasslongw    (SetClassLongPtrW, App::_OnHookSetClassLong, Hook::BEFORE);
+    Hook            App::_hook_setclasslonga            (SetClassLongPtrA, App::_OnHookSetClassLong, Hook::BEFORE);
+    Hook            App::_hook_setclasslongw            (SetClassLongPtrW, App::_OnHookSetClassLong, Hook::BEFORE);
 #else
-    Hook            App::_hook_setclasslonga    (SetClassLongA, App::_OnHookSetClassLong, Hook::BEFORE);
-    Hook            App::_hook_setclasslongw    (SetClassLongW, App::_OnHookSetClassLong, Hook::BEFORE);
+    Hook            App::_hook_setclasslonga            (SetClassLongA, App::_OnHookSetClassLong, Hook::BEFORE);
+    Hook            App::_hook_setclasslongw            (SetClassLongW, App::_OnHookSetClassLong, Hook::BEFORE);
 #endif
 
      // public
@@ -52,9 +51,6 @@ namespace YoloMouse
             elog("DllApp.Load.BuildTargetId");
             return false;
         }
-
-        // backup class long value
-        _SaveCursorClassLong();
 
         // load hooks
         if( !_LoadHooks() )
@@ -86,20 +82,20 @@ namespace YoloMouse
         // unload hooks
         _UnloadHooks();
 
-        // restore original classlong
-        _RestoreCursorClassLong();
+        // restore original class cursor
+        _RestoreClassCursor();
 
         // unload state
         state.Close();
 
-        // reset
-        _update_size = 0;
-        _update_group = INVALID_INDEX;
+        // reset fields
+        _update_size_delta = 0;
+        _update_preset_major_index = INVALID_INDEX;
         _active = false;
     }
 
     //-------------------------------------------------------------------------
-    Bool App::UpdateCursor( Index group_index )
+    Bool App::UpdatePreset( Index preset_major_index )
     {
         // require active
         if( !_active )
@@ -109,7 +105,7 @@ namespace YoloMouse
         }
 
         // mark for update
-        _update_group = group_index;
+        _update_preset_major_index = preset_major_index;
 
         // refresh cursor
         Refresh();
@@ -126,26 +122,8 @@ namespace YoloMouse
             return false;
         }
 
-        // mark for update
-        _update_size = size_index_delta;
-
-        // refresh cursor
-        Refresh();
-
-        return true;
-    }
-
-    Bool App::UpdateDefault()
-    {
-        // require active
-        if( !_active )
-        {
-            elog("DllApp.UpdateDefault.NotActive");
-            return false;
-        }
-
-        // mark for update
-        _update_default = true;
+        // mark size index delta update
+        _update_size_delta = size_index_delta;
 
         // refresh cursor
         Refresh();
@@ -168,7 +146,7 @@ namespace YoloMouse
         // get last cursor
         HCURSOR refresh_cursor = _last_cursor;
 
-        // get target window
+        // get focus window
         HWND hwnd = SystemTools::GetFocusWindow();
         if( hwnd == NULL )
         {
@@ -195,11 +173,15 @@ namespace YoloMouse
         // attach to window thread. this is to make GetCursor and SetCursor work properly
         if( AttachThreadInput(hwnd_thread_id, current_thread_id, TRUE) )
         {
-            // if does not exist
+            // if refresh cursor does not exist
             if( refresh_cursor == NULL )
             {
-                // get active windows cursor
-                refresh_cursor = GetCursor();
+                // get current application class cursor
+                refresh_cursor = _GetClassCursor();
+                
+                // if does not exist, try global windows cursor (error prone)
+                if( refresh_cursor == NULL )
+                    refresh_cursor = GetCursor();
 
                 // cannot be yolomouse cursor
                 if( _vault.HasCursor(refresh_cursor) )
@@ -217,7 +199,7 @@ namespace YoloMouse
             SetCursor( refresh_cursor );
 
             // then trigger application to call SetCursor with its own cursor
-            PostMessage(hwnd, WM_SETCURSOR, (WPARAM)hwnd, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
+            PostMessage(hwnd, WM_SETCURSOR, (WPARAM)hwnd, MAKELPARAM(HTCLIENT, WM_LBUTTONDOWN));
 
             // detach from window thread
             AttachThreadInput(hwnd_thread_id, current_thread_id, FALSE);
@@ -280,43 +262,87 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     void App::_LoadCursors()
     {
-        const CursorBindings::MapTable& map = _bindings.GetMap();
-
         // load cursor map from file
         _bindings.Load(_target_id);
 
-        // get default
-        CursorBindings::Binding& default_binding = _bindings.EditDefault();
-        if( default_binding.Isvalid() )
+        // for each binding
+        for( CursorBindings::Binding& binding: _bindings.GetBindings() )
         {
-            // load default cursor
-            _vault.Load(default_binding.resource_index, default_binding.size_index);
+            // load preset cursor
+            if( binding.cursor_hash != 0 )
+                _vault.LoadPreset(binding.preset_index, binding.size_index);
         }
 
-        // for each map entry
-        for( CursorBindings::MapIterator cm = map.Begin(); cm != map.End(); ++cm )
-        {
-            // load cursor
-            if( cm->bitmap_hash != 0 )
-                _vault.Load(cm->resource_index, cm->size_index);
-        }
+        // identity cursors will be loaded on demand
     }
 
     void App::_UnloadCursors()
     {
-        // unload cursors
+        // unload all cursors
         _vault.UnloadAll();
     }
 
     //-------------------------------------------------------------------------
-    Bool App::_OnUpdateGroup( HCURSOR hcursor )
+    Bool App::_LoadCursorByBinding( const CursorBindings::Binding& binding, HCURSOR hcursor )
     {
-        Index size_index =          CURSOR_INDEX_DEFAULT;
-        Index group_index =         _update_group;
-        Index last_resource_index = INVALID_INDEX;
+        // by resource type
+        switch( binding.resource_type )
+        {
+        case RESOURCE_IDENTITY:
+            // load identity cursor
+            return _vault.LoadIdentity(binding.cursor_hash, binding.size_index, hcursor);
+        case RESOURCE_PRESET:
+            // load preset cursor
+            return _vault.LoadPreset(binding.preset_index, binding.size_index);
+        default:
+            return false;
+        }
+    }
+
+    void App::_UnloadCursorByBinding( const CursorBindings::Binding& binding )
+    {
+        // by resource type
+        switch( binding.resource_type )
+        {
+        case RESOURCE_IDENTITY:
+            // unload identity cursor
+            _vault.UnloadIdentity(binding.cursor_hash, binding.size_index);
+            break;
+        case RESOURCE_PRESET:
+            // unload preset cursor
+            _vault.UnloadPreset(binding.preset_index, binding.size_index);
+            break;
+        default:;
+        }
+    }
+
+    Bool App::_GetCursorByBinding( HCURSOR& hcursor, const CursorBindings::Binding& binding )
+    {
+        // by resource type
+        switch( binding.resource_type )
+        {
+        case RESOURCE_IDENTITY:
+            // get identity cursor
+            hcursor = _vault.GetIdentity(binding.cursor_hash, binding.size_index);
+            return hcursor != NULL;
+        case RESOURCE_PRESET:
+            // get preset cursor
+            hcursor = _vault.GetPreset(binding.preset_index, binding.size_index);
+            return hcursor != NULL;
+        default:
+            return false;
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    Bool App::_OnUpdatePreset( HCURSOR hcursor )
+    {
+        Index size_index =          CURSOR_SIZE_INDEX_DEFAULT;
+        Index preset_major_index =  _update_preset_major_index;
+        Index last_preset_index =   INVALID_INDEX;
 
         // clear state
-        _update_group = INVALID_INDEX;
+        _update_preset_major_index = INVALID_INDEX;
 
         // cannot be yolomouse cursor
         if( _vault.HasCursor(hcursor) )
@@ -336,18 +362,18 @@ namespace YoloMouse
         }
 
         // get cursor binding
-        CursorBindings::Binding* binding = _bindings.GetBinding(cursor_hash);
+        CursorBindings::Binding* binding = _bindings.GetBindingByHash(cursor_hash);
 
         // remove previous binding
         if( binding )
         {
-            // save last resource index
-            last_resource_index = binding->resource_index;
+            // save last preset index
+            last_preset_index = binding->preset_index;
 
-            // unload cursor
-            _vault.Unload(last_resource_index, binding->size_index);
+            // unload previous cursor
+            _UnloadCursorByBinding( *binding );
 
-            // save size index
+            // keep last size index
             size_index = binding->size_index;
 
             // remove binding
@@ -355,52 +381,53 @@ namespace YoloMouse
         }
 
         // add new binding if not explicitly removing
-        if( group_index != CURSOR_SPECIAL_REMOVE && group_index < CURSOR_GROUP_COUNT )
+        if( preset_major_index != CURSOR_SPECIAL_REMOVE && preset_major_index < CURSOR_RESOURCE_PRESET_MAJOR_COUNT )
         {
-            Index cursor_index = 0;
-            Index resource_index = INVALID_INDEX;
+            CursorBindings::Binding binding;
+            Index                   preset_minor_index = 0;
+            Index                   preset_index = INVALID_INDEX;
+            Bool                    loaded = false;
 
-            // if has previous resource index and same group iterate that cursor index
-            if( last_resource_index != INVALID_INDEX && group_index == (last_resource_index / CURSOR_GROUP_SIZE) )
-                cursor_index = (last_resource_index + 1) % CURSOR_GROUP_SIZE;
+            // if has previous preset index and same major index iterate minor index
+            if( last_preset_index != INVALID_INDEX && preset_major_index == (last_preset_index / CURSOR_RESOURCE_PRESET_MINOR_COUNT) )
+                preset_minor_index = (last_preset_index + 1) % CURSOR_RESOURCE_PRESET_MINOR_COUNT;
 
             // load attempt loop
-            for( Index load_attempt = 0; load_attempt < CURSOR_GROUP_SIZE; load_attempt++, cursor_index = (cursor_index + 1) % CURSOR_GROUP_SIZE )
+            for( Index load_attempt = 0; load_attempt < CURSOR_RESOURCE_PRESET_MINOR_COUNT; load_attempt++, preset_minor_index = (preset_minor_index + 1) % CURSOR_RESOURCE_PRESET_MINOR_COUNT )
             {
-                // calculate resource index
-                resource_index = (group_index * CURSOR_GROUP_SIZE) + cursor_index;
+                // calculate preset index
+                preset_index = (preset_major_index * CURSOR_RESOURCE_PRESET_MINOR_COUNT) + preset_minor_index;
 
-                // if valid index load cursor
-                if( resource_index < CURSOR_RESOURCE_LIMIT && _vault.Load(resource_index, size_index) )
+                // load if valid preset index
+                if( preset_index < CURSOR_RESOURCE_PRESET_COUNT && _vault.LoadPreset( preset_index, size_index ) )
+                {
+                    loaded = true;
                     break;
+                }
             }
 
             // fail if nothing loaded
-            if( resource_index == INVALID_INDEX )
+            if( !loaded )
             {
                 elog("DllApp.OnUpdateGroup.NothingLoaded");
                 return false;
             }
 
+            // create binding
+            binding.cursor_hash = cursor_hash;
+            binding.size_index = size_index;
+            binding.resource_type = RESOURCE_PRESET;
+            binding.preset_index = preset_index;
+
             // add binding
-            if( _bindings.Add(cursor_hash, resource_index, size_index) == NULL )
+            if( _bindings.Add(binding) == NULL )
             {
                 elog("DllApp.OnUpdateGroup.AddBinding");
                 return false;
             }
         }
-        // else if removing
-        else
-        {
-            // if no previous binding
-            if( binding == NULL )
-            {
-                // update default (to clear it)
-                _update_default = true;
-            }
-        }
 
-        // save cursor map to file
+        // save cursor bindings
         _bindings.Save(_target_id);
 
         return true;
@@ -408,10 +435,10 @@ namespace YoloMouse
 
     Bool App::_OnUpdateSize( HCURSOR hcursor )
     {
-        Long size_index_delta = _update_size;
+        Long  size_index_delta = _update_size_delta;
 
-        // clear state
-        _update_size = 0;
+        // clear size state
+        _update_size_delta = 0;
 
         // cannot be yolomouse cursor
         if( _vault.HasCursor(hcursor) )
@@ -431,56 +458,46 @@ namespace YoloMouse
         }
 
         // get cursor binding
-        CursorBindings::Binding* binding = _bindings.GetBinding(cursor_hash);
+        CursorBindings::Binding* binding = _bindings.GetBindingByHash(cursor_hash);
 
-        // require binding
-        if( binding == NULL )
-            return false;
+        // if has binding
+        if( binding != NULL )
+        {
+            // unload previous cursor
+            _UnloadCursorByBinding( *binding );
+        }
+        // create identity binding (bind current application cursor for resizing)
+        else
+        {
+            CursorBindings::Binding identity_binding;
 
-        // unload previous cursor
-        _vault.Unload(binding->resource_index, binding->size_index);
+            // create identity binding
+            identity_binding.cursor_hash = cursor_hash;
+            identity_binding.resource_type = RESOURCE_IDENTITY;
+
+            // select initial size index as nearest current cursor's size
+            identity_binding.size_index = SharedTools::CursorSizeToSizeIndex( SharedTools::CursorToSize( hcursor ) );
+
+            // add identity binding
+            binding = _bindings.Add( identity_binding );
+            if( binding == NULL )
+            {
+                elog("DllApp.OnUpdateSize.AddBinding");
+                return false;
+            }
+        }
 
         // calculate new size index
-        Index size_index = Tools::Clamp<Long>(binding->size_index + size_index_delta, 0, CURSOR_INDEX_COUNT - 1);
-        
-        // load cursor with new size
-        if( !_vault.Load(binding->resource_index, size_index) )
-            return false;
+        binding->size_index = Tools::Clamp<Long>(binding->size_index + size_index_delta, 0, CURSOR_SIZE_INDEX_COUNT - 1);
 
-        // update binding size index
-        binding->size_index = size_index;
+        // load cursor with new size
+        if( !_LoadCursorByBinding(*binding, hcursor) )
+            return false;
 
         // save cursor map to file
         _bindings.Save(_target_id);
 
         return true;
-    }
-
-    void App::_OnUpdateDefault()
-    {
-        // clear state
-        _update_default = false;
-
-        // get default binding
-        CursorBindings::Binding& default_binding = _bindings.EditDefault();
-
-        // if valid unload that cursor
-        if( default_binding.Isvalid() )
-            _vault.Unload(default_binding.resource_index, default_binding.size_index);
-
-        // if has current binding make that the default
-        if( _current_binding )
-            default_binding = *_current_binding;
-        // else clear default binding
-        else
-            default_binding = CursorBindings::Binding();
-
-        // if valid load that cursor
-        if( default_binding.Isvalid() )
-            _vault.Load(default_binding.resource_index, default_binding.size_index);
-
-        // save cursor map to file
-        _bindings.Save(_target_id);
     }
 
     //-------------------------------------------------------------------------
@@ -507,26 +524,28 @@ namespace YoloMouse
         _replace_cursor = NULL;
 
         // get cursor binding
-        _current_binding = _bindings.GetBinding(cursor_hash);
+        _current_binding = _bindings.GetBindingByHash(cursor_hash);
 
-        // if has binding
-        if( _current_binding )
+        // fail if no binding
+        if( _current_binding == nullptr )
+            return false;
+
+        // success if get replacement cursor from binding
+        if( _GetCursorByBinding( _replace_cursor, *_current_binding ) )
+            return true;
+
+        // if identity binding
+        if( _current_binding->resource_type == RESOURCE_IDENTITY )
         {
-            // update replacement cursor
-            _replace_cursor = _vault.GetCursor(_current_binding->resource_index, _current_binding->size_index);
-        }
-        // else try default
-        else
-        {
-            // get default
-            CursorBindings::Binding& default_binding = _bindings.EditDefault();
+            // if failed and identity cursor, then attempt to load and try again
+            if( !_LoadCursorByBinding(*_current_binding, hcursor) )
+                return false;
 
-            // replace if valid
-            if( default_binding.Isvalid() )
-                _replace_cursor = _vault.GetCursor(default_binding.resource_index, default_binding.size_index);
+            // try again
+            return _GetCursorByBinding( _replace_cursor, *_current_binding );
         }
 
-        return true;
+        return false;
     }
 
     //-------------------------------------------------------------------------
@@ -547,10 +566,10 @@ namespace YoloMouse
         _last_cursor = NULL;
 
         // if updating new cursor
-        if( _update_group != INVALID_INDEX )
+        if( _update_preset_major_index != INVALID_INDEX )
         {
-            // handle cursor group
-            if(!_OnUpdateGroup(old_cursor))
+            // handle cursor preset update
+            if(!_OnUpdatePreset(old_cursor))
                 return;
 
             // set refresh state
@@ -558,21 +577,14 @@ namespace YoloMouse
         }
 
         // if updating size
-        if( _update_size != 0 )
+        if( _update_size_delta != 0 )
         {
-            // handle cursor size
+            // handle cursor size update
             if(!_OnUpdateSize(old_cursor))
                 return;
 
             // set refresh state
             _refresh_ready = true;
-        }
-
-        // if updating default
-        if( _update_default )
-        {
-            // handle cursor default
-            _OnUpdateDefault();
         }
 
         // if refreshing cursor
@@ -600,11 +612,8 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     VOID HOOK_CALL App::_OnHookSetCursor( Native* arguments )
     {
-        // backup class long value
-        _SaveCursorClassLong();
-
-        // update cursor using setclasslong method first
-        _SetCursorClassLong( arguments[1] );
+        // update cursor using class method first
+        _SetClassCursor( arguments[1] );
 
         // if replacement cursor was set pass it out to setcursor method
         if( _replace_cursor != NULL )
@@ -620,14 +629,35 @@ namespace YoloMouse
         if((int)arguments[2] == GCL_HCURSOR)
     #endif
         {
+            // backup class cursor value if not yet saved. yes do it here ;)
+            if( _classlong_save == INVALID_HANDLE )
+                _SaveClassCursor();
+
+            // if not self calling this, save classlong value to be restored on exit
+            if( !_setclasslong_self )
+                _classlong_save = static_cast<Native>(arguments[3]);
+
             // update cursor
             _OnCursorHook((HCURSOR&)arguments[3], (HCURSOR)arguments[3]);
         }
     }
 
     //-------------------------------------------------------------------------
-    void App::_SetCursorClassLong( Native value )
+    HCURSOR App::_GetClassCursor()
     {
+        // save current class long value
+    #if CPU_64
+        return (HCURSOR)GetClassLongPtrA( _hwnd, GCLP_HCURSOR );
+    #else
+        return (HCURSOR)GetClassLongA( _hwnd, GCL_HCURSOR );
+    #endif
+    }
+
+    void App::_SetClassCursor( Native value )
+    {
+        // set self caller state
+        _setclasslong_self = true;
+
         // set class long value
     #if CPU_64
         SetClassLongPtrA( _hwnd, GCLP_HCURSOR, (LONG_PTR)value );
@@ -635,36 +665,23 @@ namespace YoloMouse
         SetClassLongA( _hwnd, GCL_HCURSOR, (LONG)value );
     #endif
 
-        // set last class long value
-        _classlong_last = value;
+        // reset self caller state
+        _setclasslong_self = false;
     }
 
-    void App::_SaveCursorClassLong()
+    void App::_SaveClassCursor()
     {
-        Native current_value;
-
-        // get current class long value
-    #if CPU_64
-        current_value = (Native)GetClassLongPtrA( _hwnd, GCLP_HCURSOR );
-    #else
-        current_value = (Native)GetClassLongA( _hwnd, GCL_HCURSOR );
-    #endif
-
-        // if not last then update as original value
-        if( current_value != _classlong_last )
-            _classlong_original = current_value;
+        // save current class cursor
+        _classlong_save = reinterpret_cast<Native>(_GetClassCursor());
     }
 
-    void App::_RestoreCursorClassLong()
+    void App::_RestoreClassCursor()
     {
         // if any changes made
-        if( _classlong_last )
+        if( _classlong_save != INVALID_HANDLE )
         {
-            // get current original class long
-            _SaveCursorClassLong();
-
             // restore original class long
-            _SetCursorClassLong( _classlong_original );
+            _SetClassCursor( _classlong_save );
         }
     }
 }

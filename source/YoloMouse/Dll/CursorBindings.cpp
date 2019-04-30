@@ -2,7 +2,6 @@
 #include <YoloMouse/Share/SharedTools.hpp>
 #include <YoloMouse/Share/SharedState.hpp>
 #include <io.h>
-#include <stdio.h>
 #include <wchar.h>
 
 namespace YoloMouse
@@ -10,27 +9,16 @@ namespace YoloMouse
     // CursorBindings.Binding
     //-------------------------------------------------------------------------
     CursorBindings::Binding::Binding():
-        bitmap_hash     (0),
-        resource_index  (INVALID_INDEX),
-        size_index      (INVALID_INDEX)
+        cursor_hash     (0),
+        size_index      (INVALID_INDEX),
+        resource_type   (RESOURCE_UNKNOWN),
+        resource_index  (0)
     {
     }
 
-    CursorBindings::Binding::Binding( Hash bitmap_hash_, Index resource_index_, Index size_index_ ):
-        bitmap_hash     (bitmap_hash_),
-        resource_index  (resource_index_),
-        size_index      (size_index_)
+    Bool CursorBindings::Binding::operator==( const Hash& cursor_hash_ ) const
     {
-    }
-
-    Bool CursorBindings::Binding::Isvalid() const
-    {
-        return resource_index != INVALID_INDEX && size_index != INVALID_INDEX;
-    }
-
-    Bool CursorBindings::Binding::operator==( const Hash& hash_ ) const
-    {
-        return bitmap_hash == hash_;
+        return cursor_hash == cursor_hash_;
     }
 
     // public
@@ -40,48 +28,28 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    CursorBindings::Binding* CursorBindings::GetBinding( Hash cursor_hash ) const
+    CursorBindings::Binding* CursorBindings::GetBindingByHash( Hash cursor_hash ) const
     {
-        // find binding
-        MapIterator binding = _bindings.Find<Hash>(cursor_hash);
-
-        // return binding
-        return binding ? binding : NULL;
+        return _bindings.Find<Hash>(cursor_hash);
     }
 
-    const CursorBindings::MapTable& CursorBindings::GetMap() const
+    const CursorBindings::BindingCollection& CursorBindings::GetBindings() const
     {
         return _bindings;
     }
 
     //-------------------------------------------------------------------------
-    CursorBindings::Binding& CursorBindings::EditDefault()
+    CursorBindings::Binding* CursorBindings::Add( const Binding& binding )
     {
-        return _default;
-    }
-
-    //-------------------------------------------------------------------------
-    CursorBindings::Binding* CursorBindings::Add( Hash cursor_hash, Index resource_index, Index size_index )
-    {
-        // bounds checks
-        if( cursor_hash == 0 )
+        // validate
+        if( !_ValidateBinding( binding ) )
         {
-            elog("CursorBindings.Add.CursorHashIsZero");
-            return NULL;
-        }
-        if( resource_index >= CURSOR_RESOURCE_LIMIT )
-        {
-            elog("CursorBindings.Add.ResourceIndexOverLimit: %d", resource_index);
-            return NULL;
-        }
-        if( size_index >= CURSOR_INDEX_COUNT )
-        {
-            elog("CursorBindings.Add.SizeIndexOverLimit: %d", size_index);
+            elog("CursorBindings.Add.ValidateBinding");
             return NULL;
         }
 
         // find free binding
-        MapIterator binding = _bindings.Find<Hash>(0);
+        Binding* free_binding = _bindings.Find<Hash>(0);
 
         // fail if full
         if( binding == NULL )
@@ -90,18 +58,16 @@ namespace YoloMouse
             return NULL;
         }
 
-        // build
-        binding->resource_index = resource_index;
-        binding->size_index = size_index;
-        binding->bitmap_hash = cursor_hash;
+        // update free binding
+        *free_binding = binding;
 
-        return binding;
+        return free_binding;
     }
 
     //-------------------------------------------------------------------------
     void CursorBindings::Remove( CursorBindings::Binding& binding )
     {
-        // reset
+        // resets hash to 0, making it free entry
         binding = Binding();
     }
 
@@ -109,8 +75,6 @@ namespace YoloMouse
     Bool CursorBindings::Load( const WCHAR* target_id )
     {
         PathString  load_path;
-        Hash        bitmap_hash;
-        Index       resource_index;
         FILE*       file = NULL;
 
         // build save path
@@ -124,27 +88,24 @@ namespace YoloMouse
         if( _wfopen_s(&file, load_path, L"rt") != 0 )
             return false;
 
-        // reset map
+        // reset bindings collection
         _bindings.Zero();
 
-        // for each line
-        while( true )
+        // for each line in file, until end of file or sanity limit reached
+        for( Index linei = 0; feof(file) == 0 && linei < (CURSOR_BINDING_LIMIT * 3); ++linei )
         {
-            Index size = CURSOR_INDEX_DEFAULT;
+            Binding binding;
 
-            // read line
-            if( fscanf_s(file, "%u=%I64u,%u\n", &resource_index, &bitmap_hash, &size) < 2 )
-                break;
+            // read binding line
+            if( _ReadBindingLine( binding, file ) )
+            {
+                // find free binding
+                Binding* free_binding = _bindings.Find<Hash>(0);
 
-            // get size index from size
-            Index size_index = _GetSizeIndex(size);
-
-            // set default
-            if( bitmap_hash == 0 )
-                _default = Binding(bitmap_hash, resource_index, size_index);
-            // else add entry
-            else
-                Add( bitmap_hash, resource_index, size_index );
+                // if available, replace with read binding
+                if( free_binding != NULL )
+                    *free_binding = binding;
+            }
         }
 
         // close file
@@ -173,22 +134,15 @@ namespace YoloMouse
             return false;
         }
 
-        // if valid default
-        if( _default.Isvalid() )
+        // for each binding
+        for( const Binding& binding: _bindings )
         {
-            // write default entry
-            fprintf_s(file, "%u=0,%u\n", _default.resource_index, CURSOR_SIZE_TABLE[_default.size_index]);
-            written++;
-        }
-
-        // for each map entry
-        for( MapIterator binding = _bindings.Begin(); binding != _bindings.End(); ++binding )
-        {
-            // write valid entry
-            if( binding->bitmap_hash != 0 )
+            // if valid entry
+            if( binding.cursor_hash != 0 )
             {
-                fprintf_s(file, "%u=%I64u,%u\n", binding->resource_index, binding->bitmap_hash, CURSOR_SIZE_TABLE[binding->size_index]);
-                written++;
+                // if successfully written, increment written count
+                if( _WriteBindingLine( binding, file ) )
+                    written++;
             }
         }
 
@@ -202,30 +156,77 @@ namespace YoloMouse
         return true;
     }
 
+    // private
     //-------------------------------------------------------------------------
-    Index CursorBindings::_GetSizeIndex( ULong size )
+    Bool CursorBindings::_ReadBindingLine( Binding& binding, FILE* file )
     {
-        // if original size
-        if( size == CURSOR_INDEX_ORIGINAL )
-            return 0;
+        Index size = CURSOR_SIZE_INDEX_DEFAULT;
+        Char  iresource_type = 0;
+        Char  ini_line[INI_LINE_LIMIT];
 
-        // if old table (size is index)
-        if( size < CURSOR_SIZE_TABLE[1] )
+        // set defaults
+        binding.cursor_hash =       0;
+        binding.resource_type =     RESOURCE_UNKNOWN;
+        binding.resource_index =    INVALID_INDEX;
+
+        // read line
+        if( fgets( ini_line, sizeof( ini_line ), file ) == NULL )
+            return false;
+
+        // read binding line from file (hash,size,resource-type,resource-id)
+        if( sscanf_s( ini_line, "%I64u,%u,%c,%u\n", &binding.cursor_hash, &size, &iresource_type, 1, &binding.resource_index ) != 4 )
         {
-            // get size from old table
-            if( size < COUNT( CURSOR_SIZE_TABLE_V_0_8_3 ) )
-                size = CURSOR_SIZE_TABLE_V_0_8_3[size];
-            // else return default index
-            else
-                return CURSOR_INDEX_DEFAULT;
+            //BEGIN: v0.9.1 backwards compatibility
+            if( sscanf_s( ini_line, "%u=%I64u,%u\n", &binding.resource_index, &binding.cursor_hash, &size ) < 2 )
+                return false;
+            iresource_type = RESOURCE_PRESET;
+            //END: v0.9.1 backwards compatibility
         }
 
-        // locate size index nearest requested size
-        for( Index i = 0; i < CURSOR_INDEX_COUNT; ++i )
-            if( size <= CURSOR_SIZE_TABLE[i] )
-                return i;
+        // translate fields
+        binding.resource_type = static_cast<ResourceType>(iresource_type);
+        binding.size_index = SharedTools::CursorSizeToSizeIndex(size);
 
-        // use default
-        return CURSOR_INDEX_DEFAULT;
+        // validate
+        return _ValidateBinding( binding );
+    }
+
+    Bool CursorBindings::_WriteBindingLine( const Binding& binding, FILE* file )
+    {
+        // write binding line to file
+        fprintf_s( file, "%I64u,%u,%c,%u\n",
+            binding.cursor_hash,
+            CURSOR_SIZE_TABLE[binding.size_index],
+            binding.resource_type,
+            binding.resource_index );
+
+        return true;
+    }
+
+    //-------------------------------------------------------------------------
+    Bool CursorBindings::_ValidateBinding( const Binding& binding )
+    {
+        // validate hash
+        if( binding.cursor_hash == 0 )
+            return false;
+
+        // validate size index
+        if( binding.size_index >= CURSOR_SIZE_INDEX_COUNT )
+            return false;
+
+        // validate resource type + parameters
+        switch( binding.resource_type )
+        {
+        case RESOURCE_PRESET:
+            if( binding.resource_index >= CURSOR_RESOURCE_PRESET_COUNT )
+                return false;
+            break;
+        case RESOURCE_IDENTITY:
+            break;
+        default:
+            return false;
+        }
+
+        return true;
     }
 }

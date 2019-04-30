@@ -47,7 +47,7 @@ namespace YoloMouse
     //-------------------------------------------------------------------------
     Instance* InstanceManager::Find( DWORD process_id )
     {
-        for( InstanceIterator target = _targets.Begin(); target != _targets.End(); ++target )
+        for( InstanceIterator target = _targets.begin(); target != _targets.end(); ++target )
             if( process_id == target->GetProcessId() )
                 return target;
 

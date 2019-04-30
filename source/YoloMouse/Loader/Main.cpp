@@ -1,6 +1,7 @@
 #include <YoloMouse/Loader/App.hpp>
 #include <YoloMouse/Share/SharedTools.hpp>
 #include <Core/Windows/SystemTools.hpp>
+#include <wingdi.h>
 
 namespace YoloMouse
 {

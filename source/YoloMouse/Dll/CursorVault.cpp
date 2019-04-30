@@ -4,23 +4,36 @@
 
 namespace YoloMouse
 {
-    // CursorResource
+    // CursorCache
     //-------------------------------------------------------------------------
-    CursorVault::CursorResource::CursorResource():
-        handle      (NULL),
+    CursorVault::CursorCache::CursorCache():
+        hcursor     (NULL),
         referenced  (0)
     {
     }
 
-    // CacheEntry
+    // PresetEntry
     //-------------------------------------------------------------------------
-    CursorVault::CacheEntry::CacheEntry():
+    CursorVault::PresetEntry::PresetEntry():
         state           (RESOURCE_NONE),
         resizable       (true),
         width           (0),
         height          (0),
         loadimage_flags (0)
     {
+    }
+
+    // IdentityEntry
+    //-------------------------------------------------------------------------
+    CursorVault::IdentityEntry::IdentityEntry():
+        cursor_hash(0)
+    {
+    }
+
+    //-------------------------------------------------------------------------
+    Bool CursorVault::IdentityEntry::operator==( const Hash& cursor_hash_ ) const
+    {
+        return cursor_hash == cursor_hash_;
     }
 
     // public
@@ -35,10 +48,93 @@ namespace YoloMouse
     }
 
     //-------------------------------------------------------------------------
-    Bool CursorVault::Load( Index resource_index, Index size_index )
+    Bool CursorVault::HasCursor( HCURSOR hcursor )
+    {
+        // for each preset entry
+        for( const PresetEntry& entry: _preset_table )
+        {
+            // for each cache entry
+            for( const CursorCache& cache: entry.cache_table )
+            {
+                // success if found
+                if( hcursor == cache.hcursor )
+                    return true;
+            }
+        }
+
+        // for each identity entry
+        for( const IdentityEntry& entry: _identity_map )
+        {
+            // for each cache entry
+            for( const CursorCache& cache: entry.cache_table )
+            {
+                // success if found
+                if( hcursor == cache.hcursor )
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    //-------------------------------------------------------------------------
+    HCURSOR CursorVault::GetIdentity( Hash cursor_hash, Index size_index )
+    {
+        // find existing entry
+        IdentityEntry* entry = _identity_map.Find<Hash>(cursor_hash);
+
+        // return cursor handle if exists else null
+        return entry != nullptr ? entry->cache_table[size_index].hcursor : nullptr;
+    }
+
+    HCURSOR CursorVault::GetPreset( Index preset_index, Index size_index )
     {
         // get entry
-        CacheEntry& entry = _table[resource_index];
+        PresetEntry& entry = _preset_table[preset_index];
+
+        // return cursor handle if any
+        return entry.resizable ? entry.cache_table[size_index].hcursor : entry.cache_table[0].hcursor;
+    }
+
+    //-------------------------------------------------------------------------
+    Bool CursorVault::LoadIdentity( Hash cursor_hash, Index size_index, HCURSOR hcursor )
+    {
+        xassert( cursor_hash != 0 );
+        xassert( size_index < CURSOR_SIZE_INDEX_COUNT );
+        xassert( hcursor != NULL );
+
+        // do use original size index
+        if( size_index == CURSOR_SIZE_INDEX_ORIGINAL )
+            return false;
+
+        // find existing entry
+        IdentityEntry* entry = _identity_map.Find<Hash>(cursor_hash);
+
+        // if does not exist
+        if( entry == nullptr )
+        {
+            // fail if full
+            if( _identity_map.IsFull() )
+            {
+                elog("CursorVault.LoadIdentity.Full");
+                return false;
+            }
+
+            // add new entry
+            entry = _identity_map.Add();
+
+            // add entry
+            entry->cursor_hash = cursor_hash;
+        }
+
+        // load entry
+        return _LoadIdentity( *entry, size_index, hcursor );
+    }
+
+    Bool CursorVault::LoadPreset( Index preset_index, Index size_index )
+    {
+        // get entry
+        PresetEntry& entry = _preset_table[preset_index];
 
         // if not ready
         if( entry.state != RESOURCE_READY )
@@ -47,74 +143,177 @@ namespace YoloMouse
             if( entry.state == RESOURCE_FAILED )
                 return false;
 
-            // initialize cache
-            if( !_CacheInit( entry, resource_index ) )
+            // initialize preset
+            if( !_InitPreset( entry, preset_index ) )
                 return false;
         }
 
-        // load into cache
-        return _CacheLoad( entry, size_index );
+        // load preset
+        return _LoadPreset( entry, size_index );
     }
 
     //-------------------------------------------------------------------------
-    void CursorVault::Unload( Index resource_index, Index size_index )
+    void CursorVault::UnloadIdentity( Hash cursor_hash, Index size_index )
     {
-        // get entry
-        CacheEntry& entry = _table[resource_index];
+        xassert( cursor_hash != 0 );
+        xassert( size_index < CURSOR_SIZE_INDEX_COUNT );
 
-        // unload from cache
-        _CacheUnload(entry, size_index);
+        // find existing entry
+        IdentityEntry* entry = _identity_map.Find<Hash>(cursor_hash);
+
+        // if found
+        if( entry != nullptr )
+        {
+            // unload identity entry
+            _UnloadIdentity( *entry, size_index );
+        }
+    }
+
+    void CursorVault::UnloadPreset( Index preset_index, Index size_index )
+    {
+        xassert( preset_index < CURSOR_RESOURCE_PRESET_COUNT );
+        xassert( size_index < CURSOR_SIZE_INDEX_COUNT );
+
+        // unload preset
+        _UnloadPreset( _preset_table[preset_index], size_index );
     }
 
     void CursorVault::UnloadAll()
     {
-        // for each cursor
-        for( Index i = 0; i < _table.GetCount(); ++i )
+        // for each identity entry
+        for( IdentityEntry& entry: _identity_map )
         {
-            // for each handle by size
-            for( Index j = 0; j < CURSOR_INDEX_COUNT; ++j )
-            {
-                // unload
-                Unload(i, j);
-            }
-        }
-    }
-
-    //-------------------------------------------------------------------------
-    HCURSOR CursorVault::GetCursor( Index resource_index, Index size_index )
-    {
-        // get entry
-        CacheEntry& entry = _table[resource_index];
-
-        // return cursor handle if any
-        return entry.resizable ? entry.resources[size_index].handle : entry.resources[0].handle;
-    }
-
-    //-------------------------------------------------------------------------
-    Bool CursorVault::HasCursor( HCURSOR hcursor )
-    {
-        // for each cursor
-        for( Index i = 0; i < _table.GetCount(); ++i )
-        {
-            const ResourceTable& resources = _table[i].resources;
-
-            // for each size
-            for( Index j = 0; j < CURSOR_INDEX_COUNT; ++j )
-            {
-                // success if found
-                if( hcursor == resources[j].handle )
-                    return true;
-            }
+            // for each size index, unload cursor cache
+            for( Index size_index = 0; size_index < CURSOR_SIZE_INDEX_COUNT; ++size_index )
+                _UnloadIdentity( entry, size_index );
         }
 
-        return false;
+        // for each preset entry
+        for( PresetEntry& entry: _preset_table )
+        {
+            // for each size index, unload cursor cache
+            for( Index size_index = 0; size_index < CURSOR_SIZE_INDEX_COUNT; ++size_index )
+                _UnloadPreset( entry, size_index );
+        }
     }
 
     // private
     //-------------------------------------------------------------------------
-    Bool CursorVault::_CacheInit( CacheEntry& entry, Index resource_index )
+    Bool CursorVault::_LoadIdentity( IdentityEntry& entry, Index size_index, HCURSOR hcursor )
     {
-        static const WCHAR* EXTENSIONS[] = { EXTENSION_ANIMATED, EXTENSION_STATIC };
+        Bool status = false;
+
+        // get cache by size index
+        CursorCache& cache = entry.cache_table[size_index];
+
+        // if not referenced
+        if( cache.referenced == 0 )
+        {
+            ICONINFO ii_base;
+            BITMAP   bitmap_base;
+
+            // get base icon info
+            if( GetIconInfo(hcursor, &ii_base) == FALSE )
+            {
+                elog("CursorVault.LoadIdentity.GetIconInfo");
+                return false;
+            }
+
+            // select bitmap handle to get bitmap from
+            HBITMAP hbitmap = ii_base.hbmColor ? ii_base.hbmColor : ii_base.hbmMask;
+
+            // get base icon bitmap object
+            if( hbitmap == NULL || !GetObject( hbitmap, sizeof( BITMAP ), &bitmap_base ) )
+                elog( "CursorVault.LoadIdentity.GetBitmapDimensionEx" );
+            else
+            {
+                // require width/height over sane minimum
+                if( bitmap_base.bmWidth < 2 || bitmap_base.bmHeight < 2 )
+                    elog( "CursorVault.LoadIdentity.SizeTooSmall" );
+                else
+                {
+                    ULong width;
+                    ULong height;
+
+                    // determine target width/height
+                    height = CURSOR_SIZE_TABLE[size_index];
+
+                    // if same, use height for width (typical case, avoids float scaling errors)
+                    if( bitmap_base.bmWidth == bitmap_base.bmHeight )
+                        width = height;
+                    // else scale
+                    else
+                        width = static_cast<ULong>((static_cast<Float>(bitmap_base.bmWidth) / static_cast<Float>(bitmap_base.bmHeight)) * static_cast<Float>(height));
+
+                    // fail if width or height is 0
+                    if( width == 0 || height == 0 )
+                        elog( "CursorVault.LoadIdentity.ResizeTooSmall" );
+                    else
+                    {
+                        ICONINFO ii_new = { 0 };
+
+                        // resize hotspot
+                        ii_new.xHotspot = static_cast<DWORD>((static_cast<Float>(ii_base.xHotspot) / static_cast<Float>(bitmap_base.bmWidth)) * static_cast<Float>(width));
+                        ii_new.yHotspot = static_cast<DWORD>((static_cast<Float>(ii_base.yHotspot) / static_cast<Float>(bitmap_base.bmHeight)) * static_cast<Float>(height));
+
+                        // scale mask+color bitmap
+                        if( ii_base.hbmMask != NULL )
+                            ii_new.hbmMask = (HBITMAP)CopyImage( ii_base.hbmMask, IMAGE_BITMAP, width, height, 0 );
+                        if( ii_base.hbmColor != NULL )
+                            ii_new.hbmColor = (HBITMAP)CopyImage( ii_base.hbmColor, IMAGE_BITMAP, width, height, 0 );
+
+                        // creating cursor not icon
+                        ii_new.fIcon = FALSE;
+
+                        // create scaled cursor
+                        cache.hcursor = ::CreateIconIndirect( &ii_new );
+
+                        // require new cursor created
+                        if( cache.hcursor == NULL )
+                            elog( "CursorVault.LoadIdentity.CreateIconIndirect" );
+                        else
+                            status = cache.hcursor != NULL;
+
+                        // cleanup new icon info
+                        if( ii_new.hbmMask != NULL )
+                            DeleteObject( ii_new.hbmMask );
+                        if( ii_new.hbmColor != NULL )
+                            DeleteObject( ii_new.hbmColor );
+                    }
+                }
+            }
+
+            // cleanup base icon info
+            if( ii_base.hbmColor != NULL )
+                DeleteObject( ii_base.hbmColor );
+            if( ii_base.hbmMask != NULL )
+                DeleteObject( ii_base.hbmMask );
+        }
+
+        // increment referenced
+        cache.referenced++;
+
+        return status;
+    }
+
+    void CursorVault::_UnloadIdentity( IdentityEntry& entry, Index size_index )
+    {
+        // get cache by size index
+        CursorCache& cache = entry.cache_table[size_index];
+
+        // if referenced
+        if( cache.referenced > 0 )
+        {
+            // decrement referenced and unload if 0
+            if( --cache.referenced == 0 )
+                _UnloadCache( cache );
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    Bool CursorVault::_InitPreset( PresetEntry& entry, Index resource_index )
+    {
+        static const WCHAR* EXTENSIONS[] = { EXTENSION_ANIMATED_CURSOR, EXTENSION_STATIC_CURSOR };
         static const WCHAR* SEARCH_PATHS[] = { PATH_CURSORS_CUSTOM, PATH_CURSORS_DEFAULT };
 
         // for each search path
@@ -154,14 +353,19 @@ namespace YoloMouse
                         entry.height =      abs(bmpinfo.bmHeight) / (iconinfo.hbmColor==NULL ? 2 : 1);
                         entry.state =       RESOURCE_READY;
 
-                        // cleanup 
-                        if( iconinfo.hbmColor )
+                        // cleanup temporary resources
+                        if( iconinfo.hbmColor != NULL )
                             DeleteObject(iconinfo.hbmColor);
-                        if( iconinfo.hbmMask )
+                        if( iconinfo.hbmMask != NULL )
                             DeleteObject(iconinfo.hbmMask);
                         DestroyCursor(hcursor);
 
                         return true;
+                    }
+                    // cleanup on fail
+                    else
+                    {
+                        DestroyCursor(hcursor);
                     }
                 }
             }
@@ -174,18 +378,18 @@ namespace YoloMouse
         return false;
     }
 
-    Bool CursorVault::_CacheLoad( CacheEntry& entry, Index size_index )
+    Bool CursorVault::_LoadPreset( PresetEntry& entry, Index size_index )
     {
-        CursorResource& resource = entry.resources[entry.resizable ? size_index : 0];
+        CursorCache& cache = entry.cache_table[entry.resizable ? size_index : 0];
 
         // if not referenced
-        if( resource.referenced == 0 )
+        if( cache.referenced == 0 )
         {
             ULong width;
             ULong height;
 
             // if resizable
-            if( entry.resizable && size_index != CURSOR_INDEX_ORIGINAL )
+            if( entry.resizable && size_index != CURSOR_SIZE_INDEX_ORIGINAL )
             {
                 xassert(entry.width > 0 && entry.height > 0);
 
@@ -200,8 +404,8 @@ namespace YoloMouse
             }
 
             // load cursor
-            resource.handle = reinterpret_cast<HCURSOR>(LoadImage(NULL, entry.path, IMAGE_CURSOR, width, height, entry.loadimage_flags));
-            if( resource.handle == NULL )
+            cache.hcursor = reinterpret_cast<HCURSOR>(LoadImage(NULL, entry.path, IMAGE_CURSOR, width, height, entry.loadimage_flags));
+            if( cache.hcursor == NULL )
             {
                 elog("CursorVault.CacheLoad.LoadImage: %s %d %d %x", Tools::WToCString(entry.path), width, height, entry.loadimage_flags);
                 return false;
@@ -209,30 +413,35 @@ namespace YoloMouse
         }
 
         // increment referenced
-        resource.referenced++;
+        cache.referenced++;
 
         return true;
     }
 
-    void CursorVault::_CacheUnload( CacheEntry& entry, Index size_index )
+    void CursorVault::_UnloadPreset( PresetEntry& entry, Index size_index )
     {
-        CursorResource& resource = entry.resources[entry.resizable ? size_index : 0];
+        // unload from cache
+        CursorCache& cache = entry.cache_table[entry.resizable ? size_index : 0];
 
         // if referenced
-        if( resource.referenced > 0 )
+        if( cache.referenced > 0 )
         {
-            // decrement referenced and free if 0
-            if( --resource.referenced == 0 )
-            {
-                // must be loaded
-                xassert(resource.handle != NULL);
-
-                // free cursor
-                DestroyCursor(resource.handle);
-
-                // reset
-                resource.handle = NULL;
-            }
+            // decrement referenced and unload if 0
+            if( --cache.referenced == 0 )
+                _UnloadCache( cache );
         }
+    }
+
+    //-------------------------------------------------------------------------
+    void CursorVault::_UnloadCache( CursorCache& cache )
+    {
+        // must be loaded
+        xassert(cache.hcursor != NULL);
+
+        // free cursor
+        DestroyCursor(cache.hcursor);
+
+        // reset
+        cache.hcursor = NULL;
     }
 }

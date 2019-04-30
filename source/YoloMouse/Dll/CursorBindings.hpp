@@ -1,6 +1,8 @@
 #pragma once
 #include <Core/Container/Array.hpp>
 #include <YoloMouse/Share/Constants.hpp>
+#include <YoloMouse/Share/Enums.hpp>
+#include <stdio.h>
 
 namespace YoloMouse
 {
@@ -8,40 +10,37 @@ namespace YoloMouse
     class CursorBindings
     {
     public:
-        /**/
+        // types
         struct Binding
         {
-            Hash    bitmap_hash;    // hash of original cursor image bits
-            Index   resource_index; // cursor resource index
-            Index   size_index;     // size index
+            Hash            cursor_hash;    // hash of original cursor image bits
+            Index           size_index;     // size index
+            ResourceType    resource_type;  // resource type
+            union
+            {
+                Index       resource_index;
+                Index       preset_index;   // preset file index
+            };
 
             /**/
             Binding();
-            Binding( Hash bitmap_hash_, Index resource_index_, Index size_index_ );
 
             /**/
-            Bool Isvalid() const;
-
-            /**/
-            Bool operator==( const Hash& hash_ ) const;
+            Bool operator==( const Hash& cursor_hash_ ) const;
         };
 
-        /**/
-        typedef FlatArray<Binding, CURSOR_BINDING_LIMIT> MapTable;
-        typedef MapTable::Iterator MapIterator;
+        // aliases
+        typedef FlatArray<Binding, CURSOR_BINDING_LIMIT> BindingCollection;
 
         /**/
         CursorBindings();
     
         /**/
-        Binding*        GetBinding( Hash cursor_hash ) const;
-        const MapTable& GetMap() const;
+        Binding*                 GetBindingByHash( Hash cursor_hash ) const;
+        const BindingCollection& GetBindings() const;
 
         /**/
-        Binding& EditDefault();
-
-        /**/
-        Binding* Add( Hash cursor_hash, Index resource_index, Index size_index );
+        Binding* Add( const Binding& binding );
 
         /**/
         void Remove( CursorBindings::Binding& binding );
@@ -52,10 +51,13 @@ namespace YoloMouse
 
     private:
         /**/
-        static Index _GetSizeIndex( ULong size );
+        Bool _ReadBindingLine( Binding& binding, FILE* file );
+        Bool _WriteBindingLine( const Binding& binding, FILE* file );
+
+        /**/
+        static Bool _ValidateBinding( const Binding& binding );
 
         // fields
-        MapTable _bindings;
-        Binding  _default;
+        BindingCollection _bindings;
     };
 }

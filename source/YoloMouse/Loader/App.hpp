@@ -46,16 +46,16 @@ namespace YoloMouse
         void _StopUi();
 
         /**/
+        void _OptionAbout();
         void _OptionErrors();
+        void _OptionGamesOnly( Bool enable, Bool save );
+        Bool _OptionAutoStart( Bool enable, Bool save );
         Bool _OptionRunAsAdmin();
         void _OptionSettingsFolder();
-        Bool _OptionAutoStart( Bool enable, Bool save );
-        void _OptionAbout();
 
         /**/
         Bool _AssignCursor( Index group_index );
         Bool _AssignSize( Long size_index_delta );
-        Bool _AssignDefault();
 
         /**/
         Instance* _AccessCurrentInstance();
@@ -78,5 +78,6 @@ namespace YoloMouse
         SystemMonitor&  _system_monitor;
         Settings        _settings;
         Bool            _elevate;
+        Bool            _games_only;
     };
 }

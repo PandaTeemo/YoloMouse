@@ -5,14 +5,18 @@ namespace YoloMouse
     //------------------------------------------------------------------------
     const WCHAR* APP_MENU_STRINGS[MENU_OPTION_COUNT] =
     {
-        L"Run as administrator",    //MENU_OPTION_RUNASADMIN
-        L"Start with Windows",      //MENU_OPTION_AUTOSTART
-        L"Open settings folder",    //MENU_OPTION_SETTINGS
-        L"Errors",                  //MENU_OPTION_ERRORS
+        // info
         L"About",                   //MENU_OPTION_ABOUT
+        L"Errors",                  //MENU_OPTION_ERRORS
+        // settings
+        L"Games only",              //MENU_OPTION_GAMESONLY
+        L"Start with Windows",      //MENU_OPTION_AUTOSTART
+        // etc
+        L"Run as Administrator",    //MENU_OPTION_RUNASADMIN
+        L"Open settings folder",    //MENU_OPTION_SETTINGSFOLDER
     };
 
-    const ULong CURSOR_SIZE_TABLE[CURSOR_INDEX_COUNT] =
+    const ULong CURSOR_SIZE_TABLE[CURSOR_SIZE_INDEX_COUNT] =
     {
         0,
         16,
@@ -47,7 +51,7 @@ namespace YoloMouse
     };
 
     //------------------------------------------------------------------------
-    static Settings::KeyValue _settings[] =
+    static Settings::KeyValue _settings[SETTING_COUNT] =
     {
         { "CursorKey1",         "CONTROL ALT 1" },
         { "CursorKey2",         "CONTROL ALT 2" },
@@ -61,9 +65,9 @@ namespace YoloMouse
         { "CursorKeyReset",     "CONTROL ALT 0" },
         { "CursorKeySmaller",   "CONTROL ALT -" },
         { "CursorKeyLarger",    "CONTROL ALT =" },
-        { "CursorKeyDefault",   "CONTROL ALT D" },
+        { "GamesOnly",          "1" },
         { "AutoStart",          "1" },
         { "ShowMenu",           "1" },
     };
-    Settings::KeyValueCollection SETTINGS_ITEMS(_settings, COUNT(_settings));
+    Settings::KeyValueCollection SETTINGS_ITEMS(_settings, SETTING_COUNT);
 }

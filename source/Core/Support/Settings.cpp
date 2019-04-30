@@ -57,7 +57,7 @@ namespace Core
 
         if(_wfopen_s(&file, _path, L"wt") == 0)
         {
-            for( KeyValueIterator i = _keyvalues.Begin(); i != _keyvalues.End(); ++i )
+            for( KeyValueIterator i = _keyvalues.begin(); i != _keyvalues.end(); ++i )
                 fprintf(file, "%s=%s\n", i->key.GetMemory(), i->value.GetMemory());
 
             fclose(file);

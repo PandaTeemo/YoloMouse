@@ -30,6 +30,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\Doc\todo.txt" />
+    <Text Include="..\..\..\doc\notes.txt" />
   </ItemGroup>
 </Project>

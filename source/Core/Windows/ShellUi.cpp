@@ -122,7 +122,7 @@ namespace Core
         if(GetMenuItemInfo(_menu, wid, FALSE, &mi))
         {
             // notify
-            for( ListenerIterator l = _listeners.Begin(); l != _listeners.End(); ++l )
+            for( ListenerIterator l = _listeners.begin(); l != _listeners.end(); ++l )
             {
                 // get current state
                 Bool enabled = (mi.fState & MFS_CHECKED) != 0;
@@ -183,7 +183,7 @@ namespace Core
 
         default:
             // notify
-            for( ListenerIterator l = _listeners.Begin(); l != _listeners.End(); ++l )
+            for( ListenerIterator l = _listeners.begin(); l != _listeners.end(); ++l )
                 if((*l)->OnMessage(hwnd, message, wparam, lparam))
                     return 0;
         }

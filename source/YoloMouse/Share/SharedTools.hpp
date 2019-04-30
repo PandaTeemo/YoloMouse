@@ -15,5 +15,9 @@ namespace YoloMouse
 
         /**/
         static void MessagePopup( Bool error, const Char* format, ... );
+
+        /**/
+        static Index CursorSizeToSizeIndex( ULong size );
+        static ULong CursorToSize( HCURSOR hcursor );
     };
 }

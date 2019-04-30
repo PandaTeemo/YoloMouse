@@ -40,24 +40,24 @@ namespace Core
         /**/
         Bool ReadToken( BaseString& token, Char delimiter ) const
         {
-            Iterator begin = token.IsEmpty() ? Begin() : token.End();
+            Iterator b = token.IsEmpty() ? begin() : token.end();
 
             // skip delimiter
-            for( ; begin != End() && *begin == delimiter; ++begin );
-            Iterator end = begin;
+            for( ; b != end() && *b == delimiter; ++b );
+            Iterator e = b;
 
             // read token
-            for( ; end != End() && *end != delimiter; ++end );
+            for( ; e != end() && *e != delimiter; ++e );
 
             // get count
-            ULong count = (ULong)(end - begin);
+            ULong count = (ULong)(e - b);
 
             // done if empty
             if( count == 0 )
                 return false;
 
             // create token
-            token.SetMemory(begin);
+            token.SetMemory(b);
             token.SetCount(count);
 
             return true;
@@ -79,7 +79,7 @@ namespace Core
         /**/
         BaseString& ToUpper()
         {
-            for( Iterator c = Begin(); c != End(); c++ )
+            for( Iterator c = begin(); c != end(); c++ )
                 if(*c >= 'a' && *c <= 'z')
                     *c += 'A'-'a';
 
@@ -91,7 +91,7 @@ namespace Core
         {
             Index hash = 0;
 
-            for( Iterator c = Begin(); c != End(); c++ )
+            for( Iterator c = begin(); c != end(); c++ )
                 hash = *c + (hash << 6) + (hash << 16) - hash;
 
             return hash;

@@ -26,7 +26,7 @@ namespace YoloMouse
             return _CalculateHash(handle);
 
         // locate existing handle
-        for( CacheIterator i = _cache.Begin(); i != _cache.End(); ++i )
+        for( CacheIterator i = _cache.begin(); i != _cache.end(); ++i )
             if( i->handle == handle )
                 return i->hash;
 
