@@ -10,13 +10,13 @@ namespace Core
         _ready      (false),
         _accessed   (0)
     {
-        _path[0] = 0;
+        _path.Zero();
     }
 
     //-------------------------------------------------------------------------
-    void Settings::SetPath( const WCHAR* path )
+    void Settings::SetPath( const PathString& path )
     {
-        wcscpy_s( _path, COUNT(_path), path );
+        _path = path;
     }
 
     //-------------------------------------------------------------------------
@@ -25,7 +25,7 @@ namespace Core
         Char    line[STRING_MEDIUM_SIZE];
         FILE*   file;
 
-        if(_wfopen_s(&file, _path, L"rt") == 0)
+        if(_wfopen_s(&file, _path.GetMemory(), L"rt") == 0)
         {
             while(fgets(line, sizeof(line), file))
             {
@@ -55,7 +55,7 @@ namespace Core
     {
         FILE* file;
 
-        if(_wfopen_s(&file, _path, L"wt") == 0)
+        if(_wfopen_s(&file, _path.GetMemory(), L"wt") == 0)
         {
             for( KeyValueIterator i = _keyvalues.begin(); i != _keyvalues.end(); ++i )
                 fprintf(file, "%s=%s\n", i->key.GetMemory(), i->value.GetMemory());
@@ -70,7 +70,7 @@ namespace Core
     //-------------------------------------------------------------------------
     String Settings::Get( Id id ) const
     {
-        xassert( static_cast<Index>(id) < _keyvalues.GetCount() );
+        ASSERT( static_cast<Index>(id) < _keyvalues.GetCount() );
         return _keyvalues[id].value;
     }
 

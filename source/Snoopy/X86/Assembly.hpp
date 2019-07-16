@@ -36,9 +36,9 @@ namespace Snoopy { namespace x86
         void OpMovRegReg( RegisterId register_to, RegisterId register_from );
         void OpMovRegImm( RegisterId register_id, Native imm );
         void OpCallReg  ( RegisterId register_id );
-        void OpCallRel  ( void* address );
+        Bool OpCallRel  ( void* address );
         void OpJmpReg   ( RegisterId register_id );
-        void OpJmpRel   ( void* address );
+        Bool OpJmpRel   ( void* address );
 
         /**/
         Bool Relocate( const Assembly& source );
@@ -48,6 +48,6 @@ namespace Snoopy { namespace x86
 
     private:
         /**/
-        void _ArgRelativeAddress32( void* address );
+        Bool _ArgRelativeAddress32( void* address );
     };
 }}

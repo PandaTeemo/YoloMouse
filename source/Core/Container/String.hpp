@@ -30,7 +30,7 @@ namespace Core
         {
             if( _memory[_count] != 0 )
             {
-                xassert(_count < _limit);
+                ASSERT(_count < _limit);
                 _memory[_count] = 0;
             }
 
@@ -67,7 +67,7 @@ namespace Core
         void Format( const Char* format, ... )
         {
             va_list vargs;
-            xassert(format != nullptr);
+            ASSERT(format != nullptr);
 
             va_start(vargs, format);
             vsnprintf(_memory, _limit, format, vargs);
@@ -102,7 +102,7 @@ namespace Core
         void CopyZ( const COLLECTION& other )
         {
             ULong _count = other.GetCount();
-            xassert(_count < _limit);
+            ASSERT(_count < _limit);
             Copy(other.GetMemory(), _count);
             _memory[_count] = 0;
         }
@@ -110,7 +110,7 @@ namespace Core
         void CopyZ( const Char* chars )
         {
             ULong _count = Tools::CStrLen(chars);
-            xassert(_count < _limit);
+            ASSERT(_count < _limit);
             Copy(chars, _count);
             _memory[_count] = 0;
         }
@@ -132,7 +132,7 @@ namespace Core
         FixedString( const String& string )
         {
             Copy(string);
-            xassert(_count < _limit);
+            ASSERT(_count < _limit);
             _memory[_count] = 0;
         }
         FixedString( const Char* chars )
@@ -148,7 +148,7 @@ namespace Core
     };
 
     /**/
-    typedef FixedString<FixedArray<Char, STRING_SHORT_SIZE>>    ShortString;
-    typedef FixedString<FixedArray<Char, STRING_MEDIUM_SIZE>>   MediumString;
-    typedef FixedString<FixedArray<Char, STRING_MAX_SIZE>>      MaxString;
+    typedef FixedString<DynamicFlatArray<Char, STRING_SHORT_SIZE>>    ShortString;
+    typedef FixedString<DynamicFlatArray<Char, STRING_MEDIUM_SIZE>>   MediumString;
+    typedef FixedString<DynamicFlatArray<Char, STRING_MAX_SIZE>>      MaxString;
 }

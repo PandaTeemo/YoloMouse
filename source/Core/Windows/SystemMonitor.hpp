@@ -1,5 +1,7 @@
 #pragma once
+#include <Core/Events/SystemMonitorEvent.hpp>
 #include <Core/Support/Singleton.hpp>
+#include <Core/Support/EventDispatcher.hpp>
 
 namespace Core
 {
@@ -8,20 +10,29 @@ namespace Core
         public Singleton<SystemMonitor>
     {
     public:
-        struct IListener
+        // enums
+        enum EventId: Id
         {
-            virtual void OnWindowFocus( HWND hwnd ) {}
+            WINDOW_FOREGROUND,
+            WINDOW_ZORDER,
         };
 
-    public:
         /**/
-        void SetListener( IListener* listener=NULL );
+        SystemMonitor();
+        ~SystemMonitor();
 
         /**/
-        Bool Start();
-        void Stop();
+        Bool Initialize();
+        void Shutdown();
 
+        /**/
+        Bool IsInitialized() const;
+
+        // events
+        EventDispatcher<SystemMonitorEvent> events;
+
+    private:
         // fields
-        HWINEVENTHOOK _handle = NULL;
+        HWINEVENTHOOK _handle;
     };
 }

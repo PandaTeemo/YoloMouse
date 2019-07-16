@@ -98,6 +98,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;YOLOMOUSEDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\source</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4091</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -113,6 +114,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;YOLOMOUSEDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\source</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4091</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -160,17 +162,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\YoloMouse\Dll\App.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Dll\CursorBindings.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Dll\CursorVault.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Dll\HandleCache.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Dll\Core\App.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Dll\Cursor\CursorVault.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Dll\Cursor\HandleCache.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Dll\Main.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\source\YoloMouse\Dll\App.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Dll\CursorBindings.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Dll\CursorVault.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Dll\HandleCache.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">
@@ -182,6 +177,11 @@
     <ProjectReference Include="..\YoloMouse.Share\YoloMouse.Share.vcxproj">
       <Project>{0184cc31-2228-48e9-9c4f-68c131bf4fae}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\source\YoloMouse\Dll\Core\App.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Dll\Cursor\CursorVault.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Dll\Cursor\HandleCache.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

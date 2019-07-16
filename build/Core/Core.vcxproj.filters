@@ -10,6 +10,18 @@
     <Filter Include="Windows">
       <UniqueIdentifier>{04151bd3-4a57-4cbd-b21d-97cc97da9585}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{ae664b18-d625-46dd-a851-ef1c228a242c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System">
+      <UniqueIdentifier>{3a3f5de1-954d-4b35-b4c9-4e039eaf29b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Type">
+      <UniqueIdentifier>{a2588470-6d96-4a2a-bc40-d81e7a6ccfaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{64afbb46-1798-431b-9269-336cd51085b1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Core\Container\Array.hpp">
@@ -42,12 +54,63 @@
     <ClInclude Include="..\..\source\Core\Windows\SystemMonitor.hpp">
       <Filter>Windows</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\Core\Windows\SystemTools.hpp">
-      <Filter>Windows</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\Core\Constants.hpp" />
     <ClInclude Include="..\..\source\Core\Root.hpp" />
     <ClInclude Include="..\..\source\Core\Types.hpp" />
+    <ClInclude Include="..\..\source\Core\Math\Vector3.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Math\Matrix4.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Math\Vector4.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Math\Transform3.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Math\Quaternion.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Math\Vector2.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Math\Math.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Windows\WindowTools.hpp">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\System\IpcPair.hpp">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Container\Array2.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Container\Map.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Type\Tuple.hpp">
+      <Filter>Type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Container\List.hpp">
+      <Filter>Container</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Type\Default.hpp">
+      <Filter>Type</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\System\SystemTools.hpp">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\System\Debug.hpp">
+      <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Support\EventDispatcher.hpp">
+      <Filter>Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Events\SystemMonitorEvent.hpp">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Core\Support\Settings.cpp">
@@ -65,9 +128,39 @@
     <ClCompile Include="..\..\source\Core\Windows\SystemMonitor.cpp">
       <Filter>Windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\Windows\SystemTools.cpp">
+    <ClCompile Include="..\..\source\Core\Root.cpp" />
+    <ClCompile Include="..\..\source\Core\Math\Vector3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Math\Matrix4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Math\Vector4.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Math\Transform3.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Math\Quaternion.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Math\Vector2.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Math\Math.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Windows\WindowTools.cpp">
       <Filter>Windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\Core\Root.cpp" />
+    <ClCompile Include="..\..\source\Core\System\IpcPair.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\System\SystemTools.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\System\Debug.cpp">
+      <Filter>System</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

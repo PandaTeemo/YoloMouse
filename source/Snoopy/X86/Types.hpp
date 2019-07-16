@@ -21,5 +21,5 @@ namespace Snoopy { namespace x86
     #endif
 
     /**/
-    typedef void (HOOK_CALL *HookFunction)( Native* arguments );
+    typedef void (HOOK_CALL *HookFunction)( volatile Native* arguments );
 }}

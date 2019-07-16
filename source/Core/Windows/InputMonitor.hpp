@@ -27,12 +27,13 @@ namespace Core
 
         /**/
         InputMonitor( ShellUi& ui );
+        ~InputMonitor();
 
         /**/
-        void SetListener( IListener* listener=NULL );
+        Bool IsStarted() const;
 
         /**/
-        Bool Start();
+        Bool Start( IListener& listener );
         void Stop();
 
         /**/
@@ -40,8 +41,8 @@ namespace Core
 
     private:
         // types
-        typedef FixedArray<Bool, STATE_LIMIT>   StateTable;
-        typedef FixedArray<ULong, KEY_LIMIT>    KeyCollection;
+        typedef DynamicFlatArray<Bool, STATE_LIMIT>   StateTable;
+        typedef DynamicFlatArray<ULong, KEY_LIMIT>    KeyCollection;
         typedef KeyCollection::Iterator         KeyIterator;
 
         struct Combo
@@ -50,11 +51,11 @@ namespace Core
             KeyCollection   keys;
         };
 
-        typedef FixedArray<Combo, COMBO_LIMIT>  ComboCollection;
+        typedef DynamicFlatArray<Combo, COMBO_LIMIT>  ComboCollection;
         typedef ComboCollection::Iterator       ComboIterator;
 
         /**/
-        Bool OnMessage( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam );
+        void OnMessage( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam );
 
         /**/
         Bool _OnInputKeyboard( const RAWKEYBOARD& kb );
@@ -71,5 +72,9 @@ namespace Core
         ComboCollection _combos;
         ULONGLONG       _input_time;
         Bool            _combo_pressed;
+        // fields: objects
+        RAWINPUTDEVICE  _rawinput_kb;
+        // fields: state
+        Bool            _started;
     };
 }

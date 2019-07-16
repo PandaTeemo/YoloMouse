@@ -9,9 +9,9 @@ namespace Snoopy { namespace x86
         _source_address(0)
     {
     #if CPU_64
-        xassert(sizeof(Native) == 8);
+        ASSERT(sizeof(Native) == 8);
     #else
-        xassert(sizeof(Native) == 4);
+        ASSERT(sizeof(Native) == 4);
     #endif
     }
 
@@ -107,10 +107,10 @@ namespace Snoopy { namespace x86
         _code.Add(OP_CALL_REG + register_id);
     }
 
-    void Assembly::OpCallRel( void* address )
+    Bool Assembly::OpCallRel( void* address )
     {
         _code.Add(OP_CALL_REL);
-        _ArgRelativeAddress32(address);
+        return _ArgRelativeAddress32(address);
     }
 
     void Assembly::OpJmpReg( RegisterId register_id )
@@ -119,10 +119,10 @@ namespace Snoopy { namespace x86
         _code.Add(OP_JMP_REG + register_id);
     }
 
-    void Assembly::OpJmpRel( void* address )
+    Bool Assembly::OpJmpRel( void* address )
     {
         _code.Add(OP_JMP_REL);
-        _ArgRelativeAddress32(address);
+        return _ArgRelativeAddress32(address);
     }
 
     //-------------------------------------------------------------------------
@@ -206,15 +206,18 @@ namespace Snoopy { namespace x86
     }
 
     //-------------------------------------------------------------------------
-    void Assembly::_ArgRelativeAddress32( void* address )
+    Bool Assembly::_ArgRelativeAddress32( void* address )
     {
         // cant go too far
-        eggs(::abs((Byte*)address - _source_address) < 0x7ffffff0);
+        if( ::abs( (Byte*)address - _source_address ) >= 0x7ffffff0 )
+            return false;
 
         // calculate relative 32bit address
         Long rel32 = (Long)(Huge)address - (Long)(Huge)(_source_address + _code.GetCount()) - sizeof(Long);
 
         // write
         _code.AddRaw(rel32);
+
+        return true;
     }
 }}

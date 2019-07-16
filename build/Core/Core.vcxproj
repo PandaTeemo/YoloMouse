@@ -21,27 +21,54 @@
   <ItemGroup>
     <ClInclude Include="..\..\source\Core\Constants.hpp" />
     <ClInclude Include="..\..\source\Core\Container\Array.hpp" />
+    <ClInclude Include="..\..\source\Core\Container\Array2.hpp" />
+    <ClInclude Include="..\..\source\Core\Container\List.hpp" />
+    <ClInclude Include="..\..\source\Core\Container\Map.hpp" />
     <ClInclude Include="..\..\source\Core\Container\String.hpp" />
+    <ClInclude Include="..\..\source\Core\Events\SystemMonitorEvent.hpp" />
+    <ClInclude Include="..\..\source\Core\Math\Math.hpp" />
+    <ClInclude Include="..\..\source\Core\Math\Matrix4.hpp" />
+    <ClInclude Include="..\..\source\Core\Math\Quaternion.hpp" />
+    <ClInclude Include="..\..\source\Core\Math\Transform3.hpp" />
+    <ClInclude Include="..\..\source\Core\Math\Vector2.hpp" />
+    <ClInclude Include="..\..\source\Core\Math\Vector3.hpp" />
+    <ClInclude Include="..\..\source\Core\Math\Vector4.hpp" />
     <ClInclude Include="..\..\source\Core\Root.hpp" />
     <ClInclude Include="..\..\source\Core\Support\Enum.hpp" />
+    <ClInclude Include="..\..\source\Core\Support\EventDispatcher.hpp" />
     <ClInclude Include="..\..\source\Core\Support\Settings.hpp" />
     <ClInclude Include="..\..\source\Core\Support\Singleton.hpp" />
     <ClInclude Include="..\..\source\Core\Support\Tools.hpp" />
+    <ClInclude Include="..\..\source\Core\System\Debug.hpp" />
+    <ClInclude Include="..\..\source\Core\System\IpcPair.hpp" />
+    <ClInclude Include="..\..\source\Core\System\SystemTools.hpp" />
     <ClInclude Include="..\..\source\Core\Types.hpp" />
+    <ClInclude Include="..\..\source\Core\Type\Default.hpp" />
+    <ClInclude Include="..\..\source\Core\Type\Tuple.hpp" />
     <ClInclude Include="..\..\source\Core\Windows\InputMonitor.hpp" />
     <ClInclude Include="..\..\source\Core\Windows\SharedMemory.hpp" />
     <ClInclude Include="..\..\source\Core\Windows\ShellUi.hpp" />
     <ClInclude Include="..\..\source\Core\Windows\SystemMonitor.hpp" />
-    <ClInclude Include="..\..\source\Core\Windows\SystemTools.hpp" />
+    <ClInclude Include="..\..\source\Core\Windows\WindowTools.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\source\Core\Math\Math.cpp" />
+    <ClCompile Include="..\..\source\Core\Math\Matrix4.cpp" />
+    <ClCompile Include="..\..\source\Core\Math\Quaternion.cpp" />
+    <ClCompile Include="..\..\source\Core\Math\Transform3.cpp" />
+    <ClCompile Include="..\..\source\Core\Math\Vector2.cpp" />
+    <ClCompile Include="..\..\source\Core\Math\Vector3.cpp" />
+    <ClCompile Include="..\..\source\Core\Math\Vector4.cpp" />
     <ClCompile Include="..\..\source\Core\Root.cpp" />
     <ClCompile Include="..\..\source\Core\Support\Settings.cpp" />
     <ClCompile Include="..\..\source\Core\Support\Tools.cpp" />
+    <ClCompile Include="..\..\source\Core\System\Debug.cpp" />
+    <ClCompile Include="..\..\source\Core\System\IpcPair.cpp" />
+    <ClCompile Include="..\..\source\Core\System\SystemTools.cpp" />
     <ClCompile Include="..\..\source\Core\Windows\InputMonitor.cpp" />
     <ClCompile Include="..\..\source\Core\Windows\ShellUi.cpp" />
     <ClCompile Include="..\..\source\Core\Windows\SystemMonitor.cpp" />
-    <ClCompile Include="..\..\source\Core\Windows\SystemTools.cpp" />
+    <ClCompile Include="..\..\source\Core\Windows\WindowTools.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{BDE518BD-B435-4F68-A2C5-1AD4CC73FEA0}</ProjectGuid>
@@ -104,6 +131,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\source</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4091</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -121,6 +149,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\source</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4091</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

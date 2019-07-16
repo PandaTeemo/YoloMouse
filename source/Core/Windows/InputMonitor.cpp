@@ -3,89 +3,91 @@
 
 namespace Core
 {
-    // local: data
+    // local
     //-------------------------------------------------------------------------
-    static InputMonitor::IListener  _dummy_listener;
-    static InputMonitor::IListener* _listener = &_dummy_listener;
-
-
-    //-------------------------------------------------------------------------
-    static IdEnum::KeyValue _key_strings[] =
+    namespace
     {
-        { VK_SHIFT,     "SHIFT" },
-        { VK_CONTROL,   "CONTROL" },
-        { VK_MENU,      "ALT" },
+        // state
+        //---------------------------------------------------------------------
+        InputMonitor::IListener* _listener = nullptr;
 
-        { '0',          "0" },
-        { '1',          "1" },
-        { '2',          "2" },
-        { '3',          "3" },
-        { '4',          "4" },
-        { '5',          "5" },
-        { '6',          "6" },
-        { '7',          "7" },
-        { '8',          "8" },
-        { '9',          "9" },
+        // constants
+        //---------------------------------------------------------------------
+        IdEnum::KeyValue _KEY_STRINGS_ARRAY[] =
+        {
+            { VK_SHIFT,     "SHIFT" },
+            { VK_CONTROL,   "CONTROL" },
+            { VK_MENU,      "ALT" },
 
-        { 'A',          "A" },
-        { 'B',          "B" },
-        { 'C',          "C" },
-        { 'D',          "D" },
-        { 'E',          "E" },
-        { 'F',          "F" },
-        { 'G',          "G" },
-        { 'H',          "H" },
-        { 'I',          "I" },
-        { 'J',          "J" },
-        { 'K',          "K" },
-        { 'L',          "L" },
-        { 'M',          "M" },
-        { 'N',          "N" },
-        { 'O',          "O" },
-        { 'P',          "P" },
-        { 'Q',          "Q" },
-        { 'R',          "R" },
-        { 'S',          "S" },
-        { 'T',          "T" },
-        { 'U',          "U" },
-        { 'V',          "V" },
-        { 'W',          "W" },
-        { 'X',          "X" },
-        { 'Y',          "Y" },
-        { 'Z',          "Z" },
+            { '0',          "0" },
+            { '1',          "1" },
+            { '2',          "2" },
+            { '3',          "3" },
+            { '4',          "4" },
+            { '5',          "5" },
+            { '6',          "6" },
+            { '7',          "7" },
+            { '8',          "8" },
+            { '9',          "9" },
 
-        { VK_OEM_MINUS, "-" },
-        { VK_OEM_PLUS,  "=" },
+            { 'A',          "A" },
+            { 'B',          "B" },
+            { 'C',          "C" },
+            { 'D',          "D" },
+            { 'E',          "E" },
+            { 'F',          "F" },
+            { 'G',          "G" },
+            { 'H',          "H" },
+            { 'I',          "I" },
+            { 'J',          "J" },
+            { 'K',          "K" },
+            { 'L',          "L" },
+            { 'M',          "M" },
+            { 'N',          "N" },
+            { 'O',          "O" },
+            { 'P',          "P" },
+            { 'Q',          "Q" },
+            { 'R',          "R" },
+            { 'S',          "S" },
+            { 'T',          "T" },
+            { 'U',          "U" },
+            { 'V',          "V" },
+            { 'W',          "W" },
+            { 'X',          "X" },
+            { 'Y',          "Y" },
+            { 'Z',          "Z" },
 
-        { VK_F1,        "F1" },
-        { VK_F2,        "F2" },
-        { VK_F3,        "F3" },
-        { VK_F4,        "F4" },
-        { VK_F5,        "F5" },
-        { VK_F6,        "F6" },
-        { VK_F7,        "F7" },
-        { VK_F8,        "F8" },
-        { VK_F9,        "F9" },
-        { VK_F10,       "F10" },
-        { VK_F11,       "F11" },
-        { VK_F12,       "F12" },
+            { VK_OEM_MINUS, "-" },
+            { VK_OEM_PLUS,  "=" },
 
-        { VK_NUMPAD0,   "NUM0" },
-        { VK_NUMPAD1,   "NUM1" },
-        { VK_NUMPAD2,   "NUM2" },
-        { VK_NUMPAD3,   "NUM3" },
-        { VK_NUMPAD4,   "NUM4" },
-        { VK_NUMPAD5,   "NUM5" },
-        { VK_NUMPAD6,   "NUM6" },
-        { VK_NUMPAD7,   "NUM7" },
-        { VK_NUMPAD8,   "NUM8" },
-        { VK_NUMPAD9,   "NUM9" },
+            { VK_F1,        "F1" },
+            { VK_F2,        "F2" },
+            { VK_F3,        "F3" },
+            { VK_F4,        "F4" },
+            { VK_F5,        "F5" },
+            { VK_F6,        "F6" },
+            { VK_F7,        "F7" },
+            { VK_F8,        "F8" },
+            { VK_F9,        "F9" },
+            { VK_F10,       "F10" },
+            { VK_F11,       "F11" },
+            { VK_F12,       "F12" },
 
-        { VK_PAUSE,     "PAUSE" },
-    };
+            { VK_NUMPAD0,   "NUM0" },
+            { VK_NUMPAD1,   "NUM1" },
+            { VK_NUMPAD2,   "NUM2" },
+            { VK_NUMPAD3,   "NUM3" },
+            { VK_NUMPAD4,   "NUM4" },
+            { VK_NUMPAD5,   "NUM5" },
+            { VK_NUMPAD6,   "NUM6" },
+            { VK_NUMPAD7,   "NUM7" },
+            { VK_NUMPAD8,   "NUM8" },
+            { VK_NUMPAD9,   "NUM9" },
 
-    static const IdEnum _KEY_STRINGS(_key_strings, COUNT(_key_strings));
-
+            { VK_PAUSE,     "PAUSE" },
+        };
+        const IdEnum _KEY_STRINGS(_KEY_STRINGS_ARRAY, COUNT(_KEY_STRINGS_ARRAY));
+    }
 
     // public
     //-------------------------------------------------------------------------
@@ -93,42 +95,65 @@ namespace Core
         _ui           (ui),
         _state        (STATE_LIMIT),
         _input_time   (0),
-        _combo_pressed(false)
+        _combo_pressed(false),
+        _started      (false)
     {
         _state.Zero();
     }
 
-    //-------------------------------------------------------------------------
-    void InputMonitor::SetListener( IListener* listener )
+    InputMonitor::~InputMonitor()
     {
-        _listener = listener ? listener : &_dummy_listener;
+        ASSERT( !IsStarted() );
+    }
+
+    //--------------------------------------------------------------------------
+    Bool InputMonitor::IsStarted() const
+    {
+        return _started;
     }
 
     //-------------------------------------------------------------------------
-    Bool InputMonitor::Start()
+    Bool InputMonitor::Start( IListener& listener )
     {
-        RAWINPUTDEVICE kb;
+        ASSERT( !IsStarted() );
 
-        // create keyboard device
-        kb.usUsagePage =    0x01;
-        kb.usUsage =        0x06;
-        kb.dwFlags =        RIDEV_NOLEGACY|RIDEV_INPUTSINK|RIDEV_APPKEYS|RIDEV_NOHOTKEYS;
-        kb.hwndTarget =     _ui.GetHwnd();
+        // set fields
+        _listener = &listener;
+
+        // define raw input keyboard device
+        _rawinput_kb.usUsagePage =    0x01;
+        _rawinput_kb.usUsage =        0x06;
+        _rawinput_kb.dwFlags =        RIDEV_NOLEGACY|RIDEV_INPUTSINK|RIDEV_APPKEYS|RIDEV_NOHOTKEYS;
+        _rawinput_kb.hwndTarget =     _ui.GetHwnd();
 
         // register keyboard device
-        if(RegisterRawInputDevices(&kb, 1, sizeof(kb)) == FALSE)
+        if(RegisterRawInputDevices(&_rawinput_kb, 1, sizeof(_rawinput_kb)) == FALSE)
             return false;
 
         // register events
         _ui.AddListener(*this);
+
+        // set started
+        _started = true;
 
         return true;
     }
 
     void InputMonitor::Stop()
     {
+        ASSERT( IsStarted() );
+
+        // define raw input keyboard device disable
+        _rawinput_kb.dwFlags = RIDEV_REMOVE;
+
+        // unregister raw input
+        RegisterRawInputDevices( &_rawinput_kb, 1, sizeof( _rawinput_kb ) );
+
         // clear events
         _ui.RemoveListener(*this);
+
+        // reset started
+        _started = false;
     }
 
     //-------------------------------------------------------------------------
@@ -174,7 +199,7 @@ namespace Core
 
     // private
     //-------------------------------------------------------------------------
-    Bool InputMonitor::OnMessage( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam )
+    void InputMonitor::OnMessage( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam )
     {
         if( message == WM_INPUT )
         {
@@ -182,22 +207,20 @@ namespace Core
             UINT        ri_size = sizeof(ri);
 
             // read raw input
-            if(GetRawInputData((HRAWINPUT)lparam, RID_INPUT, &ri, &ri_size, sizeof(RAWINPUTHEADER)) < 0)
-                return false;
-
-            // read by type
-            switch(ri.header.dwType)
+            if( GetRawInputData( (HRAWINPUT)lparam, RID_INPUT, &ri, &ri_size, sizeof( RAWINPUTHEADER ) ) >= 0 )
             {
-            // keyboard
-            case RIM_TYPEKEYBOARD:
-                return _OnInputKeyboard(ri.data.keyboard);
+                // read by type
+                switch(ri.header.dwType)
+                {
+                // keyboard
+                case RIM_TYPEKEYBOARD:
+                    _OnInputKeyboard(ri.data.keyboard);
+                    break;
 
-            default:
-                return false;
+                default:;
+                }
             }
         }
-
-        return false;
     }
 
     //-------------------------------------------------------------------------

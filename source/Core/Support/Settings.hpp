@@ -23,7 +23,7 @@ namespace Core
         Settings( KeyValueCollection& items );
 
         /**/
-        void SetPath( const WCHAR* path );
+        void SetPath( const PathString& path );
 
         /**/
         Bool Load();

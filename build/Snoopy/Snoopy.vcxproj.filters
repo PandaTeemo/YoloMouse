@@ -15,7 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\Snoopy\Constants.hpp" />
     <ClInclude Include="..\..\source\Snoopy\Root.hpp" />
     <ClInclude Include="..\..\source\Snoopy\X86\Assembly.hpp">
       <Filter>X86</Filter>

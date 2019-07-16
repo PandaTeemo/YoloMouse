@@ -1,4 +1,3 @@
-#include <Snoopy/Constants.hpp>
 #include <Snoopy/Inject/Injector.hpp>
 #include <Dbghelp.h>
 #include <TlHelp32.h>
@@ -10,80 +9,55 @@ namespace Snoopy
     namespace
     {
         // constants
-        const ULong LOADSYMBOLMODULE_RETRIES =      10;
-        const ULong LOADSYMBOLMODULE_RETRYDELAY =   20;     //ms
-        const ULong LOAD_WAIT_DELAY =               500;    //ms
-        const ULong LOAD_ATTEMPT_COUNT =            8;
-    }
-
-    // Function
-    //-------------------------------------------------------------------------
-    Injector::Function::Function():
-        name    (NULL),
-        address (0)
-    {
+        const Char* DLL_KERNEL32_NAME =     "kernel32.dll";
+        const ULong LOAD_WAIT_DELAY =       2000; // ms
+        const ULong LOAD_ATTEMPT_COUNT =    3;
+        const ULong ARGUMENT_MEMORY_SIZE =  STRING_PATH_SIZE;
+        const Char* FUNCTION_NAME =         "LoadLibraryA";
+        const ULong FUNCTION_WAIT_TIME =    3000; // ms
+        const ULong FUNCTION_STACK_SIZE =   KILOBYTES(32);
     }
 
     // public
     //-------------------------------------------------------------------------
-    Injector::Injector()
+    Injector::Injector():
+        _process(NULL),
+        _loaded (false)
     {
-        // init
-        _Reset();
-
-        // register functions
-        _functions[FUNCTION_LOADLIBRARY].name = "LoadLibraryA";
-        _functions[FUNCTION_FREELIBRARY].name = "FreeLibrary";
     }
 
     Injector::~Injector()
     {
-        Unload();
+        ASSERT( !IsLoaded() );
     }
 
     //-------------------------------------------------------------------------
-    void Injector::SetNotifyName( const CHAR* name )
+    Bool Injector::IsLoaded() const
     {
-        _functions[FUNCTION_NOTIFY].name = name;
+        return _loaded;
     }
 
     //-------------------------------------------------------------------------
     Bool Injector::Load( HANDLE process, const CHAR* dll_path )
     {
-        xassert(_process == NULL);
+        ASSERT(!IsLoaded());
 
-        // attempt loop
+        // set fields
+        _process = process;
+
+        // load attempt loop
         for( Index attempt = 0; attempt < LOAD_ATTEMPT_COUNT; ++attempt )
         {
-            // wait until ready. this doesnt work in all cases, therefore ignore
-            // return value and rely on following code and multiple attempts to 
-            // qualify a succcessful injection.
-            WaitForInputIdle(process, LOAD_WAIT_DELAY);
-
-            // initialize symbol loader
-            if( SymInitialize(process, NULL, FALSE) )
+            // load can sometimes fail when it shouldnt due to "reasons" so attempt multiple times
+            if( _Load( dll_path ) )
             {
-                // save process handle
-                _process = process;
-
-                // load initial modules
-                if( _LoadSymbolModule("kernel32.dll") )
-                {
-                    // allocate argument memory
-                    _argument_memory = VirtualAllocEx(process, NULL, INJECTOR_ARGUMENT_MEMORY, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
-
-                    // if allocated
-                    if( _argument_memory )
-                    {
-                        // inject dll
-                        if( _InjectDll(dll_path) )
-                            return true;
-                    }
-                }
+                // set loaded
+                _loaded = true;
+                return true;
             }
 
-            // fail
-            Unload();
+            // undo
+            _Unload();
         }
 
         return false;
@@ -92,190 +66,142 @@ namespace Snoopy
     //-------------------------------------------------------------------------
     void Injector::Unload()
     {
-        // unload dll if successfully injected
-        if( _inject_base )
-            _CallFunction(FUNCTION_FREELIBRARY, (void*)_inject_base);
+        ASSERT(IsLoaded());
 
-        // free argument memory
-        if( _argument_memory )
-            VirtualFreeEx(_process, _argument_memory, INJECTOR_ARGUMENT_MEMORY, MEM_RELEASE);
-
-        // close symbol handler
-        if( _process )
-            SymCleanup(_process);
+        // unload
+        _Unload();
 
         // reset state
-        _Reset();
-    }
-
-    //-------------------------------------------------------------------------
-    Bool Injector::CallNotify( const void* argument, ULong size )
-    {
-        xassert(_process);
-        return _CallFunction(FUNCTION_NOTIFY, argument, size);
+        _loaded = false;
     }
 
     // private
     //-------------------------------------------------------------------------
-    Bool Injector::_GetFunctionAddress( UHuge& address, const CHAR* name )
+    Bool Injector::_Load( const CHAR* dll_path )
     {
-        SYMBOL_INFO symbol = {0};
+        CHAR    full_dll_path[STRING_PATH_SIZE];
+        DWORD64 dll_kernel32_address;
 
-        // init parameters
-        symbol.SizeOfStruct = sizeof(symbol);
+        // wait until ready. this doesnt work in all cases, therefore ignore
+        // return value and rely on following code and multiple attempts to 
+        // qualify a succcessful injection.
+        WaitForInputIdle(_process, LOAD_WAIT_DELAY);
 
-        // get address of function
-        if( !SymFromName(_process, name, &symbol) || symbol.Address == 0 )
+        // initialize symbol loader
+        if( !SymInitialize( _process, NULL, FALSE ) )
             return false;
 
-        // store address
-        address = symbol.Address;
-        return true;
-    }
-
-    //-------------------------------------------------------------------------
-    Bool Injector::_InjectDll( const CHAR* dll_path )
-    {
-        CHAR   full_path[STRING_PATH_SIZE];
-        CHAR*  pdll_name = NULL;
-        xassert(_process);
+        // load initial modules
+        if( !_LoadSymbolModule(dll_kernel32_address, DLL_KERNEL32_NAME) )
+            return false;
 
         // get full dll path
-        if(!GetFullPathNameA(dll_path, COUNT(full_path), full_path, &pdll_name))
+        if(!GetFullPathNameA(dll_path, COUNT(full_dll_path), full_dll_path, NULL))
             return false;
 
         // tell process to load dll
-        if( !_CallFunction(FUNCTION_LOADLIBRARY, full_path, static_cast<ULong>(strlen(full_path) + 1)) )
-            return false;
-
-        // load symbols for new dll
-        _inject_base = _LoadSymbolModule(pdll_name);
-        if( _inject_base == 0 )
+        if( !_CallRemoteLoadLibrary(full_dll_path) )
             return false;
 
         return true;
     }
 
-    //-------------------------------------------------------------------------
-    Bool Injector::_CallFunction( FunctionId id, const void* argument, ULong size )
+    void Injector::_Unload()
     {
-        xassert(id < FUNCTION_COUNT);
-        Function&   f = _functions[id];
-        void*       remote_argument = 0;
+        // close symbol handler
+        SymCleanup(_process);
+    }
 
-        // if not loaded
-        if( f.address == 0 )
-        {
-            xassert(f.name);
+    //-------------------------------------------------------------------------
+    Bool Injector::_CallRemoteLoadLibrary( const CHAR* dll_path )
+    {
+        Bool        status = false;
+        SYMBOL_INFO function_symbol = {0};
 
-            // get address of function
-            if( !_GetFunctionAddress(f.address, f.name) )
-                return false;
-        }
-
-        // if argument is a pointer to an object
-        if( size > 0 )
-        {
-            xassert(size <= INJECTOR_ARGUMENT_MEMORY);
-
-            // write object to argument memory
-            if(!WriteProcessMemory(_process, _argument_memory, argument, size, NULL))
-                return false;
-
-            // argument is pointer to argument memory
-            remote_argument = _argument_memory;
-        }
-        // else argument is the provided value
-        else
-            remote_argument = const_cast<void*>(argument);
-
-        // call function
-        HANDLE remote_thread = CreateRemoteThread(
-            _process,
-            NULL,
-            0,
-            (LPTHREAD_START_ROUTINE)f.address,
-            remote_argument,
-            NULL,
-            NULL);
-        if( remote_thread == NULL )
+        // get function address
+        function_symbol.SizeOfStruct = sizeof(function_symbol);
+        if( !SymFromName(_process, FUNCTION_NAME, &function_symbol) || function_symbol.Address == 0 )
             return false;
 
-        // wait for completion
-        Bool status = WaitForSingleObject(remote_thread, INJECTOR_FUNCTION_WAIT) == WAIT_OBJECT_0;
+        // dll path is argument size
+        size_t argument_size = strlen( dll_path ) + 1;
 
-        // close thread object
-        CloseHandle(remote_thread);
+        // allocate argument memory
+        void* argument_memory = VirtualAllocEx(_process, NULL, argument_size, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+        if( argument_memory == nullptr )
+            return false;
+
+        // write argument to argument memory
+        if( WriteProcessMemory( _process, argument_memory, dll_path, argument_size, NULL ) )
+        {
+            // create/start remote thread pointing to function
+            HANDLE remote_thread = CreateRemoteThread(
+                _process,
+                NULL,
+                FUNCTION_STACK_SIZE,
+                (LPTHREAD_START_ROUTINE)function_symbol.Address,
+                argument_memory,
+                0,
+                NULL);
+            if( remote_thread != NULL )
+            {
+                // wait for completion
+                status = WaitForSingleObject(remote_thread, FUNCTION_WAIT_TIME) == WAIT_OBJECT_0;
+
+                // close remote thread object
+                CloseHandle(remote_thread);
+            }
+        }
+
+        // free argument memory
+        VirtualFreeEx(_process, argument_memory, 0, MEM_RELEASE);
 
         return status;
     }
 
     //-------------------------------------------------------------------------
-    DWORD64 Injector::_LoadSymbolModule( const CHAR* name )
+    Bool Injector::_LoadSymbolModule( DWORD64& address, const CHAR* name )
     {
         MODULEENTRY32 me;
         HANDLE        handle;
 
-        // loop until retries exhausted
-        for( ULong retry = 0; retry < LOADSYMBOLMODULE_RETRIES; ++retry )
+        // create toolhelp snapshot
+        handle = CreateToolhelp32Snapshot( TH32CS_SNAPMODULE|TH32CS_SNAPMODULE32, GetProcessId(_process) );
+        if( handle == INVALID_HANDLE_VALUE )
+            return false;
+
+        // init
+        address = 0;
+        me.dwSize = sizeof(me);
+
+        // walk modules
+        if( Module32First(handle, &me) )
         {
-            // create toolhelp snapshot
-            handle = CreateToolhelp32Snapshot( TH32CS_SNAPMODULE|TH32CS_SNAPMODULE32, GetProcessId(_process) );
-
-            // if created
-            if( handle != INVALID_HANDLE_VALUE )
+            do
             {
-                DWORD64 base_address = 0;
-
-                // init
-                me.dwSize = sizeof(me);
-
-                // walk modules
-                if( Module32First(handle, &me) )
+                // if matches
+                if( _stricmp(me.szModule, name) == 0 )
                 {
-                    do
-                    {
-                        // if matches
-                        if( _stricmp(me.szModule, name) == 0 )
-                        {
-                            // load module into symbol loader
-                            base_address = SymLoadModuleEx(
-                                _process,
-                                NULL,
-                                me.szExePath,
-                                me.szModule,
-                                (DWORD64)me.modBaseAddr,
-                                me.modBaseSize,
-                                NULL,
-                                0);
+                    // load module into symbol loader and get 
+                    address = SymLoadModuleEx(
+                        _process,
+                        NULL,
+                        me.szExePath,
+                        me.szModule,
+                        (DWORD64)me.modBaseAddr,
+                        me.modBaseSize,
+                        NULL,
+                        0);
 
-                            break;
-                        }
-                    }
-                    while( Module32Next(handle, &me) );
+                    break;
                 }
-
-                // close toolhelp snapshot
-                CloseHandle(handle);
-
-                return base_address;
             }
-
-            // wait a little
-            Sleep(LOADSYMBOLMODULE_RETRYDELAY);
+            while( Module32Next(handle, &me) );
         }
 
-        return 0;
-    }
+        // close toolhelp snapshot
+        CloseHandle(handle);
 
-    //-------------------------------------------------------------------------
-    void Injector::_Reset()
-    {
-        _process = NULL;
-        _argument_memory = NULL;
-        _inject_base = 0;
-
-        for( Index i = 0; i < FUNCTION_COUNT; ++i )
-            _functions[i].address = 0;
+        return address != 0;
     }
 }

@@ -14,11 +14,12 @@ namespace Core
         return (ULong)strlen(string);
     }
 
-    CHAR* Tools::WToCString( const WCHAR* wstring )
+    const CHAR* Tools::WToCString( const WCHAR* wstring )
     {
         static CHAR cstring[STRING_MAX_SIZE];
 
-        eggs(WideCharToMultiByte( CP_ACP, 0, wstring, -1, cstring, sizeof(cstring), NULL, NULL ) > 0);
+        if( WideCharToMultiByte( CP_ACP, 0, wstring, -1, cstring, sizeof( cstring ), NULL, NULL ) == 0 )
+            return nullptr;
 
         return cstring;
     }
@@ -62,13 +63,14 @@ namespace Core
         return hash;
     }
 
-    // private
     //-------------------------------------------------------------------------
-    void Tools::_MemSet( void* memory, Byte value, ULong size )
+    void Tools::MemSet( Byte* memory, Byte value, ULong count )
     {
-        ::memset(memory, value, size);
+        ::memset(memory, value, count);
     }
 
+    // private
+    //-------------------------------------------------------------------------
     void Tools::_MemCpy( void* to, const void* from, ULong size )
     {
         ::memcpy(to, from, size);

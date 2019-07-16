@@ -4,49 +4,75 @@ namespace Snoopy
 {
     // public
     //-------------------------------------------------------------------------
-    Hook::Hook( void* target_address, x86::HookFunction hook_function, Placement placement ):
+    Hook::Hook():
         _enabled        (false),
-        _target_buffer  (CODE_BUFFER_SIZE),
-        _target_address (target_address),
-        _hook_function  (hook_function),
-        _placement      (placement)
+        _initialized    (false),
+        _target_buffer  (CODE_BUFFER_SIZE)
     {
     }
 
     Hook::~Hook()
     {
-        // free trampoline memory
-        if(_trampoline.GetSourceAddress())
-            VirtualFree(_trampoline.GetSourceAddress(), 0, MEM_RELEASE);
+        ASSERT( !IsInitialized() );
     }
 
     //-------------------------------------------------------------------------
-    Bool Hook::Init()
+    Bool Hook::IsInitialized() const
     {
-        // init target
-        if(!_InitTarget(_target_address))
+        return _initialized;
+    }
+
+    Bool Hook::IsEnabled() const
+    {
+        return _enabled;
+    }
+
+    //-------------------------------------------------------------------------
+    Bool Hook::Initialize( void* target_address, x86::HookFunction hook_function )
+    {
+        ASSERT( !IsInitialized() );
+
+        // set fields
+        _target_address = target_address;
+        _hook_function = hook_function;
+
+        // initialize target
+        if(!_InitializeTarget(_target_address))
             return false;
 
-        // int target backup
-        if(!_InitTargetBackup())
+        // intialize target backup
+        if(!_InitializeTargetBackup())
             return false;
 
-        // init trampoline
-        if(!_InitTrampoline(_hook_function))
+        // initialize trampoline
+        if(!_InitializeTrampoline(_hook_function))
             return false;
+
+        // set initialized
+        _initialized = true;
 
         return true;
+    }
+
+    void Hook::Shutdown()
+    {
+        ASSERT( IsInitialized() );
+
+        // free trampoline memory
+        if(_trampoline.GetSourceAddress())
+            VirtualFree(_trampoline.GetSourceAddress(), 0, MEM_RELEASE);
+
+        // reset initialized
+        _initialized = false;
     }
 
     //-------------------------------------------------------------------------
     Bool Hook::Enable()
     {
+        ASSERT( !IsEnabled() );
+
         DWORD   old_permissions;
         BOOL    status;
-
-        // fail if enabled
-        if(_enabled)
-            return false;
 
         // enable write permissions
         status = VirtualProtect(_target.GetSourceAddress(), _target_backup.GetCodeLength(), PAGE_EXECUTE_READWRITE, &old_permissions);
@@ -57,7 +83,8 @@ namespace Snoopy
         _target.Empty();
 
         // replace target with jump to trampoline
-        _target.OpJmpRel(_trampoline.GetSourceAddress());
+        if( !_target.OpJmpRel( _trampoline.GetSourceAddress() ) )
+            return false;
 
         // pad with nops
         while( _target.GetCodeLength() < _target_backup.GetCodeLength() )
@@ -71,9 +98,7 @@ namespace Snoopy
 
     Bool Hook::Disable()
     {
-        // fail if disabled
-        if( !_enabled )
-            return false;
+        ASSERT( IsEnabled() );
 
         // reset target
         _target.Empty();
@@ -89,7 +114,7 @@ namespace Snoopy
 
     // private
     //-------------------------------------------------------------------------
-    Bool Hook::_InitTarget( void* target_address )
+    Bool Hook::_InitializeTarget( void* target_address )
     {
         // set address
         _target.SetSourceAddress(target_address);
@@ -104,7 +129,7 @@ namespace Snoopy
     }
 
     //-------------------------------------------------------------------------
-    Bool Hook::_InitTargetBackup()
+    Bool Hook::_InitializeTargetBackup()
     {
         x86::Operation op;
 
@@ -129,7 +154,7 @@ namespace Snoopy
     }
 
     //-------------------------------------------------------------------------
-    Bool Hook::_InitTrampoline( void* hook_address )
+    Bool Hook::_InitializeTrampoline( void* hook_address )
     {
         // allocate memory
 		Byte* address = _AllocTrampolineAddress();
@@ -145,17 +170,23 @@ namespace Snoopy
         // clear
         _trampoline.Empty();
 
-        // relocate target (hook after)
-        if( _placement == AFTER && !_trampoline.Relocate(_target_backup))
-            return false;
-
     #if CPU_64
-        // push hook arguments
+        // push target arguments
         _trampoline.OpPushReg(x86::REGISTER_R9);
         _trampoline.OpPushReg(x86::REGISTER_R8);
         _trampoline.OpPushReg(x86::REGISTER_DX);
         _trampoline.OpPushReg(x86::REGISTER_CX);
         _trampoline.OpPushReg(x86::REGISTER_AX);
+
+        /* 
+            RCX is the argument to our hook function. it points to the stack containing
+            the arguments (CX,DX,R8,R9) being passed to the target function. this allows
+            hook function to modify these arguments as they get popped back to registers
+            before theyre passed to the target.
+
+            note that AX is actually the first value seen by hook argument array. this
+            should be ignored and exists to be consistent with 32bit calling impl.
+        */
         _trampoline.OpMovRegReg(x86::REGISTER_CX, x86::REGISTER_SP);
 
         // set hook function address
@@ -171,22 +202,28 @@ namespace Snoopy
         _trampoline.OpPopReg(x86::REGISTER_R8);
         _trampoline.OpPopReg(x86::REGISTER_R9);
     #else
-        // push hook arguments
+        // push stack pointer
         _trampoline.OpPushReg(x86::REGISTER_SP);
 
         // call hook function
-        _trampoline.OpCallRel(hook_address);
+        if( !_trampoline.OpCallRel( hook_address ) )
+            return false;
 
-        // pop hook arguments
-        _trampoline.OpPopReg(x86::REGISTER_SP);
+        /*
+            pop stack pointer into unused register, (or can just increment it by 4) since
+            calling function allowed to use that piece of memory. plus it makes no sense
+            to pop a stack pointer.
+        */
+        _trampoline.OpPopReg(x86::REGISTER_AX);
     #endif
 
-        // relocate target (hook before)
-        if( _placement == BEFORE && !_trampoline.Relocate(_target_backup))
+        // relocate target
+        if( !_trampoline.Relocate(_target_backup))
             return false;
 
         // jump back to after target
-        _trampoline.OpJmpRel(reinterpret_cast<Byte*>(_target.GetSourceAddress()) + _target_backup.GetCodeLength());
+        if( !_trampoline.OpJmpRel(reinterpret_cast<Byte*>(_target.GetSourceAddress()) + _target_backup.GetCodeLength()) )
+            return false;
 
         return true;
     }

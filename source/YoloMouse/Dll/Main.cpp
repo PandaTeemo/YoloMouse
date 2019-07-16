@@ -1,9 +1,11 @@
-#include <YoloMouse/Dll/App.hpp>
-#include <YoloMouse/Share/NotifyMessage.hpp>
-using namespace YoloMouse;
+#include <YoloMouse/Dll/Core/App.hpp>
+//#include <YoloMouse/Share/NotifyMessage.hpp>
+using namespace Yolomouse;
+
 
 // exports
 //-----------------------------------------------------------------------------
+/*
 void __declspec(dllexport)
 YoloNotify( void* arg )
 {
@@ -29,16 +31,31 @@ YoloNotify( void* arg )
         break;
     }
 }
+*/
 
 // platform
 //-----------------------------------------------------------------------------
 BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved )
 {
+    // get app
+    App& app = App::Instance();
+
     // dll requests
     switch(fdwReason)
     {
+    case DLL_PROCESS_ATTACH:
+        // initialize app
+        if( !app.IsInitialized() )
+            app.Initialize(hinstDLL);
+        break;
     case DLL_PROCESS_DETACH:
-        App::Unload();
+        // unload and shutdown app
+        if( app.IsInitialized() )
+        {
+            if( app.IsLoaded() )
+                app.Unload();
+            app.Shutdown();
+        }
         break;
     }
 

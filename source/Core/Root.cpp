@@ -1,78 +1,57 @@
-#pragma once
 #include <Core/Root.hpp>
-#include <Core/Support/Tools.hpp>
+#include <Core/System/Debug.hpp>
 #include <stdio.h>
 
 namespace Core
 {
-    //------------------------------------------------------------------------
-    void LogFile( const Char* format, ... )
+    // local
+    //-------------------------------------------------------------------------
+    namespace
     {
-        FILE* file;
-
-        if(format == NULL)
-        {
-            if(fopen_s(&file, LOG_PATH, "w") == 0)
-                fclose(file);
-        }
-        else if(fopen_s(&file, LOG_PATH, "at") == 0)
-        {
-            va_list args;
-            va_start(args, format);
-            vfprintf(file, format, args);
-            va_end(args);
-            fclose(file);
-        }
+        // constants
+        //---------------------------------------------------------------------
+        static const ULong LOG_STRING_LIMIT = 1024;
     }
 
-    void LogAssert( const char* message, const char *file, unsigned line )
+    // logging
+    //-------------------------------------------------------------------------
+    void DebugLog( const Char* format, ... )
     {
-        // log
-        LogFile("%s @ %s:%u\n", message, file, line);
-
-        // the end!
-        abort();
-    }
-
-    void LogConsole( const Char* format, ... )
-    {
-        static Bool open = false;
         va_list vargs;
+        Char    message[LOG_STRING_LIMIT];
+        ASSERT(format != nullptr);
 
-        // only once
-        if(!open)
-        {
-            FILE* file;
-
-            AllocConsole();
-            freopen_s(&file, "conin$", "r", stdin);
-            freopen_s(&file, "conout$", "w", stdout);
-            freopen_s(&file, "conout$", "w", stderr);
-            open = true;
-        }
-
-        xassert(format != NULL);
+        // build log message
         va_start(vargs, format);
-        vfprintf(stdout, format, vargs); fputs("", stdout);
+        vsnprintf(message, COUNT(message), format, vargs);
         va_end(vargs);
+
+        // log message
+        Debug::Log(String(message));
     }
 
-    //------------------------------------------------------------------------
-    void ExceptionMessage( const char* message, const char *file, unsigned line )
+    // failure
+    //-------------------------------------------------------------------------
+    void DebugFatal( const Char* format, ... )
     {
-        static Char buffer[0x100];
+        va_list vargs;
+        Char    message[LOG_STRING_LIMIT];
+        ASSERT(format != nullptr);
 
-        // path length
-        ULong file_length = (ULong)strlen(file);
+        // build log message
+        va_start(vargs, format);
+        vsnprintf(message, COUNT(message), format, vargs);
+        va_end(vargs);
 
-        // create message
-        sprintf_s(buffer, sizeof(buffer),
-            "%s\n\n...%s:%u",
-            message,
-            file + file_length - Tools::Min<ULong>(file_length, 20),
-            line);
+        // log message
+        Debug::Log(String(message));
 
-        // throw message
-        throw buffer;
+        // exit
+        Debug::Exit();
+    }
+
+    void DebugAssert( const Char* message, const Char *file, ULong line )
+    {
+        DebugFatal( "ASSERT:%s (%s:%u)", message, file, line );
     }
 }

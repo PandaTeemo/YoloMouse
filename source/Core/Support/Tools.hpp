@@ -64,17 +64,20 @@ namespace Core
         template<typename TYPE>
         static inline void MemZero( TYPE& object )
         {
-            _MemSet(&object, 0, sizeof(TYPE));
+            MemSet(reinterpret_cast<Byte*>(&object), 0, sizeof(TYPE));
         }
         template<typename TYPE>
         static inline void MemZero( TYPE* memory, ULong count )
         {
-            _MemSet(memory, 0, count * sizeof(TYPE));
+            MemSet(reinterpret_cast<Byte*>(memory), 0, count * sizeof(TYPE));
         }
 
         /**/
+        static void MemSet( Byte* memory, Byte value, ULong count );
+
+        /**/
         static ULong CStrLen( const Char* string );
-        static CHAR* WToCString( const WCHAR* wstring );
+        static const CHAR* WToCString( const WCHAR* wstring );
 
         /**/
         static Bool StripFileName( WCHAR* path );
@@ -85,7 +88,6 @@ namespace Core
 
     private:
         /**/
-        static void _MemSet( void* memory, Byte value, ULong size );
         static void _MemCpy( void* to, const void* from, ULong size );
         static Long _MemCmp( const void* a, const void* b, ULong size );
     };

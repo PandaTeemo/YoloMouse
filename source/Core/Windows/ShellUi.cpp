@@ -6,7 +6,7 @@ namespace Core
 {
     // local: types
     //------------------------------------------------------------------------
-    typedef FixedArray<ShellUi::IListener*, 4>   ListenerCollection;
+    typedef DynamicFlatArray<ShellUi::IListener*, 4>   ListenerCollection;
     typedef ListenerCollection::Iterator    ListenerIterator;
 
 
@@ -184,8 +184,7 @@ namespace Core
         default:
             // notify
             for( ListenerIterator l = _listeners.begin(); l != _listeners.end(); ++l )
-                if((*l)->OnMessage(hwnd, message, wparam, lparam))
-                    return 0;
+                ((*l)->OnMessage( hwnd, message, wparam, lparam ));
         }
 
         return DefWindowProc( hwnd, message, wparam, lparam );
@@ -197,9 +196,22 @@ namespace Core
     {
     }
 
+    //--------------------------------------------------------------------------
+    Bool ShellUi::IsStarted() const
+    {
+        return _hwnd != NULL;
+    }
+
+    //--------------------------------------------------------------------------
+    HWND ShellUi::GetHwnd()
+    {
+        return _hwnd;
+    }
+
+    //--------------------------------------------------------------------------
     void ShellUi::AddMenu()
     {
-        xassert(_hwnd);
+        ASSERT(_hwnd);
 
         // create shell icon
         _ShellIconCreate();
@@ -227,16 +239,10 @@ namespace Core
     //--------------------------------------------------------------------------
     void ShellUi::HideMenu()
     {
-        xassert(_menu);
+        ASSERT(_menu);
 
         // destroy shell icon
         _ShellIconDestroy();
-    }
-
-    //--------------------------------------------------------------------------
-    HWND ShellUi::GetHwnd()
-    {
-        return _hwnd;
     }
 
     //--------------------------------------------------------------------------
@@ -336,18 +342,6 @@ namespace Core
     }
 
     //--------------------------------------------------------------------------
-    void ShellUi::Run()
-    {
-        MSG msg;
-
-        // run loop
-        while(GetMessage(&msg, NULL, 0, 0 ) > 0)
-        { 
-            TranslateMessage(&msg); 
-            DispatchMessage(&msg); 
-        }
-    }
-
     void ShellUi::Exit()
     {
         PostMessage( _hwnd, WM_CLOSE, 0, 0 );

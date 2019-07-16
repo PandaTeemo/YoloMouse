@@ -2,17 +2,49 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="..\..\source\YoloMouse\Share\Constants.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Share\SharedLog.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Share\SharedState.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Share\SharedTools.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Share\Ipc\IpcMessenger.cpp">
+      <Filter>Ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Share\Bindings\CursorBindings.cpp">
+      <Filter>Bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Share\Bindings\CursorBindingsSerializer.cpp">
+      <Filter>Bindings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Share\Tools\CursorTools.cpp">
+      <Filter>Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Share\Root.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\YoloMouse\Share\Constants.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Share\NotifyMessage.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\Root.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Share\SharedLog.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Share\SharedState.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Share\SharedTools.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\Enums.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Share\Ipc\IpcMessage.hpp">
+      <Filter>Ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Share\Ipc\IpcMessenger.hpp">
+      <Filter>Ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Share\Bindings\CursorBindings.hpp">
+      <Filter>Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Share\Bindings\CursorBindingsSerializer.hpp">
+      <Filter>Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Share\Tools\CursorTools.hpp">
+      <Filter>Tools</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Ipc">
+      <UniqueIdentifier>{e52f3b00-ca6d-4bcf-90fa-96e765c75da0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Tools">
+      <UniqueIdentifier>{2baec6ad-ce25-435b-ac5b-40b0ac161089}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bindings">
+      <UniqueIdentifier>{043da821-aed6-4480-b904-70a49fa2ee80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

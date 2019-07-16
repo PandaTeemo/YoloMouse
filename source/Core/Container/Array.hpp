@@ -1,5 +1,4 @@
 #pragma once
-#include <Core/Root.hpp>
 #include <Core/Support/Tools.hpp>
 
 namespace Core
@@ -159,7 +158,7 @@ namespace Core
         void SetCount( ULong count )
         {
             _count = count;
-            xassert(count <= _limit);
+            ASSERT(count <= _limit);
         }
 
         void SetLimit( ULong limit )
@@ -170,24 +169,24 @@ namespace Core
         void PushCount( ULong count )
         {
             _count += count;
-            xassert(_count <= _limit);
+            ASSERT(_count <= _limit);
         }
 
         /**/
         Iterator Add()
         {
-            xassert(_count < _limit);
+            ASSERT(_count < _limit);
             return _memory + _count++;
         }
         void Add( const TYPE& value )
         {
-            xassert(_count < _limit);
+            ASSERT(_count < _limit);
             _memory[_count++] = value;
         }
         void Add( const TYPE* values, ULong count )
         {
-            xassert(sizeof(TYPE) == 1);
-            xassert((_count + count) <= _limit);
+            ASSERT(sizeof(TYPE) == 1);
+            ASSERT((_count + count) <= _limit);
 
             Tools::MemCopy(
                 reinterpret_cast<Byte*>(_memory + _count),
@@ -199,8 +198,8 @@ namespace Core
         template<typename OBJECT>
         void AddRaw( const OBJECT& object )
         {
-            xassert(sizeof(TYPE) == 1);
-            xassert((_count + sizeof(OBJECT) - 1) < _limit);
+            ASSERT(sizeof(TYPE) == 1);
+            ASSERT((_count + sizeof(OBJECT) - 1) < _limit);
 
             Tools::MemCopy(
                 reinterpret_cast<Byte*>(_memory + _count),
@@ -213,7 +212,7 @@ namespace Core
         /**/
         void PopSwap( Iterator iterator )
         {
-            xassert(IndexOf(iterator) < _count);
+            ASSERT(IndexOf(iterator) < _count);
             *iterator = _memory[_count - 1];
             _count--;
         }
@@ -221,7 +220,7 @@ namespace Core
         /**/
         void Pop()
         {
-            xassert(_count > 0);
+            ASSERT(_count > 0);
             _count--;
         }
 
@@ -242,12 +241,12 @@ namespace Core
         /**/
         TYPE& operator[]( Index index )
         {
-            xassert(index < _count);
+            ASSERT(index < _count);
             return _memory[index];
         }
         const TYPE& operator[]( Index index ) const
         {
-            xassert(index < _count);
+            ASSERT(index < _count);
             return _memory[index];
         }
 
@@ -303,14 +302,14 @@ namespace Core
                 if(*i == o)
                     return i;
 
-            return NULL;
+            return nullptr;
         }
 
         /**/
         template<class COLLECTION>
         void Copy( const COLLECTION& other )
         {
-            xassert(other.GetCount() <= _limit);
+            ASSERT(other.GetCount() <= _limit);
 
             TYPE* i = _memory;
             for( COLLECTION::Iterator ci = other.Begin(); ci != other.End(); ci++, i++ )
@@ -322,7 +321,7 @@ namespace Core
         /**/
         void Copy( const TYPE* memory, ULong count )
         {
-            xassert(count <= _limit);
+            ASSERT(count <= _limit);
 
             for( Index i = 0; i < count; i++ )
                 _memory[i] = memory[i];
@@ -385,12 +384,12 @@ namespace Core
 
     /**/
     template<typename TYPE, ULong LIMIT>
-    class FixedArray:
+    class DynamicFlatArray:
         public BaseArray<TYPE, CountFlatArrayTraits<TYPE, LIMIT>>
     {
     public:
         /**/
-        FixedArray( ULong count = 0 ):
+        DynamicFlatArray( ULong count = 0 ):
             BaseArray(count)
         {
         }

@@ -9,16 +9,18 @@ namespace Core
         public Singleton<ShellUi>
     {
     public:
-        /**/
+        // types
         struct IListener
         {
-            virtual Bool OnMessage( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam ) { return false; }
+            virtual void OnMessage( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam ) {}
             virtual Bool OnMenuOption( Id id, Bool enabled ) { return false; }
         };
 
-    public:
         /**/
         ShellUi();
+
+        /**/
+        Bool IsStarted() const;
 
         /**/
         HWND GetHwnd();
@@ -45,7 +47,6 @@ namespace Core
         void Stop();
 
         /**/
-        void Run();
         void Exit();
     };
 }

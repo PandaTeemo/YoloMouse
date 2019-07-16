@@ -1,9 +1,8 @@
-#include <YoloMouse/Loader/App.hpp>
-#include <YoloMouse/Share/SharedTools.hpp>
-#include <Core/Windows/SystemTools.hpp>
-#include <wingdi.h>
+#include <YoloMouse/Loader/Core/App.hpp>
+#include <Core/System/SystemTools.hpp>
+#include <Core/Windows/WindowTools.hpp>
 
-namespace YoloMouse
+namespace Yolomouse
 {
     // types
     //-------------------------------------------------------------------------
@@ -22,46 +21,45 @@ namespace YoloMouse
 
     // main
     //-------------------------------------------------------------------------
-    static ExitStatus Main()
+    static ExitStatus Main( HINSTANCE hinstance )
     {
-        App         app;
-        ExitStatus  status;
+        App&        app = App::Instance();
+        ExitStatus  status = EXIT_NORMAL;
 
-        // run main
-        try
+        // initialize app
+        if( app.Initialize( hinstance ) )
         {
-            // start
-            app.Start();
+            // run window loop
+            WindowTools::RunWindowLoop();
 
-            // run
-            app.Run();
-
-            // stop
-            app.Stop();
-
-            // normal or elevated exit
-            status = app.GetElevate() ? EXIT_ELEVATE : EXIT_NORMAL;
+            // shutdown app
+            app.Shutdown();
         }
-        // catch eggs
-        catch( const Char* error )
-        {
-            // show error message
-            SharedTools::MessagePopup(true, error);
+        // else error
+        else
+            status = EXIT_ERROR;
 
-            // stop
-            app.Stop();
+        // return status if error
+        if( status  )
+            return status;
 
-            // error exit
-            status = EXIT_PLATFORM_MAIN;
-        }
+        // if elevated requested, return elevate status
+        if( app.GetElevate() )
+            return EXIT_ELEVATE;
 
-        return status;
+        return EXIT_NORMAL;
     }
 
-    // unit testing area
+    // temporary unit testing area
     //-------------------------------------------------------------------------
-    void _UnitTest()
+    void _UnitTest( HINSTANCE hInstance )
     {
+        /*
+        Overlay& w = Overlay::Instance();
+        w.Initialize( hInstance );
+        w.Run();
+        w.Shutdown();
+        */
     }
 }
 
@@ -74,9 +72,9 @@ int WINAPI WinMain(
     int         iCmdShow)
 {
     using namespace Core;
-    using namespace YoloMouse;
+    using namespace Yolomouse;
 
-    //YoloMouse::_UnitTest(); return 0;
+    //YoloMouse::_UnitTest(hInstance); return 0;
 
     // restart loop
     while( true )
@@ -101,10 +99,13 @@ int WINAPI WinMain(
                 PathString path;
 
                 // ensure working directory is that of the main executable
-                if(SystemTools::GetProcessDirectory(path, COUNT(path)) && SetCurrentDirectory(path))
+                if( SystemTools::GetProcessDirectory(path) && SetCurrentDirectory(path.GetMemory()) )
                 {
+                    // raise our priority to improve overlay cursor accuracy (allow fail)
+                    SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
+
                     // run main
-                    status = Main();
+                    status = Main(hInstance);
                 }
                 // path change failed
                 else
@@ -123,7 +124,7 @@ int WINAPI WinMain(
                 return 0;
             else
             {
-                SharedTools::MessagePopup(true, "Run As Administrator Failed");
+                WindowTools::MessagePopup(APP_NAMEC, true, "Run As Administrator Failed");
                 return EXIT_PLATFORM_RUNASADMIN;
             }
         }
@@ -132,7 +133,7 @@ int WINAPI WinMain(
         {
             // report exit error except duplicate
             if( status && status != EXIT_PLATFORM_DUPLICATE )
-                SharedTools::MessagePopup(true, "Start Error: %d", status);
+                WindowTools::MessagePopup(APP_NAMEC, true, "Start Error: %d", status);
 
             return status;
         }

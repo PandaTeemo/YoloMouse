@@ -29,8 +29,8 @@ namespace Core
         /**/
         Bool Open( Bool host )
         {
-            xassert(_memory == NULL);
-            xassert(_handle == NULL);
+            ASSERT(_memory == NULL);
+            ASSERT(_handle == NULL);
 
             // if host create
             if( host )
@@ -74,14 +74,14 @@ namespace Core
         /**/
         TYPE& Object()
         {
-            xassert(_memory);
+            ASSERT(_memory);
             return *_memory;
         }
 
         /**/
         TYPE* operator->() const
         {
-            xassert(_memory);
+            ASSERT(_memory);
             return _memory;
         }
     };

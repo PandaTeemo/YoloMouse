@@ -7,9 +7,10 @@ namespace Core
     //-------------------------------------------------------------------------
     enum Bitness
     {
-        BITNESS_UNKNOWN,
         BITNESS_32,
         BITNESS_64,
+        BITNESS_COUNT,
+        BITNESS_UNKNOWN,
     };
 
     enum OsVersion
@@ -29,6 +30,7 @@ namespace Core
     static const ULong STRING_SHORT_SIZE =          16;
     static const ULong STRING_MEDIUM_SIZE =         64;
     static const ULong STRING_MAX_SIZE =            512;
+    static const ULong STRING_LINE_SIZE =           128;
     static const ULong STRING_PATH_SIZE =           STRING_MAX_SIZE;
     static const ULong GAME_WINDOW_MIN_WIDTH =      240;
     static const ULong GAME_WINDOW_MIN_HEIGHT =     240;

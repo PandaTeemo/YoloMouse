@@ -1,53 +1,64 @@
-#pragma once
 #include <Core/Windows/SystemMonitor.hpp>
 
 namespace Core
 {
-    // local: state
+    // local
     //-------------------------------------------------------------------------
-    static SystemMonitor::IListener  _dummy_listener;
-    static SystemMonitor::IListener* _listener = &_dummy_listener;
-
-    // local: handler
-    //-------------------------------------------------------------------------
-    static VOID CALLBACK _WinEvent(
-        HWINEVENTHOOK hWinEventHook,
-        DWORD         event,
-        HWND          hwnd,
-        LONG          idObject,
-        LONG          idChild,
-        DWORD         idEventThread,
-        DWORD         dwmsEventTime)
+    namespace
     {
-        if( idObject == OBJID_WINDOW && idChild == CHILDID_SELF )
+        // event handler
+        //---------------------------------------------------------------------
+        static VOID CALLBACK _WinEvent(
+            HWINEVENTHOOK hWinEventHook,
+            DWORD         event,
+            HWND          hwnd,
+            LONG          idObject,
+            LONG          idChild,
+            DWORD         idEventThread,
+            DWORD         dwmsEventTime)
         {
-            switch(event)
+            if( idObject == OBJID_WINDOW && idChild == CHILDID_SELF )
             {
-            case EVENT_SYSTEM_FOREGROUND:
-                _listener->OnWindowFocus(hwnd);
-                break;
+                SystemMonitor& system_monitor = SystemMonitor::Instance();
+
+                switch(event)
+                {
+                case EVENT_SYSTEM_FOREGROUND:
+                    system_monitor.events.Notify( { SystemMonitorEvent::WINDOW_FOREGROUND, hwnd } );
+                    system_monitor.events.Notify( { SystemMonitorEvent::WINDOW_ZORDER, hwnd } );
+                    break;
+
+                case EVENT_OBJECT_REORDER:
+                case EVENT_OBJECT_LOCATIONCHANGE:
+                case EVENT_OBJECT_PARENTCHANGE:
+                    system_monitor.events.Notify( { SystemMonitorEvent::WINDOW_ZORDER, hwnd } );
+                    break;
+                }
             }
         }
     }
 
     // public
     //-------------------------------------------------------------------------
-    void SystemMonitor::SetListener( IListener* listener )
+    SystemMonitor::SystemMonitor():
+        _handle  (NULL)
     {
-        _listener = listener ? listener : &_dummy_listener;
+    }
+
+    SystemMonitor::~SystemMonitor()
+    {
     }
 
     //-------------------------------------------------------------------------
-    Bool SystemMonitor::Start()
+    Bool SystemMonitor::Initialize()
     {
         // set window event hook
-        _handle = SetWinEventHook( EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, NULL, _WinEvent, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS );
+        _handle = SetWinEventHook( EVENT_SYSTEM_FOREGROUND, EVENT_OBJECT_PARENTCHANGE, NULL, _WinEvent, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS );
 
         return _handle != NULL;
     }
 
-    //-------------------------------------------------------------------------
-    void SystemMonitor::Stop()
+    void SystemMonitor::Shutdown()
     {
         // if window event hook set
         if( _handle != NULL )
@@ -58,5 +69,11 @@ namespace Core
             // clear state
             _handle = NULL;
         }
+    }
+
+    //-------------------------------------------------------------------------
+    Bool SystemMonitor::IsInitialized() const
+    {
+        return _handle != NULL;
     }
 }
