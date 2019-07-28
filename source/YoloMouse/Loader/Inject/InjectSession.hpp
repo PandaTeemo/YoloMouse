@@ -31,7 +31,7 @@ namespace Yolomouse
         void Unload();
 
         /**/
-        Bool SendSetCursor( CursorType type, CursorId id, CursorVariation variation, CursorSize size_delta );
+        Bool SendSetCursor( const CursorInfo& updates, CursorUpdateFlags flags );
         Bool SendSetDefaultCursor();
         Bool SendResetCursor();
         Bool SendRefreshCursor();

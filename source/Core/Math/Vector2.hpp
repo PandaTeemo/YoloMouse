@@ -38,6 +38,15 @@ namespace Core
         BaseVector2 operator -  () const;
 
         /**/
+        template<typename TO_TYPE>
+        BaseVector2<TO_TYPE> Cast() const
+        {
+            return BaseVector2<TO_TYPE>(
+                static_cast<TO_TYPE>(x),
+                static_cast<TO_TYPE>(y) );
+        }
+
+        /**/
         void Set( TYPE xy );
         void Set( TYPE x_, TYPE y_ );
 

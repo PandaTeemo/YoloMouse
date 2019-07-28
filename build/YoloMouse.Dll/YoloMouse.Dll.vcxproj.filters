@@ -5,9 +5,6 @@
     <ClCompile Include="..\..\source\YoloMouse\Dll\Core\App.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\YoloMouse\Dll\Cursor\CursorVault.cpp">
-      <Filter>Cursor</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\YoloMouse\Dll\Cursor\HandleCache.cpp">
       <Filter>Cursor</Filter>
     </ClCompile>
@@ -23,9 +20,6 @@
   <ItemGroup>
     <ClInclude Include="..\..\source\YoloMouse\Dll\Core\App.hpp">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\YoloMouse\Dll\Cursor\CursorVault.hpp">
-      <Filter>Cursor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\YoloMouse\Dll\Cursor\HandleCache.hpp">
       <Filter>Cursor</Filter>

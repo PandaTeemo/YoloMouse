@@ -11,7 +11,6 @@ namespace Core
         enum EventId: Id
         {
             WINDOW_FOREGROUND,
-            WINDOW_ZORDER,
         };
 
         // fields

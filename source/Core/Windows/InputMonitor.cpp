@@ -229,6 +229,9 @@ namespace Core
         ULong key =  kb.VKey;
         Bool  down = ( kb.Flags & RI_KEY_BREAK ) == 0;
 
+        // log
+        LOG3("InputMonitor.OnInputKeyboard: KEY:%d FLAGS:%x", key, kb.Flags);
+
         // if valid and changed
         if( key < 0xff && _state[key] != down )
         {

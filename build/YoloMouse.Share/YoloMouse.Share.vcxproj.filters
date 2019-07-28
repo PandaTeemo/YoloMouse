@@ -5,16 +5,22 @@
     <ClCompile Include="..\..\source\YoloMouse\Share\Ipc\IpcMessenger.cpp">
       <Filter>Ipc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\YoloMouse\Share\Bindings\CursorBindings.cpp">
-      <Filter>Bindings</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\YoloMouse\Share\Bindings\CursorBindingsSerializer.cpp">
-      <Filter>Bindings</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\source\YoloMouse\Share\Tools\CursorTools.cpp">
-      <Filter>Tools</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\YoloMouse\Share\Root.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Share\Cursor\CursorTools.cpp">
+      <Filter>Cursor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Share\Cursor\CursorVault.cpp">
+      <Filter>Cursor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Share\Cursor\CursorBindings.cpp">
+      <Filter>Cursor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Share\Cursor\CursorBindingsSerializer.cpp">
+      <Filter>Cursor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Share\Cursor\CursorInfo.cpp">
+      <Filter>Cursor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\YoloMouse\Share\Constants.hpp" />
@@ -26,25 +32,31 @@
     <ClInclude Include="..\..\source\YoloMouse\Share\Ipc\IpcMessenger.hpp">
       <Filter>Ipc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\YoloMouse\Share\Bindings\CursorBindings.hpp">
-      <Filter>Bindings</Filter>
+    <ClInclude Include="..\..\source\YoloMouse\Share\Cursor\CursorVault.hpp">
+      <Filter>Cursor</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\YoloMouse\Share\Bindings\CursorBindingsSerializer.hpp">
-      <Filter>Bindings</Filter>
+    <ClInclude Include="..\..\source\YoloMouse\Share\Cursor\CursorTools.hpp">
+      <Filter>Cursor</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\YoloMouse\Share\Tools\CursorTools.hpp">
-      <Filter>Tools</Filter>
+    <ClInclude Include="..\..\source\YoloMouse\Share\Cursor\CursorTypes.hpp">
+      <Filter>Cursor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Share\Cursor\CursorBindings.hpp">
+      <Filter>Cursor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Share\Cursor\CursorBindingsSerializer.hpp">
+      <Filter>Cursor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Share\Cursor\CursorInfo.hpp">
+      <Filter>Cursor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Ipc">
       <UniqueIdentifier>{e52f3b00-ca6d-4bcf-90fa-96e765c75da0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Tools">
+    <Filter Include="Cursor">
       <UniqueIdentifier>{2baec6ad-ce25-435b-ac5b-40b0ac161089}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Bindings">
-      <UniqueIdentifier>{043da821-aed6-4480-b904-70a49fa2ee80}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

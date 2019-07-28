@@ -2,7 +2,8 @@
 #include <YoloMouse/Loader/Overlay/Overlay.hpp>
 #include <YoloMouse/Loader/Target/Support/CursorVisibilityHacker.hpp>
 #include <YoloMouse/Loader/Target/Target.hpp>
-#include <YoloMouse/Share/Bindings/CursorBindingsSerializer.hpp>
+#include <YoloMouse/Share/Cursor/CursorBindingsSerializer.hpp>
+#include <YoloMouse/Share/Cursor/CursorTools.hpp>
 #include <Psapi.h>
 
 namespace Yolomouse
@@ -37,6 +38,11 @@ namespace Yolomouse
         return _started;
     }
 
+    Bool Target::IsRestricted() const
+    {
+        return !_inject_session.IsLoaded();
+    }
+
     //-------------------------------------------------------------------------
     Id Target::GetProcessId() const
     {
@@ -44,72 +50,63 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    Bool Target::ActionSetCursor( CursorType type, CursorId id )
+    Bool Target::SetCursor( const CursorInfo& updates, CursorUpdateFlags flags )
     {
-        ASSERT( type != CURSOR_TYPE_INVALID );
-        ASSERT( id < CURSOR_ID_COUNT );
-
-        // if inject session loaded
-        if( _inject_session.IsLoaded() )
-            return _inject_session.SendSetCursor( type, id, CURSOR_VARIATION_INVALID, 0 );
-        // else restricted state
-        else
+        // if restricted state
+        if( IsRestricted() )
         {
-            // update as overlay binding directly
-            _UpdateRestrictedBinding( CURSOR_TYPE_OVERLAY, id, CURSOR_VARIATION_INVALID, 0 );
+            // if inactive
+            if( _active_cursor.type == CURSOR_TYPE_INVALID )
+            {
+                // ignore clone cursor attempt
+                if( flags & ( CURSOR_UPDATE_INCREMENT_SIZE | CURSOR_UPDATE_DECREMENT_SIZE ) )
+                    return false;
+
+                // activate with default
+                _BuildDefaultCursor(_active_cursor);
+            }
+            // update binding
+            else if( !_UpdateRestrictedBinding( updates, flags ) )
+                return false;
 
             // update cursor
             _UpdateCursor();
-        }
 
-        return true;
+            return true;
+        }
+        // else update through inject session
+        else
+            return _inject_session.SendSetCursor( updates, flags );
     }
 
-    Bool Target::ActionSetDefaultCursor()
+    Bool Target::SetDefaultCursor()
     {
-        // if inject session loaded
-        if( _inject_session.IsLoaded() )
-            return _inject_session.SendSetDefaultCursor();
-        else
+        // if restricted state
+        if( IsRestricted() )
         {
             // in restricted state, cursors are already the default
         }
+        // else update through inject session
+        else
+            return _inject_session.SendSetDefaultCursor();
 
         return true;
     }
 
-    Bool Target::ActionResetCursor()
+    Bool Target::ResetCursor()
     {
-        // if inject session loaded
-        if( _inject_session.IsLoaded() )
+        // if restricted state
+        if( IsRestricted() )
+        {
+            // reset cursor
+            _active_cursor = CursorInfo();
+
+            // update cursor
+            _UpdateCursor();
+        }
+        // else update through inject session
+        else
             return _inject_session.SendResetCursor();
-        // else restricted state
-        else
-        {
-            // reset cursor binding
-            _binding = CursorBindings::Binding();
-
-            // update cursor
-            _UpdateCursor();
-        }
-
-        return true;
-    }
-
-    Bool Target::ActionSetCursorSize( Long size_index_delta )
-    {
-        // if inject session loaded
-        if( _inject_session.IsLoaded() )
-            return _inject_session.SendSetCursor( CURSOR_TYPE_INVALID, CURSOR_ID_INVALID, CURSOR_VARIATION_INVALID, size_index_delta );
-        // else restricted state
-        else
-        {
-            // update as overlay binding directly
-            _UpdateRestrictedBinding( CURSOR_TYPE_OVERLAY, CURSOR_ID_INVALID, CURSOR_VARIATION_INVALID, size_index_delta );
-
-            // update cursor
-            _UpdateCursor();
-        }
 
         return true;
     }
@@ -174,18 +171,21 @@ namespace Yolomouse
                 _inject_session.Shutdown();
         }
 
-        // if inject session failed and therefore restricted state
-        if( !_inject_session.IsLoaded() )
+        // if restricted state (inject session failed)
+        if( IsRestricted() )
         {
+            //TODO2: also notify user via overlay that this happened
+            LOG( "Target.Start: Entering Restricted Mode" );
+
             // load cursor map from file (can fail)
             CursorBindingsSerializer::Load( _restricted_bindings, _bindings_path );
 
             // use/load only default binding
-            _binding = _restricted_bindings.GetDefaultBinding();
+            _active_cursor = _restricted_bindings.GetDefaultBinding();
 
-            // if invalid or not overlay, build valid default overlay binding
-            if( _binding.type != CURSOR_TYPE_OVERLAY || !_binding.IsValid() )
-                _BuildDefaultOverlayBinding( _binding );
+            // verify supported cursor
+            if( !_IsValidCursor(_active_cursor) )
+                _BuildDefaultCursor(_active_cursor);
         }
 
         // set started
@@ -228,12 +228,12 @@ namespace Yolomouse
             // set new hovering hwnd
             _hover_hwnd = hwnd;
 
-            // refresh injected cursor
-            if( _inject_session.IsLoaded() )
-                _inject_session.SendRefreshCursor();
-            // else update cursor in restricted state
-            else
+            // if restricted state, update cursor locally
+            if( IsRestricted() )
                 _UpdateCursor();
+            // else update through inject session
+            else
+                _inject_session.SendRefreshCursor();
         }
     }
 
@@ -285,63 +285,99 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    void Target::_UpdateRestrictedBinding( CursorType type, CursorId id, CursorVariation variation, CursorSize size_delta )
+    Bool Target::_IsValidCursor( const CursorInfo& properties )
     {
-        // get last binding id
-        CursorId last_id = _binding.id;
+        // verify supported cursor
+        return properties.IsValid() && (properties.type == CURSOR_TYPE_BASIC || properties.type == CURSOR_TYPE_OVERLAY);
+    }
 
-        // restricted binding type is always overlay
-        _binding.type = CURSOR_TYPE_OVERLAY;
+    //-------------------------------------------------------------------------
+    Bool Target::_UpdateRestrictedBinding( const CursorInfo& updates, CursorUpdateFlags flags )
+    {
+        CursorInfo cursor = _active_cursor;
 
-        // if updating id, update id
-        if( id != CURSOR_ID_INVALID )
-            _binding.id = id;
+        // patch cursor with updates
+        CursorTools::PatchProperties(cursor, updates, flags);
 
-        // if updating variation, update variation
-        if( variation != CURSOR_VARIATION_INVALID )
-            _binding.variation = variation;
-        // else if not updating size, rotate current variation
-        else if( size_delta == 0 )
-            _binding.variation = _binding.variation == CURSOR_VARIATION_INVALID || id != last_id ? 0 : ((_binding.variation + 1) % CURSOR_VARIATION_COUNT);
+        // verify supported cursor
+        if( !_IsValidCursor(cursor) )
+            return false;
 
-        // if specified, update size by size delta
-        if( size_delta != 0 )
-            _binding.size = Tools::Clamp<Long>(_binding.size + size_delta, 0, CURSOR_SIZE_COUNT - 1);
+        // update cursor
+         _active_cursor = cursor;
 
         // update default restricted binding
-        _restricted_bindings.GetDefaultBinding() = _binding;
+        _restricted_bindings.GetDefaultBinding() = _active_cursor;
 
         // save cursor bindings (can fail)
         CursorBindingsSerializer::Save( _restricted_bindings, _bindings_path );
+
+        return true;
     }
 
     void Target::_UpdateCursor()
     {
         Overlay& overlay = Overlay::Instance();
 
+        // if hovering
+        if( _hover_hwnd != NULL )
+        {
+            // if restricted state
+            if( IsRestricted() )
+            {
+                CursorVisibilityHacker& cursor_visibility_hacker = CursorVisibilityHacker::Instance();
+
+                // if showing and valid cursor
+                if( _showing && _active_cursor.type != CURSOR_TYPE_INVALID )
+                {
+                    // set cursor via overlay and hack hide
+                    if( overlay.SetCursorIterated( _active_cursor ) )
+                        cursor_visibility_hacker.Hide(_hover_hwnd, HACK_VISIBILITY_TIMEOUT);
+                }
+                // else hide overlay cursor and show app cursor
+                else
+                {
+                    overlay.SetCursorHidden();
+                    cursor_visibility_hacker.Show(_hover_hwnd, HACK_VISIBILITY_TIMEOUT);
+                }
+            }
+            // else injected state
+            else
+            {
+                // if showing and overlay cursor set cursor via overlay else hide
+                if( _showing && _active_cursor.type == CURSOR_TYPE_OVERLAY )
+                    overlay.SetCursorIterated( _active_cursor );
+                else
+                    overlay.SetCursorHidden();
+            }
+        }
+        // else ensure overlay cursor hidden (this should happen first before new target gets hover control)
+        else
+            overlay.SetCursorHidden();
+
+        
+        
+/*
         // if hovering, showing, and binding is overlay type, update overlay cursor
         if( _hover_hwnd != NULL && _showing && _binding.type == CURSOR_TYPE_OVERLAY )
         {
-            // if cursor not supported, update to use id 0 instead.
-            if( !Overlay::Instance().IsCursorInstalled( _binding.id ) )
-                _binding.id = 0;
-
             // show overlay cursor
-            overlay.ShowCursor( _binding.id, _binding.variation, _binding.size );
+            overlay.SetCursorIterated( _binding );
 
             // if restricted state, hack hide application cursor
-            if( !_inject_session.IsLoaded() )
+            if( IsRestricted() )
                 CursorVisibilityHacker::Instance().Hide(_hover_hwnd, HACK_VISIBILITY_TIMEOUT);
         }
         else
         {
             // hide overlay cursor
-            overlay.HideCursor();
+            overlay.SetCursorHidden();
 
             // if hovering and restricted state, hack show application cursor
-            if( _hover_hwnd != NULL && !_inject_session.IsLoaded() )
+            if( _hover_hwnd != NULL && IsRestricted() )
                 CursorVisibilityHacker::Instance().Show(_hover_hwnd, HACK_VISIBILITY_TIMEOUT);
         }
+*/
     }
 
     //-------------------------------------------------------------------------
@@ -412,10 +448,10 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    void Target::_OnInjectedCursorChanging( const CursorBindings::Binding& binding )
+    void Target::_OnInjectedCursorChanging( const CursorInfo& info )
     {
-        // save binding
-        _binding = binding;
+        // update cursor
+        _active_cursor = info;
 
         // if hovering over target
         if( _hover_hwnd != NULL )
@@ -484,11 +520,11 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    void Target::_BuildDefaultOverlayBinding( CursorBindings::Binding& binding )
+    void Target::_BuildDefaultCursor( CursorInfo& info )
     {
-        binding.type = CURSOR_TYPE_OVERLAY;
-        binding.id = 0;
-        binding.variation = 0;
-        binding.size = CURSOR_SIZE_DEFAULT;
+        info.type = CURSOR_TYPE_OVERLAY;
+        info.id = 0;
+        info.variation = 0;
+        info.size = CURSOR_SIZE_DEFAULT;
     }
 }

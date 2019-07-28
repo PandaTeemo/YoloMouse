@@ -167,23 +167,39 @@ namespace Yolomouse
         // access current target
         if( TargetController::Instance().AccessTarget( target ) )
         {
-            // change basic cursor
-            if( combo_id >= SETTING_CURSORKEY_1 && combo_id <= SETTING_CURSORKEY_9 )
-                target->ActionSetCursor( CURSOR_TYPE_BASIC, combo_id - SETTING_CURSORKEY_1 );
-            // change overlay cursor
-            if( combo_id >= SETTING_CURSORKEY_OVERLAY_1 && combo_id <= SETTING_CURSORKEY_OVERLAY_9 )
-                target->ActionSetCursor( CURSOR_TYPE_OVERLAY, combo_id - SETTING_CURSORKEY_OVERLAY_1 );
+            // handle by combo id
+            switch (combo_id)
+            {
+            // set/increment basic cursor
+            case SETTING_CURSORKEY_BASIC:
+                target->SetCursor({CURSOR_TYPE_BASIC}, CURSOR_UPDATE_INCREMENT_ID);
+                break;
+            // set/increment overlay cursor
+            case SETTING_CURSORKEY_OVERLAY:
+                target->SetCursor({CURSOR_TYPE_OVERLAY}, CURSOR_UPDATE_INCREMENT_ID);
+                break;
+            // increment current cursor variation
+            case SETTING_CURSORKEY_VARIATION:
+                target->SetCursor({}, CURSOR_UPDATE_INCREMENT_VARIATION);
+                break;
             // reset cursor
-            else if( combo_id == SETTING_CURSORKEY_RESET || combo_id == SETTING_CURSORKEY_RESET2 )
-                target->ActionResetCursor();
+            case SETTING_CURSORKEY_RESET:
+                target->ResetCursor();
+                break;
             // set default cursor
-            else if( combo_id == SETTING_CURSORKEY_DEFAULT || combo_id == SETTING_CURSORKEY_DEFAULT2 )
-                target->ActionSetDefaultCursor();
-            // change size
-            else if( combo_id == SETTING_CURSORKEY_SMALLER || combo_id == SETTING_CURSORKEY_SMALLER2 )
-                target->ActionSetCursorSize(-1);
-            else if( combo_id == SETTING_CURSORKEY_LARGER || combo_id == SETTING_CURSORKEY_LARGER2 )
-                target->ActionSetCursorSize(1);
+            case SETTING_CURSORKEY_DEFAULT:
+                target->SetDefaultCursor();
+                break;
+            // decrement size
+            case SETTING_CURSORKEY_SMALLER:
+                target->SetCursor({}, CURSOR_UPDATE_DECREMENT_SIZE);
+                break;
+            // increment size
+            case SETTING_CURSORKEY_LARGER:
+                target->SetCursor({}, CURSOR_UPDATE_INCREMENT_SIZE);
+                break;
+            default:;
+            }
         }
         else
             LOG("App.OnKeyCombo.AccessTarget");
@@ -202,15 +218,6 @@ namespace Yolomouse
         case MENU_OPTION_ERRORS:
             _OptionErrors();
             return true;
-
-        // games only
-        /*
-        case MENU_OPTION_GAMESONLY:
-            // toggle games only
-            _OptionGamesOnly( !enabled, true );
-            _ui.SetMenuOption(MENU_OPTION_GAMESONLY, !enabled);
-            return true;
-        */
 
         // auto start
         case MENU_OPTION_AUTOSTART:
@@ -258,15 +265,8 @@ namespace Yolomouse
         PathString settings_path;
 
         // create settings file path
-        if( swprintf_s( settings_path.EditMemory(), settings_path.GetLimit(), L"%s\\%s.%s", _user_path.GetMemory(), PATH_SETTINGS_NAME, EXTENSION_INI ) <= 0 )
+        if( swprintf_s( settings_path.EditMemory(), settings_path.GetLimit(), L"%s\\%s", _user_path.GetMemory(), PATH_SETTINGS ) <= 0 )
             return false;
-
-        /*
-        if( SharedTools::BuildUserPath(settings_path, COUNT(settings_path), PATH_SETTINGS_NAME, EXTENSION_INI, NULL) )
-            _settings.SetPath(settings_path);
-        else
-            LOG("App.StartSettings.BuildUserPath: %s", Tools::WToCString(PATH_SETTINGS_NAME));
-        */
 
         // load settings
         _settings.SetPath(settings_path);
@@ -303,8 +303,6 @@ namespace Yolomouse
             _ui.AddMenuBreak();
             // add autostart option
             _ui.AddMenuOption(MENU_OPTION_AUTOSTART, APP_MENU_STRINGS[MENU_OPTION_AUTOSTART], _settings.GetBoolean(SETTING_AUTOSTART));
-            // add games only option
-            //_ui.AddMenuOption(MENU_OPTION_GAMESONLY, APP_MENU_STRINGS[MENU_OPTION_GAMESONLY], _settings.GetBoolean(SETTING_GAMESONLY));
 
             // add menu break
             _ui.AddMenuBreak();
@@ -325,7 +323,7 @@ namespace Yolomouse
         const Settings::KeyValueCollection& kvs = _settings.GetCollection();
 
         // for each cursor key
-        for( Id id = SETTING_CURSORKEY_1; id <= SETTING_CURSORKEY_LARGER2; id++ )
+        for( Id id = SETTING_CURSORKEY_BASIC; id <= SETTING_CURSORKEY_LARGER; id++ )
         {
             String format = _settings.Get(id);
 
@@ -396,9 +394,6 @@ namespace Yolomouse
             if( cursor != nullptr )
                 overlay.InstallCursor( static_cast<CursorId>(cursor_id), *cursor );
         }
-
-        //!!!!!!!
-        //overlay.ShowCursor( 0, 0, 10 );
     }
 
     //-------------------------------------------------------------------------

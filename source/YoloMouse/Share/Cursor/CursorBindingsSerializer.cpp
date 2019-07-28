@@ -1,5 +1,5 @@
-#include <YoloMouse/Share/Bindings/CursorBindingsSerializer.hpp>
-#include <YoloMouse/Share/Tools/CursorTools.hpp>
+#include <YoloMouse/Share/Cursor/CursorBindingsSerializer.hpp>
+#include <YoloMouse/Share/Cursor/CursorTools.hpp>
 #include <io.h>
 #include <wchar.h>
 
@@ -61,7 +61,7 @@ namespace Yolomouse
         for( Index linei = 0; feof(file) == 0 && linei < 1000; ++linei )
         {
             Hash                    hash;
-            CursorBindings::Binding binding;
+            CursorInfo binding;
 
             // read binding line
             if( _ReadBindingLine( hash, binding, file ) )
@@ -72,7 +72,7 @@ namespace Yolomouse
                 else
                 {
                     // create binding
-                    CursorBindings::Binding* create_binding = bindings.CreateBinding(hash);
+                    CursorInfo* create_binding = bindings.CreateBinding(hash);
 
                     // if created, replace with read binding
                     if( create_binding != nullptr )
@@ -127,7 +127,7 @@ namespace Yolomouse
 
     // private
     //-------------------------------------------------------------------------
-    Bool CursorBindingsSerializer::_ReadBindingLine( Hash& hash, CursorBindings::Binding& binding, FILE* file )
+    Bool CursorBindingsSerializer::_ReadBindingLine( Hash& hash, CursorInfo& info, FILE* file )
     {
         Char    type_char = 0;
         Index   index =     INVALID_INDEX;
@@ -135,7 +135,7 @@ namespace Yolomouse
         Char    ini_line    [STRING_LINE_SIZE];
 
         // set defaults
-        binding = CursorBindings::Binding();
+        info = CursorInfo();
 
         // read line
         if( fgets( ini_line, sizeof( ini_line ), file ) == NULL )
@@ -152,26 +152,26 @@ namespace Yolomouse
         }
 
         // translate fields
-        CursorTools::IndexToIdVariation( binding.id, binding.variation, index );
-        binding.type = CharToCursorType(type_char);
-        binding.size = CursorTools::SizeToId(size);
+        CursorTools::IndexToIdVariation( info.id, info.variation, index );
+        info.type = CharToCursorType(type_char);
+        info.size = CursorTools::SizeToId(size);
 
         // validate
-        return binding.IsValid();
+        return info.IsValid();
     }
 
-    Bool CursorBindingsSerializer::_WriteBindingLine( const Hash hash, const CursorBindings::Binding& binding, FILE* file )
+    Bool CursorBindingsSerializer::_WriteBindingLine( const Hash hash, const CursorInfo& info, FILE* file )
     {
         Index index = 0;
 
         // get index from id/variation (can fail)
-        CursorTools::IdVariationToIndex( index, binding.id, binding.variation );
+        CursorTools::IdVariationToIndex( index, info.id, info.variation );
 
         // write binding line to file
         fprintf_s( file, "%I64u,%u,%c,%u\n",
             hash,
-            CursorTools::IdToSize(binding.size),
-            CursorTypeToChar(binding.type),
+            CursorTools::IdToSize(info.size),
+            CursorTypeToChar(info.type),
             index );
 
         return true;

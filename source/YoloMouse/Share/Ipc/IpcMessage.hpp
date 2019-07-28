@@ -1,6 +1,6 @@
 #pragma once
 #include <YoloMouse/Share/Enums.hpp>
-#include <YoloMouse/Share/Bindings/CursorBindings.hpp>
+#include <YoloMouse/Share/Cursor/CursorBindings.hpp>
 
 namespace Yolomouse
 {
@@ -25,16 +25,14 @@ namespace Yolomouse
     struct SetCursorIpcMessage:
         public IpcMessage
     {
-        CursorType      type;
-        CursorId        id;
-        CursorVariation variation;
-        CursorSize      size_delta;
+        CursorInfo    properties;
+        CursorUpdateFlags   flags;
     };
 
     struct OnCursorChangingIpcMessage:
         public IpcMessage
     {
-        CursorBindings::Binding  binding;
+        CursorInfo  info;
     };
 
     struct OnCursorShowingIpcMessage:

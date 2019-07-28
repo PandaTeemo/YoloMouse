@@ -13,12 +13,6 @@
     <Filter Include="Overlay">
       <UniqueIdentifier>{99cb516b-eee0-4670-baa7-394c1756cb2f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Overlay\Shaders">
-      <UniqueIdentifier>{a9a5c4e5-0836-4b32-92d9-dc2746fcf5aa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Overlay\Shaders\Default">
-      <UniqueIdentifier>{1edd26d7-acc9-4146-85d3-8c38764e1202}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Overlay\Cursor">
       <UniqueIdentifier>{cb8fca4b-c5d4-4d4b-ba92-72f531a6c225}</UniqueIdentifier>
     </Filter>
@@ -34,11 +28,23 @@
     <Filter Include="Events">
       <UniqueIdentifier>{b1dfac45-bb68-4f34-a95e-d4eb059ca26b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Overlay\Support">
-      <UniqueIdentifier>{f40c8472-d299-4a6b-bc45-99b0fb6c4246}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Target\Support">
       <UniqueIdentifier>{83cf32cd-bdfb-4f7c-899c-ff225308f46a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Overlay\Rendering">
+      <UniqueIdentifier>{efd79406-9f38-479f-b474-e2b5a23fb53e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Overlay\Rendering\Shaders">
+      <UniqueIdentifier>{a9a5c4e5-0836-4b32-92d9-dc2746fcf5aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Overlay\Rendering\Shaders\Default">
+      <UniqueIdentifier>{1edd26d7-acc9-4146-85d3-8c38764e1202}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Overlay\Rendering\Support">
+      <UniqueIdentifier>{f40c8472-d299-4a6b-bc45-99b0fb6c4246}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Overlay\Mouse">
+      <UniqueIdentifier>{4938d3f7-9383-41fa-945a-a8fae4fcdbf1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -67,14 +73,29 @@
     <ClCompile Include="..\..\source\YoloMouse\Loader\Target\TargetController.cpp">
       <Filter>Target</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Support\RenderTimingController.cpp">
-      <Filter>Overlay\Support</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\OverlayCursorVault.cpp">
       <Filter>Overlay\Cursor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\source\YoloMouse\Loader\Target\Support\CursorVisibilityHacker.cpp">
       <Filter>Target\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\BaseCursor.cpp">
+      <Filter>Overlay\Cursor\Cursors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\CircleCursor.cpp">
+      <Filter>Overlay\Cursor\Cursors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\BasicCursor.cpp">
+      <Filter>Overlay\Cursor\Cursors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\RenderContext.cpp">
+      <Filter>Overlay\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Support\RenderTimingController.cpp">
+      <Filter>Overlay\Rendering\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Mouse\MousePositionMonitor.cpp">
+      <Filter>Overlay\Mouse</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,15 +113,6 @@
     </ClInclude>
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Overlay.hpp">
       <Filter>Overlay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Shaders\ShaderTypes.hpp">
-      <Filter>Overlay\Shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Shaders\Default\VertexShader.hpp">
-      <Filter>Overlay\Shaders\Default</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Shaders\Default\PixelShader.hpp">
-      <Filter>Overlay\Shaders\Default</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\IOverlayCursor.hpp">
       <Filter>Overlay\Cursor</Filter>
@@ -123,14 +135,41 @@
     <ClInclude Include="..\..\source\YoloMouse\Loader\Events\InjectSessionEvent.hpp">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Support\RenderTimingController.hpp">
-      <Filter>Overlay\Support</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\OverlayCursorVault.hpp">
       <Filter>Overlay\Cursor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\source\YoloMouse\Loader\Target\Support\CursorVisibilityHacker.hpp">
       <Filter>Target\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\BaseCursor.hpp">
+      <Filter>Overlay\Cursor\Cursors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Types.hpp">
+      <Filter>Overlay\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\CircleCursor.hpp">
+      <Filter>Overlay\Cursor\Cursors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\BasicCursor.hpp">
+      <Filter>Overlay\Cursor\Cursors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\RenderContext.hpp">
+      <Filter>Overlay\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\Default\VertexShader.hpp">
+      <Filter>Overlay\Rendering\Shaders\Default</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\Default\PixelShader.hpp">
+      <Filter>Overlay\Rendering\Shaders\Default</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\ShaderTypes.hpp">
+      <Filter>Overlay\Rendering\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Support\RenderTimingController.hpp">
+      <Filter>Overlay\Rendering\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Mouse\MousePositionMonitor.hpp">
+      <Filter>Overlay\Mouse</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -147,11 +186,11 @@
     <Text Include="..\..\..\doc\notes.txt" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\..\source\YoloMouse\Loader\Overlay\Shaders\Default\PixelShader.hlsl">
-      <Filter>Overlay\Shaders\Default</Filter>
+    <FxCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\Default\VertexShader.hlsl">
+      <Filter>Overlay\Rendering\Shaders\Default</Filter>
     </FxCompile>
-    <FxCompile Include="..\..\source\YoloMouse\Loader\Overlay\Shaders\Default\VertexShader.hlsl">
-      <Filter>Overlay\Shaders\Default</Filter>
+    <FxCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\Default\PixelShader.hlsl">
+      <Filter>Overlay\Rendering\Shaders\Default</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

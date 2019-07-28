@@ -184,9 +184,14 @@
     <ClCompile Include="..\..\source\YoloMouse\Loader\Main.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\ArrowCursor.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\CursorFactory.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\BaseCursor.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\BasicCursor.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\CircleCursor.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\OverlayCursorVault.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Mouse\MousePositionMonitor.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Overlay.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Support\RenderTimingController.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\RenderContext.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Support\RenderTimingController.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Target\Support\CursorVisibilityHacker.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Target\Target.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Target\TargetController.cpp" />
@@ -198,14 +203,20 @@
     <ClInclude Include="..\..\source\YoloMouse\Loader\Inject\InjectEnvironment.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Inject\InjectSession.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\ArrowCursor.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\BaseCursor.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\BasicCursor.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\Cursors\CircleCursor.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\IOverlayCursor.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\CursorFactory.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\OverlayCursorVault.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Mouse\MousePositionMonitor.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Overlay.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Shaders\Default\PixelShader.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Shaders\Default\VertexShader.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Shaders\ShaderTypes.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Support\RenderTimingController.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\RenderContext.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\Default\PixelShader.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\Default\VertexShader.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\ShaderTypes.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Support\RenderTimingController.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Types.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Resource\resource.h" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Target\Support\CursorVisibilityHacker.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Target\Target.hpp" />
@@ -232,49 +243,49 @@
     <Text Include="..\..\..\doc\notes.txt" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\..\source\YoloMouse\Loader\Overlay\Shaders\Default\PixelShader.hlsl">
+    <FxCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\Default\PixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)\%(Filename).hpp</HeaderFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ObjectFileOutput>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS</EntryPointName>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">PS</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">PS</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PS</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PS</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RelativeDir)\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RelativeDir)\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       </ObjectFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RelativeDir)\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RelativeDir)\%(Filename).hpp</HeaderFileOutput>
+      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).hpp</HeaderFileOutput>
+    </FxCompile>
+    <FxCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\Default\VertexShader.hlsl">
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)\%(Filename).hpp</HeaderFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </ObjectFileOutput>
-    </FxCompile>
-    <FxCompile Include="..\..\source\YoloMouse\Loader\Overlay\Shaders\Default\VertexShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS</EntryPointName>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ObjectFileOutput>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">VS</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">VS</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">VS</EntryPointName>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">VS</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(RelativeDir)\%(Filename).hpp</HeaderFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ObjectFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RelativeDir)\%(Filename).hpp</HeaderFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </ObjectFileOutput>
       <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(RelativeDir)\%(Filename).hpp</HeaderFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ObjectFileOutput>
-      <HeaderFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(RelativeDir)\%(Filename).hpp</HeaderFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </ObjectFileOutput>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

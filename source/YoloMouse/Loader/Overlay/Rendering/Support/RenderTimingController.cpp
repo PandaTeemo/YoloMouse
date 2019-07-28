@@ -1,19 +1,21 @@
 #include <Core/Math/Math.hpp>
 #include <Core/System/SystemTools.hpp>
-#include <YoloMouse/Loader/Overlay/Support/RenderTimingController.hpp>
+#include <YoloMouse/Loader/Overlay/Rendering/Support/RenderTimingController.hpp>
 
 namespace Yolomouse
 {
     // public
     //-------------------------------------------------------------------------
     RenderTimingController::RenderTimingController():
-        _dxgi_output    (nullptr),
-        _resolution     (0, 0),
-        _tick_frequency (0),
-        _refresh_time   (0),
-        _render_time    (0),
-        _frame_time     (0),
-        _begin_ticks    (0)
+        _dxgi_output        (nullptr),
+        _resolution         (0, 0),
+        _tick_frequency     (0),
+        _refresh_time       (0),
+        _render_time        (RENDER_TIME_INITIAL),
+        _frameskip_threshold(0),
+        _fill_time          (0),
+        _frame_time         (0),
+        _begin_ticks        (0)
     {
     }
 
@@ -30,14 +32,17 @@ namespace Yolomouse
         // set fields
         _dxgi_output = &dxgi_output;
 
-        // set initial render time
-        _render_time = 0;
-
         // get tick frequency
         _tick_frequency = SystemTools::GetTickFrequency();
 
         // calculate refresh rate
         _CalculateRefreshRate();
+
+        // update fill time
+        _UpdateFillTime();
+
+        // initialize begin ticks
+        _begin_ticks = SystemTools::GetTickTime();
     }
 
     void RenderTimingController::Shutdown()
@@ -71,11 +76,13 @@ namespace Yolomouse
     {
         ASSERT( IsInitialized() );
 
-        // calculate estimated render time based on last time, limited by half of refresh time
-        Float estimated_render_time = Tools::Min(_render_time + RENDER_TIME_PAD, _refresh_time * 0.5f);
+        // sleep fill time (estimated render time - refresh time)
+        Sleep( _fill_time );
+    }
 
-        // wait refresh time minus current render time estimate
-        Sleep( static_cast<ULong>((_refresh_time - estimated_render_time) * 1000.0f) );
+    void RenderTimingController::End()
+    {
+        ASSERT( IsInitialized() );
 
         // get current ticks
         UHuge current_ticks = SystemTools::GetTickTime();
@@ -83,19 +90,30 @@ namespace Yolomouse
         // calculate frame time
         _frame_time = _TicksToSeconds(current_ticks - _begin_ticks);
 
-        // set begin ticks
+        // update begin ticks
         _begin_ticks = current_ticks;
-    }
 
-    void RenderTimingController::End()
-    {
-        ASSERT( IsInitialized() );
+        // if we're skipping frames, increase render time estimate. limit to half refresh time
+        if( _frame_time > _frameskip_threshold )
+            _render_time = Tools::Min( _render_time + RENDER_TIME_INCREMENT, _refresh_time * 0.5f );
+        // else decrease render time estimate a little. limit to initial render time
+        else
+            _render_time = Tools::Max( _render_time - RENDER_TIME_RECOVER, RENDER_TIME_INITIAL );
 
-        // calculate new render time
-        _render_time = _TicksToSeconds(SystemTools::GetTickTime() - _begin_ticks);
+        // update fill time
+        _UpdateFillTime();
+
+        // log
+        LOG3( "RenderTimingController.FrameTime FRAME:%f FILL:%u", _frame_time, _fill_time );
     }
 
     //-------------------------------------------------------------------------
+    void RenderTimingController::_UpdateFillTime()
+    {
+        // update fill time as refresh time minus current render time
+        _fill_time = static_cast<ULong>((_refresh_time - _render_time) * 1000.0f);
+    }
+
     void RenderTimingController::_CalculateRefreshRate()
     {
         UINT num_modes = 0;
@@ -140,6 +158,9 @@ namespace Yolomouse
             // cleanup
             delete[] modes;
         }
+
+        // update frameskip threshold
+        _frameskip_threshold = _refresh_time * 1.5f;
     }
 
     Float RenderTimingController::_TicksToSeconds( UHuge ticks )
@@ -147,5 +168,4 @@ namespace Yolomouse
         // calculate frame time
         return static_cast<Float>((ticks * 1000000) / _tick_frequency) / 1000000.0f;
     }
-
 }

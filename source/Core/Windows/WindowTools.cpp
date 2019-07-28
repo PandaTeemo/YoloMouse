@@ -110,6 +110,66 @@ namespace Core
     };
 
     //-------------------------------------------------------------------------
+    Bool WindowTools::ReadHBitmapPixels( Byte4*& pixels, Vector2l& size, HBITMAP hbitmap )
+    {
+        BITMAP           bitmap_info;
+        BITMAPINFOHEADER bmi = {};
+        Bool             status = false;
+
+        // get bitmap info
+        if( GetObject( hbitmap, sizeof( BITMAP ), &bitmap_info ) == 0 )
+            return false;
+
+        // create a device context same as the screen
+        HDC hdc = CreateCompatibleDC(NULL);
+        if( hdc == NULL )
+            return false;
+
+        // select the hbitmap into that device context
+        HBITMAP old_bitmap = (HBITMAP)SelectObject(hdc, hbitmap);
+        if( old_bitmap != NULL )
+        {
+            // determine size and count
+            size.Set(bitmap_info.bmWidth, abs(bitmap_info.bmHeight) );
+            ULong pixel_count = size.x * size.y;
+
+            // set bitmap info for extracting pixels from hbitmap
+            bmi.biSize = sizeof(BITMAPINFOHEADER);
+            bmi.biPlanes = 1;
+            bmi.biBitCount = 32;
+            bmi.biWidth = size.x;
+            bmi.biHeight = -size.y;
+            bmi.biCompression = BI_RGB;
+            bmi.biSizeImage = 0;
+
+            // allocate pixel data
+            pixels = new Byte4[pixel_count];
+
+            // get pixel data from bitmap
+            if( GetDIBits(hdc, hbitmap, 0, size.y, pixels, (BITMAPINFO*)&bmi, DIB_RGB_COLORS) != 0 )
+            {
+                // swap pixels from BGRA to RGBA
+                for (Index i = 0; i < pixel_count; ++i)
+                {
+                    Byte* rgba = reinterpret_cast<Byte*>(pixels + i);
+                    Tools::Swap(rgba[0], rgba[2]);
+                }
+
+                // success
+                status = true;
+            }
+            else
+                delete[] pixels;
+        }
+
+        // cleanup resources
+        SelectObject(hdc, old_bitmap);
+        DeleteDC(hdc);
+
+        return status;
+    }
+
+    //-------------------------------------------------------------------------
     void WindowTools::MessagePopup( const Char* title, Bool error, const Char* format, ... )
     {
         va_list args;

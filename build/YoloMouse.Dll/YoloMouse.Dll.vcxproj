@@ -163,7 +163,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\YoloMouse\Dll\Core\App.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Dll\Cursor\CursorVault.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Dll\Cursor\HandleCache.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Dll\Main.cpp" />
   </ItemGroup>
@@ -180,7 +179,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\YoloMouse\Dll\Core\App.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Dll\Cursor\CursorVault.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Dll\Cursor\HandleCache.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

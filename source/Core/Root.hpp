@@ -30,12 +30,10 @@
 #else
     #define BUILD_DEBUG
 #endif
-/*
 #ifdef BUILD_RELEASE
     #undef  OPTION_DEBUG_LOG_LEVEL
     #define OPTION_DEBUG_LOG_LEVEL       0
 #endif
-//*/
 
 // type defines
 //-----------------------------------------------------------------------------

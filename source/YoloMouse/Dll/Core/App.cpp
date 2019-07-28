@@ -2,8 +2,8 @@
 #include <Core/System/SystemTools.hpp>
 #include <Core/Windows/WindowTools.hpp>
 #include <YoloMouse/Dll/Core/App.hpp>
-#include <YoloMouse/Share/Bindings/CursorBindingsSerializer.hpp>
-#include <YoloMouse/Share/Tools/CursorTools.hpp>
+#include <YoloMouse/Share/Cursor/CursorBindingsSerializer.hpp>
+#include <YoloMouse/Share/Cursor/CursorTools.hpp>
 
 namespace Yolomouse
 {
@@ -246,21 +246,23 @@ namespace Yolomouse
     //-------------------------------------------------------------------------
     void App::_RefreshCursor( HCURSOR hcursor, HWND hwnd )
     {
-        // set cursor class to update
+        DWORD process_id;
+
+        // update via set class cursor
         _SetClassCursor( hwnd, hcursor, CLASSLONG_NINDEX_REFRESH );
 
-        // set cursor class to update
-        /*
-        DWORD process_id;
+        // also update via setcursor
         DWORD hwnd_thread_id = GetWindowThreadProcessId(hwnd, &process_id);
         DWORD current_thread_id = GetCurrentThreadId();
-        AttachThreadInput( hwnd_thread_id, current_thread_id, TRUE );
-        SetCursor( hcursor );
-        AttachThreadInput(hwnd_thread_id, current_thread_id, FALSE);
-        */
+        if( hwnd_thread_id != 0 && current_thread_id != 0 )
+        {
+            AttachThreadInput( hwnd_thread_id, current_thread_id, TRUE );
+            SetCursor( hcursor );
+            AttachThreadInput(hwnd_thread_id, current_thread_id, FALSE);
+        }
 
         // this should get cursor class to update immediately instead of waiting for mouse move
-        PostMessage(hwnd, WM_SETCURSOR, (WPARAM)hwnd, MAKELPARAM(HTCLIENT, WM_LBUTTONDOWN));
+        //PostMessage(hwnd, WM_SETCURSOR, (WPARAM)hwnd, MAKELPARAM(HTCLIENT, WM_LBUTTONDOWN));
     }
 
     void App::_RefreshCurrentCursor()
@@ -274,75 +276,53 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    CursorBindings::Binding* App::_UpdateCursorBinding( HCURSOR hcursor, Hash cursor_hash, CursorType type, CursorId id, CursorVariation variation, CursorSize size_delta )
+    CursorInfo* App::_UpdateCursorBinding( HCURSOR hcursor, Hash cursor_hash, const CursorInfo& updates, CursorUpdateFlags flags )
     {
-        CursorId last_id = CURSOR_ID_INVALID;
-
-        // get existing cursor binding
-        CursorBindings::Binding* binding = _bindings.GetBinding(cursor_hash);
+        // get existing cursor binding info
+        CursorInfo* info = _bindings.GetBinding(cursor_hash);
 
         // if does not exist
-        if( binding == nullptr )
+        if( info == nullptr )
         {
             // create
-            binding = _bindings.CreateBinding( cursor_hash );
+            info = _bindings.CreateBinding( cursor_hash );
 
-            // if full
-            if( binding == nullptr )
+            // fail if full
+            if( info == nullptr )
             {
                 LOG( "DllApp.UpdateCursorBinding.Full" );
                 return nullptr;
             }
 
-            // if creating without type
-            if( type == CURSOR_TYPE_INVALID )
+            // if creating through resize
+            if( flags & ( CURSOR_UPDATE_INCREMENT_SIZE | CURSOR_UPDATE_DECREMENT_SIZE ) )
             {
                 // set clone type
-                binding->type = CURSOR_TYPE_CLONE;
+                info->type = CURSOR_TYPE_CLONE;
 
                 // assign a default size nearest original cursor size
-                binding->size = CursorTools::SizeToId( CursorTools::HandleToSize( hcursor ) );
+                info->size = CursorTools::SizeToId( CursorTools::HandleToSize( hcursor ) );
             }
-        }
-        // else get last cursor id
-        else
-            last_id = binding->id;
-
-        // if updating type and type changing
-        if( type != CURSOR_TYPE_INVALID && binding->type != type )
-        {
-            *binding = CursorBindings::Binding();
-            binding->type = type;
-        }
-
-        // if updating id, update id
-        if( id != CURSOR_ID_INVALID )
-            binding->id = id;
-
-        // if updating variation, update variation
-        if( variation != CURSOR_VARIATION_INVALID )
-            binding->variation = variation;
-        // else if not updating size
-        else if( size_delta == 0 )
-        {
-            // if supported type, rotate current variation
-            switch( binding->type )
+            else
             {
-            case CURSOR_TYPE_BASIC:
-            case CURSOR_TYPE_OVERLAY:
-                binding->variation = binding->variation == CURSOR_VARIATION_INVALID || id != last_id ? 0 : ((binding->variation + 1) % CURSOR_VARIATION_COUNT);
-                break;
+                // require valid type
+                if( updates.type == CURSOR_TYPE_INVALID )
+                    return nullptr;
+
+                // set default id, variation, size
+                info->id = 0;
+                info->variation = 0;
+                info->size = CURSOR_SIZE_DEFAULT;
             }
         }
 
-        // if specified, update size by size delta
-        if( size_delta != 0 )
-            binding->size = Tools::Clamp<Long>(binding->size + size_delta, 0, CURSOR_SIZE_COUNT - 1);
+        // patch bindings with updates
+        CursorTools::PatchProperties(*info, updates, flags);
 
-        // validate binding
-        if( !binding->IsValid() )
+        // validate cursor info
+        if( !info->IsValid() )
         {
-            LOG("DllApp.UpdateCursorBinding.Invalid");
+            LOG("DllApp.UpdateCursorBinding.InvalidBinding");
             _bindings.RemoveBinding(cursor_hash);
             return nullptr;
         }
@@ -352,69 +332,93 @@ namespace Yolomouse
 
         // log
     #if CPU_64
-        LOG2( "DllApp.UpdateCursorBinding: HANDLE:%I64x HASH:%I64x BINDING:T=%d,I=%d,V=%d,S=%d", hcursor, cursor_hash, binding->type, binding->id, binding->variation, binding->size );
+        LOG2( "DllApp.UpdateCursorBinding: HANDLE:%I64x HASH:%I64x BINDING:T=%d,I=%d,V=%d,S=%d", hcursor, cursor_hash, info->type, info->id, info->variation, info->size );
     #else
-        LOG2( "DllApp.UpdateCursorBinding: HANDLE:%x HASH:%x BINDING:T=%d,I=%d,V=%d,S=%d", hcursor, cursor_hash, binding->type, binding->id, binding->variation, binding->size );
+        LOG2( "DllApp.UpdateCursorBinding: HANDLE:%x HASH:%x BINDING:T=%d,I=%d,V=%d,S=%d", hcursor, cursor_hash, info->type, info->id, info->variation, info->size );
     #endif
 
-        return binding;
+        return info;
     }
 
     //-------------------------------------------------------------------------
-    HCURSOR App::_LoadBoundCursor( HCURSOR hcursor, Hash cursor_hash, CursorBindings::Binding& binding )
+    HCURSOR App::_LoadBoundCursor( HCURSOR hcursor, Hash cursor_hash, CursorInfo& info )
     {
-        // only basic cursors can be loaded from bindings
-        switch( binding.type )
+        // by type
+        switch( info.type )
         {
         case CURSOR_TYPE_BASIC:
-            // load cursor. not all variations may be available so iterate until successful.
-            for( Index attempt = 0; attempt < CURSOR_VARIATION_COUNT; attempt++ )
-            {
-                // load vault cursor
-                HCURSOR hcursor = _cursor_vault.LoadBasic( binding.id, binding.variation, binding.size );
-                if( hcursor != NULL )
-                    return hcursor;
-
-                // iterate variation
-                binding.variation = (binding.variation + 1) % CURSOR_VARIATION_COUNT;
-            }
-            return NULL;
+            // load basic cursor
+            return _LoadBoundBasicCursor( info );
         case CURSOR_TYPE_CLONE:
             // load clone cursor
-            return _cursor_vault.LoadClone( hcursor, cursor_hash, binding.size );
+            return _LoadBoundCloneCursor( hcursor, cursor_hash, info );
         default:
             return NULL;
         }
     }
 
-    void App::_UnloadBoundCursor( Hash cursor_hash, const CursorBindings::Binding& binding )
+    /*
+        loads given binding otherwise iterates binding until load succeeds or fails when iteration exhausted
+    */
+    HCURSOR App::_LoadBoundBasicCursor( CursorInfo& info )
+    {
+        // for each cursor id with rotation
+        for( CursorId idi = 0; idi < CURSOR_ID_COUNT; info.id = (info.id + 1) % CURSOR_ID_COUNT, ++idi )
+        {
+            // for each cursor variation with rotation
+            for( CursorVariation variationi = 0; variationi < CURSOR_VARIATION_COUNT; info.variation = (info.variation + 1) % CURSOR_VARIATION_COUNT, ++variationi )
+            {
+                // load vault cursor
+                HCURSOR hcursor = _cursor_vault.LoadBasic( info.id, info.variation, info.size );
+                if( hcursor != NULL )
+                    return hcursor;
+            }
+
+            info.variation = 0;
+        }
+
+        return NULL;
+    }
+
+    HCURSOR App::_LoadBoundCloneCursor( HCURSOR hcursor, Hash cursor_hash, CursorInfo& info )
+    {
+        // load clone from vault
+        HCURSOR cloned_hcursor = _cursor_vault.LoadClone( hcursor, cursor_hash, info.size );
+        if( cloned_hcursor != NULL )
+            return cloned_hcursor;
+
+        return NULL;
+
+    }
+
+    void App::_UnloadBoundCursor( Hash cursor_hash, const CursorInfo& info )
     {
         // by resource type
-        switch( binding.type )
+        switch( info.type )
         {
         case CURSOR_TYPE_BASIC:
             // unload basic cursor
-            _cursor_vault.UnloadBasic(binding.id, binding.variation, binding.size);
+            _cursor_vault.UnloadBasic(info.id, info.variation, info.size);
             break;
         case CURSOR_TYPE_CLONE:
             // unload clone cursor
-            _cursor_vault.UnloadClone(cursor_hash, binding.size);
+            _cursor_vault.UnloadClone(cursor_hash, info.size);
             break;
         default:;
         }
     }
 
-    HCURSOR App::_GetBoundCursor( Hash cursor_hash, const CursorBindings::Binding& binding )
+    HCURSOR App::_GetBoundCursor( Hash cursor_hash, const CursorInfo& info )
     {
-        // by resource type
-        switch( binding.type )
+        // by type
+        switch( info.type )
         {
         case CURSOR_TYPE_BASIC:
             // get basic cursor
-            return _cursor_vault.GetBasic(binding.id, binding.variation, binding.size);
+            return _cursor_vault.GetBasic(info.id, info.variation, info.size);
         case CURSOR_TYPE_CLONE:
             // unload clone cursor
-            return _cursor_vault.GetClone(cursor_hash, binding.size);
+            return _cursor_vault.GetClone(cursor_hash, info.size);
         default:
             return NULL;
         }
@@ -536,13 +540,13 @@ namespace Yolomouse
 
     // cursor event handlers
     //-------------------------------------------------------------------------
-    Bool App::_NotifyCursorChanging( const CursorBindings::Binding& binding )
+    Bool App::_NotifyCursorChanging( const CursorInfo& info )
     {
         OnCursorChangingIpcMessage message;
 
         // build message
         message.request = IPC_REQUEST_ON_CURSOR_CHANGING;
-        message.binding = binding;
+        message.info = info;
 
         // send message. use small timeout
         return _ipc.Send( message, sizeof( message ), 2 );
@@ -592,7 +596,7 @@ namespace Yolomouse
             if( cursor_hash != 0 )
             {
                 // update cursor binding
-                CursorBindings::Binding* binding = _UpdateCursorBinding( hcursor, cursor_hash, message.type, message.id, message.variation, message.size_delta );
+                CursorInfo* binding = _UpdateCursorBinding( hcursor, cursor_hash, message.properties, message.flags );
 
                 // if binding updated
                 if( binding != nullptr )
@@ -617,7 +621,7 @@ namespace Yolomouse
             if( cursor_hash != 0 )
             {
                 // get associated binding
-                CursorBindings::Binding* binding = _bindings.GetBinding( cursor_hash );
+                CursorInfo* binding = _bindings.GetBinding( cursor_hash );
 
                 // if binding exists
                 if( binding != nullptr )
@@ -629,7 +633,7 @@ namespace Yolomouse
                     case CURSOR_TYPE_OVERLAY:
                         {
                             // get current default binding
-                            CursorBindings::Binding& default_binding = _bindings.GetDefaultBinding();
+                            CursorInfo& default_binding = _bindings.GetDefaultBinding();
 
                             // if default binding active, unload previous default cursor
                             if( default_binding.IsValid() )
@@ -662,7 +666,7 @@ namespace Yolomouse
             if( cursor_hash != 0 )
             {
                 // get associated binding
-                CursorBindings::Binding* binding = _bindings.GetBinding( cursor_hash );
+                CursorInfo* binding = _bindings.GetBinding( cursor_hash );
 
                 // if exists
                 if( binding != nullptr )
@@ -675,7 +679,7 @@ namespace Yolomouse
                 }
                 // else reset default binding
                 else
-                    _bindings.GetDefaultBinding() = CursorBindings::Binding();
+                    _bindings.GetDefaultBinding() = CursorInfo();
 
                 // refresh cursor
                 _RefreshCursor(hcursor, hwnd);
@@ -690,8 +694,8 @@ namespace Yolomouse
     //-------------------------------------------------------------------------
     void App::_OnInjectedCursorChanging( HCURSOR& out_cursor, HCURSOR in_cursor )
     {
-        // get default binding
-        CursorBindings::Binding* binding = &_bindings.GetDefaultBinding();
+        // get default cursor binding
+        CursorInfo* info = &_bindings.GetDefaultBinding();
 
         // get hash of app cursor
         Hash cursor_hash = _cache.GetHash(in_cursor);
@@ -700,15 +704,15 @@ namespace Yolomouse
         if( cursor_hash != 0 )
         {
             // check for assigned binding
-            CursorBindings::Binding* assigned_binding = _bindings.GetBinding( cursor_hash );
+            CursorInfo* assigned_info = _bindings.GetBinding( cursor_hash );
 
             // if found, use assigned binding instead
-            if( assigned_binding != nullptr )
-                binding = assigned_binding;
+            if( assigned_info != nullptr )
+                info = assigned_info;
         }
 
         // handle by binding type
-        switch( binding->type )
+        switch( info->type )
         {
         case CURSOR_TYPE_OVERLAY:
             // if overlay, hide app cursor by using hidden cursor (do not use 0, SetClassLong doesnt like it)
@@ -720,23 +724,23 @@ namespace Yolomouse
         case CURSOR_TYPE_CLONE:
             {
                 // get matching vault cursor
-                HCURSOR vault_cursor = _GetBoundCursor( cursor_hash, *binding );
+                HCURSOR vault_cursor = _GetBoundCursor( cursor_hash, *info );
 
                 // if exists or loaded successfully, make new app cursor
-                if( vault_cursor != NULL || (vault_cursor = _LoadBoundCursor( in_cursor, cursor_hash, *binding )) != NULL )
+                if( vault_cursor != NULL || (vault_cursor = _LoadBoundCursor( in_cursor, cursor_hash, *info )) != NULL )
                     out_cursor = vault_cursor;
             }
             break;
         }
 
         // notify loader cursor changing
-        _NotifyCursorChanging( *binding );
+        _NotifyCursorChanging( *info );
 
         // log
     #if CPU_64
-        LOG2( "DllApp.OnCursorChanging: UPDATED:%u HASH:%I64x BINDING:T=%d,I=%d,V=%d,S=%d", out_cursor != in_cursor, cursor_hash, binding->type, binding->id, binding->variation, binding->size );
+        LOG2( "DllApp.OnCursorChanging: UPDATED:%u HASH:%I64x BINDING:T=%d,I=%d,V=%d,S=%d", out_cursor != in_cursor, cursor_hash, info->type, info->id, info->variation, info->size );
     #else
-        LOG2( "DllApp.OnCursorChanging: UPDATED:%u HASH:%x BINDING:T=%d,I=%d,V=%d,S=%d", out_cursor != in_cursor, cursor_hash, binding->type, binding->id, binding->variation, binding->size );
+        LOG2( "DllApp.OnCursorChanging: UPDATED:%u HASH:%x BINDING:T=%d,I=%d,V=%d,S=%d", out_cursor != in_cursor, cursor_hash, info->type, info->id, info->variation, info->size );
     #endif
     }
 

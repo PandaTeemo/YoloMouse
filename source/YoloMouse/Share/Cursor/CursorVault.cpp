@@ -1,6 +1,6 @@
 #include <Core/System/SystemTools.hpp>
-#include <YoloMouse/Dll/Cursor/CursorVault.hpp>
-#include <YoloMouse/Share/Tools/CursorTools.hpp>
+#include <YoloMouse/Share/Cursor/CursorVault.hpp>
+#include <YoloMouse/Share/Cursor/CursorTools.hpp>
 #include <stdio.h>
 
 namespace Yolomouse
@@ -91,9 +91,7 @@ namespace Yolomouse
 
     HCURSOR CursorVault::GetClone( Hash cursor_hash, CursorSize size )
     {
-        // original size not supported
-        if( size == CURSOR_SIZE_ORIGINAL )
-            return nullptr;
+        ASSERT( size >= CURSOR_SIZE_MIN && size < CURSOR_SIZE_COUNT );
 
         // get entry
         CloneEntry* entry = _clone_map.Get( cursor_hash );
@@ -170,11 +168,7 @@ namespace Yolomouse
     {
         ASSERT( hcursor != NULL );
         ASSERT( cursor_hash != 0 );
-        ASSERT( size < CURSOR_SIZE_COUNT );
-
-        // original size not supported
-        if( size == CURSOR_SIZE_ORIGINAL )
-            return false;
+        ASSERT( size >= CURSOR_SIZE_MIN && size < CURSOR_SIZE_COUNT );
 
         // access entry
         CloneEntry& entry = _clone_map.Set(cursor_hash);
@@ -188,7 +182,7 @@ namespace Yolomouse
     {
         ASSERT( id < CURSOR_ID_COUNT );
         ASSERT( variation < CURSOR_VARIATION_COUNT );
-        ASSERT( size < CURSOR_SIZE_COUNT );
+        ASSERT( size >= CURSOR_SIZE_MIN && size < CURSOR_SIZE_COUNT );
 
         // unload basic
         _UnloadBasic( _basic_table[id][variation], size );
@@ -197,7 +191,7 @@ namespace Yolomouse
     void CursorVault::UnloadClone( Hash cursor_hash, CursorSize size )
     {
         ASSERT( cursor_hash != 0 );
-        ASSERT( size < CURSOR_SIZE_COUNT );
+        ASSERT( size >= CURSOR_SIZE_MIN && size < CURSOR_SIZE_COUNT );
 
         // get entry
         CloneEntry* entry = _clone_map.Get( cursor_hash );
@@ -351,7 +345,7 @@ namespace Yolomouse
             ULong height;
 
             // if resizable
-            if( entry.resizable && size != CURSOR_SIZE_ORIGINAL )
+            if( entry.resizable )
             {
                 ASSERT(entry.width > 0 && entry.height > 0);
 

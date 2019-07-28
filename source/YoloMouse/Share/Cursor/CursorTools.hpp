@@ -1,5 +1,5 @@
 #pragma once
-#include <YoloMouse/Share/Root.hpp>
+#include <YoloMouse/Share/Cursor/CursorInfo.hpp>
 
 namespace Yolomouse
 {
@@ -13,5 +13,8 @@ namespace Yolomouse
         static ULong      HandleToSize( HCURSOR hcursor );
         static Bool       IdVariationToIndex( Index& index, CursorId id, CursorVariation variation );
         static Bool       IndexToIdVariation( CursorId& id, CursorVariation& variation, Index index );
+
+        /**/
+        static void PatchProperties( CursorInfo& properties, const CursorInfo& updates, CursorUpdateFlags flags );
     };
 }

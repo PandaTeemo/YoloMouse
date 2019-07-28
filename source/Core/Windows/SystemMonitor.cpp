@@ -25,6 +25,7 @@ namespace Core
                 {
                 case EVENT_SYSTEM_FOREGROUND:
                     system_monitor.events.Notify( { SystemMonitorEvent::WINDOW_FOREGROUND, hwnd } );
+                /*
                     system_monitor.events.Notify( { SystemMonitorEvent::WINDOW_ZORDER, hwnd } );
                     break;
 
@@ -33,6 +34,7 @@ namespace Core
                 case EVENT_OBJECT_PARENTCHANGE:
                     system_monitor.events.Notify( { SystemMonitorEvent::WINDOW_ZORDER, hwnd } );
                     break;
+                */
                 }
             }
         }
@@ -53,7 +55,7 @@ namespace Core
     Bool SystemMonitor::Initialize()
     {
         // set window event hook
-        _handle = SetWinEventHook( EVENT_SYSTEM_FOREGROUND, EVENT_OBJECT_PARENTCHANGE, NULL, _WinEvent, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS );
+        _handle = SetWinEventHook( EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, NULL, _WinEvent, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS );
 
         return _handle != NULL;
     }

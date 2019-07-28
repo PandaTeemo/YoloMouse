@@ -92,15 +92,6 @@ namespace Yolomouse
             return false;
         }
 
-        // if games only option enabled, fail if game window test fails
-        /*
-        if( _games_only && !WindowTools::TestGameWindow( hwnd ) )
-        {
-            LOG("TargetController.AccessTarget.TestGameWindow");
-            return false;
-        }
-        //*/
-
         // get process and thread id
         if( GetWindowThreadProcessId( hwnd, &process_id ) == 0 )
         {

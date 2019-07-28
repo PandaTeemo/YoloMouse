@@ -2,11 +2,11 @@
 #include <Core/Container/Map.hpp>
 #include <Core/Support/Singleton.hpp>
 #include <Snoopy/Hook/Hook.hpp>
-#include <YoloMouse/Dll/Cursor/CursorVault.hpp>
+#include <YoloMouse/Share/Cursor/CursorVault.hpp>
 #include <YoloMouse/Dll/Cursor/HandleCache.hpp>
 #include <YoloMouse/Share/Constants.hpp>
 #include <YoloMouse/Share/Ipc/IpcMessenger.hpp>
-#include <YoloMouse/Share/Bindings/CursorBindings.hpp>
+#include <YoloMouse/Share/Cursor/CursorBindings.hpp>
 
 namespace Yolomouse
 {
@@ -68,12 +68,14 @@ namespace Yolomouse
         void _RefreshCurrentCursor();
 
         /**/
-        CursorBindings::Binding* _UpdateCursorBinding( HCURSOR hcursor, Hash cursor_hash, CursorType type, CursorId id, CursorVariation variation, CursorSize size_delta );
+        CursorInfo* _UpdateCursorBinding( HCURSOR hcursor, Hash cursor_hash, const CursorInfo& updates, CursorUpdateFlags flags );
         
         /**/
-        HCURSOR _LoadBoundCursor( HCURSOR hcursor, Hash cursor_hash, CursorBindings::Binding& binding );
-        void    _UnloadBoundCursor( Hash cursor_hash, const CursorBindings::Binding& binding );
-        HCURSOR _GetBoundCursor( Hash cursor_hash, const CursorBindings::Binding& binding );
+        HCURSOR _LoadBoundCursor( HCURSOR hcursor, Hash cursor_hash, CursorInfo& info );
+        HCURSOR _LoadBoundBasicCursor( CursorInfo& info );
+        HCURSOR _LoadBoundCloneCursor( HCURSOR hcursor, Hash cursor_hash, CursorInfo& info );
+        void    _UnloadBoundCursor( Hash cursor_hash, const CursorInfo& info );
+        HCURSOR _GetBoundCursor( Hash cursor_hash, const CursorInfo& info );
 
         /**/
         Bool    _GetCurrentCursor( HCURSOR& hcursor, HWND& hwnd );
@@ -82,7 +84,7 @@ namespace Yolomouse
         void    _RestoreClassCursors();
 
         /**/
-        Bool _NotifyCursorChanging( const CursorBindings::Binding& binding );
+        Bool _NotifyCursorChanging( const CursorInfo& info );
         Bool _NotifyCursorShowing( Bool showing );
 
         /**/

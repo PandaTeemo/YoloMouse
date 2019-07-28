@@ -33,4 +33,77 @@ namespace Core
     {
         return static_cast<TYPE>(std::abs( value ));
     }
+
+    //-------------------------------------------------------------------------
+    template<>
+    Float Math<Float>::Sin( Float radians )
+    {
+        return std::sinf(radians);
+    }
+    template<typename TYPE>
+    TYPE Math<TYPE>::Sin( TYPE radians )
+    {
+        ASSERT_TODO;
+        return 0;
+    }
+
+    template<>
+    Float Math<Float>::ArcSin( Float radians )
+    {
+        return std::asinf(radians);
+    }
+    template<typename TYPE>
+    TYPE Math<TYPE>::ArcSin( TYPE radians )
+    {
+        ASSERT_TODO;
+        return 0;
+    }
+
+    template<>
+    Float Math<Float>::Cos( Float radians )
+    {
+        return std::cosf(radians);
+    }
+    template<typename TYPE>
+    TYPE Math<TYPE>::Cos( TYPE radians )
+    {
+        ASSERT_TODO;
+        return 0;
+    }
+
+    template<>
+    Float Math<Float>::ArcCos( Float radians )
+    {
+        return std::acosf(radians);
+    }
+    template<typename TYPE>
+    TYPE Math<TYPE>::ArcCos( TYPE radians )
+    {
+        ASSERT_TODO;
+        return 0;
+    }
+
+    template<>
+    Float Math<Float>::Tan( Float radians )
+    {
+        return std::tanf(radians);
+    }
+    template<typename TYPE>
+    TYPE Math<TYPE>::Tan( TYPE radians )
+    {
+        ASSERT_TODO;
+        return 0;
+    }
+
+    template<>
+    Float Math<Float>::ArcTan( Float x, Float y )
+    {
+        return std::atan2f(y, x);
+    }
+    template<typename TYPE>
+    TYPE Math<TYPE>::ArcTan( TYPE x, TYPE y )
+    {
+        ASSERT_TODO;
+        return 0;
+    }
 }

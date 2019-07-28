@@ -66,6 +66,8 @@ namespace Yolomouse
     //-------------------------------------------------------------------------
     Bool InjectSession::Load( const PathString& bindings_path )
     {
+        // to more easily test restricted state (anticheat) force fail here
+        //return false;
         ASSERT( !IsLoaded() );
         ASSERT( IsInitialized() );
 
@@ -119,16 +121,14 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    Bool InjectSession::SendSetCursor( CursorType type, CursorId id, CursorVariation variation, CursorSize size_delta )
+    Bool InjectSession::SendSetCursor( const CursorInfo& updates, CursorUpdateFlags flags )
     {
         SetCursorIpcMessage message;
 
         // build message
         message.request = IPC_REQUEST_SET_CURSOR;
-        message.type = type;
-        message.id = id;
-        message.variation = variation;
-        message.size_delta = size_delta;
+        message.properties = updates;
+        message.flags = flags;
 
         // send message
         return _ipc.Send( message, sizeof(message) );
@@ -217,7 +217,7 @@ namespace Yolomouse
 
         // build event
         event.id = InjectSessionEvent::CURSOR_CHANGING;
-        event.u.cursor_changing = message.binding;
+        event.u.cursor_changing = message.info;
 
         // notify
         events.Notify(event);

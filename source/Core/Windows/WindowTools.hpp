@@ -1,5 +1,7 @@
+//TODO2: refactor dis random crap
 #pragma once
 #include <Core/Container/String.hpp>
+#include <Core/Math/Vector2.hpp>
 #include <Windows.h>
 
 namespace Core
@@ -25,6 +27,9 @@ namespace Core
 
         /**/
         static SIZE RectToSize( const RECT& rect );
+
+        /**/
+        static Bool ReadHBitmapPixels( Byte4*& pixels, Vector2l& size, HBITMAP hbitmap );
 
         /**/
         static void MessagePopup( const Char* title, Bool error, const Char* format, ... );

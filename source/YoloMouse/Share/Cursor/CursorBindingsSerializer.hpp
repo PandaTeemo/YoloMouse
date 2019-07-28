@@ -1,5 +1,5 @@
 #pragma once
-#include <YoloMouse/Share/Bindings/CursorBindings.hpp>
+#include <YoloMouse/Share/Cursor/CursorBindings.hpp>
 #include <stdio.h>
 
 namespace Yolomouse
@@ -14,7 +14,7 @@ namespace Yolomouse
 
     private:
         /**/
-        static Bool _ReadBindingLine( Hash& hash, CursorBindings::Binding& binding, FILE* file );
-        static Bool _WriteBindingLine( const Hash hash, const CursorBindings::Binding& binding, FILE* file );
+        static Bool _ReadBindingLine( Hash& hash, CursorInfo& info, FILE* file );
+        static Bool _WriteBindingLine( const Hash hash, const CursorInfo& info, FILE* file );
     };
 }

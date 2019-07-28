@@ -22,6 +22,9 @@
     <Filter Include="Events">
       <UniqueIdentifier>{64afbb46-1798-431b-9269-336cd51085b1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{4ec989f1-759e-4deb-abc2-9156b5b9cd50}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\Core\Container\Array.hpp">
@@ -111,6 +114,12 @@
     <ClInclude Include="..\..\source\Core\Events\SystemMonitorEvent.hpp">
       <Filter>Events</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Core\UI\Window.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\Core\Events\WindowEvent.hpp">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Core\Support\Settings.cpp">
@@ -161,6 +170,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Core\System\Debug.cpp">
       <Filter>System</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\UI\Window.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

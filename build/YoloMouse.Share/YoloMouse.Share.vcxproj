@@ -19,22 +19,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\source\YoloMouse\Share\Bindings\CursorBindings.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Share\Bindings\CursorBindingsSerializer.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Share\Constants.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Share\Cursor\CursorBindings.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Share\Cursor\CursorBindingsSerializer.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Share\Cursor\CursorInfo.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Share\Cursor\CursorTools.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Share\Cursor\CursorVault.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Share\Ipc\IpcMessenger.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Share\Root.cpp" />
-    <ClCompile Include="..\..\source\YoloMouse\Share\Tools\CursorTools.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\source\YoloMouse\Share\Bindings\CursorBindings.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Share\Bindings\CursorBindingsSerializer.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\Constants.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Share\Cursor\CursorBindings.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Share\Cursor\CursorBindingsSerializer.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Share\Cursor\CursorInfo.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Share\Cursor\CursorTools.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Share\Cursor\CursorTypes.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Share\Cursor\CursorVault.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\Enums.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\Ipc\IpcMessage.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\Ipc\IpcMessenger.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Share\Root.hpp" />
-    <ClInclude Include="..\..\source\YoloMouse\Share\Tools\CursorTools.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

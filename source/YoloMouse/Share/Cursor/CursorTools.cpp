@@ -1,8 +1,5 @@
 #include <YoloMouse/Share/Constants.hpp>
-#include <YoloMouse/Share/Tools/CursorTools.hpp>
-//#include <Psapi.h>
-//#include <Shlobj.h>
-//#include <stdio.h>
+#include <YoloMouse/Share/Cursor/CursorTools.hpp>
 
 namespace Yolomouse
 {
@@ -51,12 +48,12 @@ namespace Yolomouse
     //-------------------------------------------------------------------------
     CursorSize CursorTools::SizeToId( ULong size )
     {
-        // if original size
+        // if 0 return minimum size id
         if( size == 0 )
-            return CURSOR_SIZE_ORIGINAL;
+            return CURSOR_SIZE_MIN;
 
         // if old table (size is index)
-        if( size < CURSOR_SIZE_TABLE[1] )
+        if( size < CURSOR_SIZE_TABLE[CURSOR_SIZE_MIN] )
         {
             // get size from old table
             if( size < COUNT( CURSOR_SIZE_TABLE_V_0_8_3 ) )
@@ -67,7 +64,7 @@ namespace Yolomouse
         }
 
         // locate size index nearest requested size
-        for( Index i = 0; i < CURSOR_SIZE_COUNT; ++i )
+        for( Index i = CURSOR_SIZE_MIN; i < CURSOR_SIZE_COUNT; ++i )
             if( size <= CURSOR_SIZE_TABLE[i] )
                 return i;
 
@@ -131,5 +128,48 @@ namespace Yolomouse
             return false;
 
         return true;
+    }
+
+    void CursorTools::PatchProperties( CursorInfo& properties, const CursorInfo& updates, CursorUpdateFlags flags )
+    {
+        // update type
+        if( updates.type != CURSOR_TYPE_INVALID )
+        {
+            // when change type, reset id (but keep variation and size)
+            if( properties.type != updates.type )
+            {
+                properties.id = 0;
+                flags &= ~CURSOR_UPDATE_INCREMENT_ID;
+            }
+            properties.type = updates.type;
+        }
+
+        // update id
+        if( updates.id < CURSOR_ID_COUNT )
+            properties.id = updates.id;
+        // else increment id
+        else if( flags & CURSOR_UPDATE_INCREMENT_ID )
+        {
+            properties.id = (properties.id + 1) % CURSOR_ID_COUNT;
+            if( properties.type == CURSOR_TYPE_OVERLAY && properties.id >= CURSOR_ID_OVERLAY_COUNT )
+                properties.id = 0;
+        }
+
+        // update variation
+        if( updates.variation < CURSOR_VARIATION_COUNT )
+            properties.variation = updates.variation;
+        // else increment variation
+        else if( flags & CURSOR_UPDATE_INCREMENT_VARIATION )
+            properties.variation = (properties.variation + 1) % CURSOR_VARIATION_COUNT;
+
+        // update size
+        if( updates.size >= CURSOR_SIZE_MIN && updates.size < CURSOR_SIZE_COUNT )
+            properties.size = updates.size;
+        // else increment size
+        else if( flags & CURSOR_UPDATE_INCREMENT_SIZE )
+            properties.size = Tools::Min(properties.size + 1, CURSOR_SIZE_COUNT - 1);
+        // else decrement size
+        else if( flags & CURSOR_UPDATE_DECREMENT_SIZE )
+            properties.size = Tools::Max<CursorSize>(properties.size - 1, CURSOR_SIZE_MIN);
     }
 }

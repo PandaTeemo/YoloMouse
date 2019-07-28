@@ -3,6 +3,7 @@
 #include <Core/Container/Array2.hpp>
 #include <Core/Container/Map.hpp>
 #include <Core/Types.hpp>
+#include <YoloMouse/Share/Cursor/CursorTypes.hpp>
 #include <YoloMouse/Share/Constants.hpp>
 
 namespace Yolomouse

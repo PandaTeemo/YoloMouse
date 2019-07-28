@@ -26,6 +26,7 @@
     <ClInclude Include="..\..\source\Core\Container\Map.hpp" />
     <ClInclude Include="..\..\source\Core\Container\String.hpp" />
     <ClInclude Include="..\..\source\Core\Events\SystemMonitorEvent.hpp" />
+    <ClInclude Include="..\..\source\Core\Events\WindowEvent.hpp" />
     <ClInclude Include="..\..\source\Core\Math\Math.hpp" />
     <ClInclude Include="..\..\source\Core\Math\Matrix4.hpp" />
     <ClInclude Include="..\..\source\Core\Math\Quaternion.hpp" />
@@ -45,6 +46,7 @@
     <ClInclude Include="..\..\source\Core\Types.hpp" />
     <ClInclude Include="..\..\source\Core\Type\Default.hpp" />
     <ClInclude Include="..\..\source\Core\Type\Tuple.hpp" />
+    <ClInclude Include="..\..\source\Core\UI\Window.hpp" />
     <ClInclude Include="..\..\source\Core\Windows\InputMonitor.hpp" />
     <ClInclude Include="..\..\source\Core\Windows\SharedMemory.hpp" />
     <ClInclude Include="..\..\source\Core\Windows\ShellUi.hpp" />
@@ -65,6 +67,7 @@
     <ClCompile Include="..\..\source\Core\System\Debug.cpp" />
     <ClCompile Include="..\..\source\Core\System\IpcPair.cpp" />
     <ClCompile Include="..\..\source\Core\System\SystemTools.cpp" />
+    <ClCompile Include="..\..\source\Core\UI\Window.cpp" />
     <ClCompile Include="..\..\source\Core\Windows\InputMonitor.cpp" />
     <ClCompile Include="..\..\source\Core\Windows\ShellUi.cpp" />
     <ClCompile Include="..\..\source\Core\Windows\SystemMonitor.cpp" />

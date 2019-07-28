@@ -1,7 +1,7 @@
 #pragma once
 #include <YoloMouse/Loader/Events/InjectSessionEvent.hpp>
 #include <YoloMouse/Loader/Inject/InjectSession.hpp>
-#include <YoloMouse/Share/Bindings/CursorBindings.hpp>
+#include <YoloMouse/Share/Cursor/CursorBindings.hpp>
 
 namespace Yolomouse
 {
@@ -17,15 +17,15 @@ namespace Yolomouse
         /**/
         Bool IsInitialized() const;
         Bool IsStarted() const;
+        Bool IsRestricted() const;
 
         /**/
         Id GetProcessId() const;
 
         /**/
-        Bool ActionSetCursor( CursorType type, CursorId id );
-        Bool ActionSetDefaultCursor();
-        Bool ActionResetCursor();
-        Bool ActionSetCursorSize( Long size_index_delta );
+        Bool SetCursor( const CursorInfo& updates, CursorUpdateFlags flags );
+        Bool SetDefaultCursor();
+        Bool ResetCursor();
 
     private:
         friend class TargetController;
@@ -57,14 +57,17 @@ namespace Yolomouse
         void _ShutdownProcessListener();
 
         /**/
-        void _UpdateRestrictedBinding( CursorType type, CursorId id, CursorVariation variation, CursorSize size_delta );
+        static Bool _IsValidCursor( const CursorInfo& properties );
+
+        /**/
+        Bool _UpdateRestrictedBinding( const CursorInfo& updates, CursorUpdateFlags flags );
         void _UpdateCursor();
 
         /**/
         Bool _BuildBindingsPath();
 
         /**/
-        void _OnInjectedCursorChanging( const CursorBindings::Binding& binding );
+        void _OnInjectedCursorChanging( const CursorInfo& info );
         void _OnInjectedCursorShowing( Bool showing );
         Bool _OnEvent( const InjectSessionEvent& event );
 
@@ -72,7 +75,7 @@ namespace Yolomouse
         static VOID CALLBACK _OnProcessExit( _In_ PVOID lpParameter, _In_ BOOLEAN TimerOrWaitFired );
 
         /**/
-        static void _BuildDefaultOverlayBinding( CursorBindings::Binding& binding );
+        static void _BuildDefaultCursor( CursorInfo& info );
 
         // fields: parameters
         Id                      _process_id;
@@ -84,7 +87,7 @@ namespace Yolomouse
         Bool                    _started;
         HWND                    _hover_hwnd;
         Bool                    _showing;
-        CursorBindings::Binding _binding;
+        CursorInfo              _active_cursor;
         // fields: objects
         CursorBindings          _restricted_bindings;
         InjectSession           _inject_session;

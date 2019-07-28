@@ -1,5 +1,5 @@
 #pragma once
-#include <YoloMouse/Share/Bindings/CursorBindings.hpp>
+#include <YoloMouse/Share/Cursor/CursorBindings.hpp>
 #include <Yolomouse/Share/Enums.hpp>
 
 namespace Yolomouse
@@ -21,9 +21,9 @@ namespace Yolomouse
         union U
         {
             // CURSOR_CHANGING
-            CursorBindings::Binding  cursor_changing;
+            CursorInfo  cursor_changing;
             // CURSOR_SHOWING0
-            Bool                     cursor_showing;
+            Bool              cursor_showing;
 
             U(){}
         }
