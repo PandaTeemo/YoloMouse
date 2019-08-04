@@ -8,7 +8,7 @@
     <div class="TitlePanel">
         <div class="TitleHeader">
             <img src="Title.png"/>
-            <div class="TitleVersion">0.10.0 <b style="color:red">BETA</b></div>
+            <div class="TitleVersion">0.11.2 <b style="color:red">BETA</b></div>
         </div>
         <div class="TitleDescription">
             Game Cursor Changer
@@ -22,9 +22,24 @@
     </div>
 
     <!-- changes -->
-    <div class="Panel" style="top:225px; width:680px; height:600px; left:70px; background-color:#08f; overflow:auto;">
+    <div class="Panel" style="top:225px; width:880px; height:600px; left:70px; background-color:#08f; overflow:auto;">
         <div class="Header" style="width:50%; background-color:#06e;">
             Change Log
+        </div>
+        <div class="Section">
+            0.11.2
+            <li> new: 3d overlay cursors. slightly laggier but much prettier. they also work with anticheat protected games, unlike basic cursors.
+            <li> new: overlay error notifications<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp; when binding fails because YM needs to be admin<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp; when YM is already admin and standard binding fails, and has to instead switch to overlay cursors
+            <li> new: option: "Reduce overlay log": enable to reduce overlay pointer lag (may cause choppy movement on some systems).
+            <li> new: default cursors: brought these back by popular request. same operation and hotkey (CTRL ALT D) as before.
+            <li> new: reworked hotkeys:<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp; CTRL ALT 1: now cycles basic cursors<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp; CTRL ALT 2: cycles overlay cursors<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp; CTRL ALT 3: cycles colors<br/>
+            <li> etc: large code rework (cleanup, fixes, optimizations, etc)
+            <li> remove: option: "games only": this didnt work too, but due to other changes misassigning cursors to non-games should be less problematic.
         </div>
         <div class="Section">
             0.10.0
