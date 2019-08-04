@@ -1,11 +1,13 @@
 #include <Core/Math/Math.hpp>
 #include <Core/Math/Vector3.hpp>
+#include <Core/Math/Number.hpp>
 
 namespace Core
 {
     // explicit instantiations
     //-------------------------------------------------------------------------
     template class BaseVector3<Float>;
+    template class BaseVector3<ULong>;
 
     // statics
     //-------------------------------------------------------------------------
@@ -140,7 +142,7 @@ namespace Core
     template<typename TYPE>
     BaseVector3<TYPE> BaseVector3<TYPE>::operator - () const
     {
-        return BaseVector3(-x, -y, -z);
+        return BaseVector3(-Number<TYPE>(x), -Number<TYPE>(y), -Number<TYPE>(z));
     }
 
     //-------------------------------------------------------------------------

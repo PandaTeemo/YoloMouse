@@ -137,6 +137,11 @@ namespace Yolomouse
         return _initialized;
     }
 
+    Bool App::IsElevated() const
+    {
+        return IsUserAnAdmin() == TRUE;
+    }
+
     //-------------------------------------------------------------------------
     Bool App::GetElevate() const
     {
@@ -165,7 +170,7 @@ namespace Yolomouse
         Target* target;
 
         // access current target
-        if( TargetController::Instance().AccessTarget( target ) )
+        if( TargetController::Instance().AccessTarget( target, IsElevated() ) )
         {
             // handle by combo id
             switch (combo_id)
@@ -224,6 +229,13 @@ namespace Yolomouse
             // toggle auto start
             if( _OptionAutoStart(!enabled, true) )
                 _ui.SetMenuOption(MENU_OPTION_AUTOSTART, !enabled);
+            return true;
+
+        // reduce overlay lag
+        case MENU_OPTION_REDUCEOVERLAYLAG:
+            // toggle reduce overlay lag
+            _OptionReduceOverlayLag( !enabled, true );
+            _ui.SetMenuOption(MENU_OPTION_REDUCEOVERLAYLAG, !enabled);
             return true;
 
         // run as administrator
@@ -295,12 +307,14 @@ namespace Yolomouse
             _ui.AddMenuBreak();
             // add show settings
             _ui.AddMenuOption(MENU_OPTION_SETTINGSFOLDER, APP_MENU_STRINGS[MENU_OPTION_SETTINGSFOLDER], false);
-            // add run-as-administrator option if not already admin
-            if( !IsUserAnAdmin() )
+            // add run-as-administrator option if not already elevated/admin
+            if( !IsElevated() )
                 _ui.AddMenuOption(MENU_OPTION_RUNASADMIN, APP_MENU_STRINGS[MENU_OPTION_RUNASADMIN], false);
 
             // add menu break
             _ui.AddMenuBreak();
+            // add reduce overlay lag option
+            _ui.AddMenuOption(MENU_OPTION_REDUCEOVERLAYLAG, APP_MENU_STRINGS[MENU_OPTION_REDUCEOVERLAYLAG], _settings.GetBoolean(SETTING_REDUCEOVERLAYLAG));
             // add autostart option
             _ui.AddMenuOption(MENU_OPTION_AUTOSTART, APP_MENU_STRINGS[MENU_OPTION_AUTOSTART], _settings.GetBoolean(SETTING_AUTOSTART));
 
@@ -345,8 +359,8 @@ namespace Yolomouse
         if( _settings.GetBoolean(SETTING_AUTOSTART) )
             _OptionAutoStart(true, false);
 
-        // update "games only" option
-        _OptionGamesOnly(_settings.GetBoolean(SETTING_GAMESONLY), false);
+        // update "reduce overlay lag" option
+        _OptionReduceOverlayLag(_settings.GetBoolean(SETTING_REDUCEOVERLAYLAG), false);
 
         return true;
     }
@@ -484,20 +498,6 @@ namespace Yolomouse
             WindowTools::MessagePopup(APP_NAMEC, false, TEXT_NOLOG);
     }
 
-    void App::_OptionGamesOnly( Bool enable, Bool save )
-    {
-        // update games only state
-        TargetController::Instance().SetGamesOnly(enable);
-
-        // update settings
-        if( save )
-        {
-            _settings.SetBoolean(SETTING_GAMESONLY, enable);
-            if( !_settings.Save() )
-                LOG("App.OptionGamesOnly.Save");
-        }
-    }
-
     Bool App::_OptionAutoStart( Bool enable, Bool save )
     {
         PathString path;
@@ -526,6 +526,20 @@ namespace Yolomouse
             LOG("App.OptionAutoStart.GetFullPathName");
 
         return false;
+    }
+
+    void App::_OptionReduceOverlayLag( Bool enable, Bool save )
+    {
+        // update games only state
+        Overlay::Instance().SetReduceLatency(enable);
+
+        // update settings
+        if( save )
+        {
+            _settings.SetBoolean(SETTING_REDUCEOVERLAYLAG, enable);
+            if( !_settings.Save() )
+                LOG("App.ReduceOverlayLag.Save");
+        }
     }
 
     Bool App::_OptionRunAsAdmin()

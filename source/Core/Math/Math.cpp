@@ -7,13 +7,16 @@ namespace Core
     //-------------------------------------------------------------------------
     template class Math<Float>;
     template class Math<Long>;
+    template class Math<ULong>;
 
     // statics
     //-------------------------------------------------------------------------
     template<> const Float Math<Float>::PI =    3.14159274f;
     template<> const Long  Math<Long>::PI =     3;
+    template<> const ULong Math<ULong>::PI =    3;
     template<> const Float Math<Float>::PI2 =   6.28318530f;
     template<> const Long  Math<Long>::PI2 =    6;
+    template<> const ULong Math<ULong>::PI2 =   6;
 
     //-------------------------------------------------------------------------
     template<>
@@ -26,12 +29,27 @@ namespace Core
     {
         return 0;
     }
+    template<>
+    ULong Math<ULong>::SquareRoot( ULong value )
+    {
+        return 0;
+    }
 
     //-------------------------------------------------------------------------
-    template<typename TYPE>
-    TYPE Math<TYPE>::Absolute( TYPE value )
+    template<>
+    Float Math<Float>::Absolute( Float value )
     {
-        return static_cast<TYPE>(std::abs( value ));
+        return static_cast<Float>(std::fabs( value ));
+    }
+    template<>
+    Long Math<Long>::Absolute( Long value )
+    {
+        return static_cast<Long>(std::abs( value ));
+    }
+    template<>
+    ULong Math<ULong>::Absolute( ULong value )
+    {
+        return value;
     }
 
     //-------------------------------------------------------------------------

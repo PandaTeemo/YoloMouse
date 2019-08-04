@@ -9,8 +9,9 @@ namespace Yolomouse
     namespace
     {
         // constants
-        constexpr ULong TOPMOST_UPDATE_COUNT =  8;              // frames
-        constexpr ULong TOPMOST_ROUTINE_COUNT = 200;            // frames
+        constexpr ULong TOPMOST_UPDATE_COUNT =              8;      // frames
+        constexpr ULong TOPMOST_ROUTINE_COUNT =             200;    // frames
+        constexpr ULong MESSAGE_TIMEOUT_PER_CHARACTER =     40;     // ms
     }
 
     // public
@@ -19,14 +20,16 @@ namespace Yolomouse
         // fields: parameters
         _active_cursor          (nullptr),
         // fields: state
-        _thread                 (NULL),
         _initialized            (false),
         _started                (false),
         _active                 (false),
         _hover_hwnd             (NULL),
+        // fields: events
         _pre_frame_events       (0),
         _in_frame_events        (0),
-        _resize_event           (0, 0)
+        _resize_event           (0, 0),
+        // fields: objects
+        _thread                 (NULL)
     {
         _cursors.Zero();
     }
@@ -125,8 +128,26 @@ namespace Yolomouse
 
     void Overlay::SetCursorHidden()
     {
+        // activate (remove any inflight set cursor event)
+        _in_frame_events = IN_FRAME_EVENT_HIDE_CURSOR | (_in_frame_events & ~IN_FRAME_EVENT_SET_CURSOR);
+    }
+
+    void Overlay::SetMessage( const String& message )
+    {
+        // copy message
+        _message_event = message;
+
         // activate
-        _in_frame_events |= IN_FRAME_EVENT_HIDE_CURSOR;
+        _in_frame_events |= IN_FRAME_EVENT_SET_MESSAGE;
+    }
+
+    void Overlay::SetReduceLatency( Bool enable )
+    {
+        // set improved mouse precision
+        _mouse.SetImprovedPrecision( enable );
+
+        // set reduced rendering latency
+        _render_context.SetReduceLatency( enable );
     }
 
     //-------------------------------------------------------------------------
@@ -136,8 +157,9 @@ namespace Yolomouse
         ASSERT( _cursors[id] == nullptr );
 
         // initialize cursor
-        if( !cursor.Initialize({ _render_context, _window.GetAspectRatio() }) )
+        if( !cursor.Initialize( _render_context) )
             return false;
+        cursor.SetAspectRatio( _window.GetAspectRatio() );
 
         // add cursor to table
         _cursors[id] = &cursor;
@@ -178,6 +200,7 @@ namespace Yolomouse
     #ifdef BUILD_DEBUG
         CursorInfo cursor = { CURSOR_TYPE_OVERLAY, 0, 0, 10 };
         SetCursorIterated( cursor );
+        SetMessage( "Test Message 123" );
     #endif
 
         return true;
@@ -214,8 +237,14 @@ namespace Yolomouse
             return false;
 
         // initialize basic cursor
-        if( !_basic_cursor.Initialize({ _render_context, _window.GetAspectRatio() }) )
+        if( !_basic_cursor.Initialize( _render_context ) )
             return false;
+        _basic_cursor.SetAspectRatio( _window.GetAspectRatio() );
+
+        // initialize text popup
+        if( !_text_popup.Initialize(_render_context) )
+            return false;
+        _text_popup.SetAspectRatio( _window.GetAspectRatio() );
 
         // register events
         _window.events.Add( *this );
@@ -245,6 +274,9 @@ namespace Yolomouse
         // unregister events
         _window.events.Remove( *this );
 
+        // shutdown text popup
+        _text_popup.Shutdown();
+
         // shutdown basic cursor
         _basic_cursor.Shutdown();
 
@@ -272,56 +304,9 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    void Overlay::_ProcessPreFrameEvents()
-    {
-        // if pending pre frame events exist
-        if( _pre_frame_events != 0 )
-        {
-            // handle resize
-            if( _pre_frame_events & PRE_FRAME_EVENT_RESIZE )
-                _FrameResize( _resize_event );
-
-            // reset pre frame events
-            _pre_frame_events = 0;
-        }
-    }
-
-    void Overlay::_ProcessInFrameEvents()
-    {
-        // if pending in frame events exist
-        if( _in_frame_events != 0 )
-        {
-            // if cursor hide, reset active cursor
-            if( _in_frame_events & IN_FRAME_EVENT_HIDE_CURSOR )
-                _active_cursor = nullptr;
-            // if cursor set, if set new cursor
-            if( _in_frame_events & IN_FRAME_EVENT_SET_CURSOR )
-                _active_cursor = _cursor_event;
-
-            // reset in frame events
-            _in_frame_events = 0;
-        }
-    }
-
-    void Overlay::_FrameResize( const Vector2l& size )
-    {
-        // update window size
-        _window.SetSize(size);
-
-        // resize render context
-        _render_context.Resize(size);
-
-        // notify cursors
-        _basic_cursor.OnResize( { _window.GetAspectRatio() } );
-        for( IOverlayCursor* cursor : _cursors )
-            if( cursor != nullptr )
-                cursor->OnResize( { _window.GetAspectRatio() } );
-    }
-
     void Overlay::_FrameLoop()
     {
         Vector2l windows_position;
-        Vector2l adjusted_position;
         Vector2f nds_position;
 
         // run frame loop
@@ -336,7 +321,7 @@ namespace Yolomouse
             _render_context.RenderBegin();
 
             // get mouse monitor cursor position
-            if( _mouse.GetCursorPosition(windows_position, adjusted_position, nds_position) )
+            if( _mouse.GetCursorPosition(windows_position, nds_position) )
             {
                 // update hover state using windows cursor position
                 _UpdateHoverState(windows_position);
@@ -344,22 +329,96 @@ namespace Yolomouse
                 // process in frame events
                 _ProcessInFrameEvents();
 
-                // if active cursor exists
+                // update text popup and reset idle if active
+                if( _UpdateTextPopup() )
+                    idle = false;
+
+                // if active cursor exists, draw cursor and reset idle
                 if( _active_cursor != nullptr )
                 {
-                    // update cursor
-                    _active_cursor->Update({ nds_position });
-
-                    // draw cursor
-                    _active_cursor->Draw();
-
-                    // set render
+                    _active_cursor->Draw(nds_position);
                     idle = false;
                 }
             }
 
             // complete render session
             _render_context.RenderComplete(idle);
+        }
+    }
+
+    void Overlay::_ProcessPreFrameEvents()
+    {
+        // if pending pre frame events exist
+        if( _pre_frame_events != 0 )
+        {
+            // handle resize
+            if( _pre_frame_events & PRE_FRAME_EVENT_RESIZE )
+                _OnFrameEventResize( _resize_event );
+
+            // reset pre frame events
+            _pre_frame_events = 0;
+        }
+    }
+
+    void Overlay::_ProcessInFrameEvents()
+    {
+        // if pending in frame events exist
+        if( _in_frame_events != 0 )
+        {
+            // reset active cursor
+            if( _in_frame_events & IN_FRAME_EVENT_HIDE_CURSOR )
+                _active_cursor = nullptr;
+            // set new cursor (ensure called after hide cursor in case hide+set event at same time)
+            if( _in_frame_events & IN_FRAME_EVENT_SET_CURSOR )
+                _active_cursor = _cursor_event;
+            // set message popup
+            if( _in_frame_events & IN_FRAME_EVENT_SET_MESSAGE )
+                _OnFrameEventMessage( _message_event );
+
+            // reset in frame events
+            _in_frame_events = 0;
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    void Overlay::_OnFrameEventResize( const Vector2l& size )
+    {
+        // update window size
+        _window.SetSize(size);
+
+        // resize render context
+        _render_context.Resize(size);
+
+        // update cursor aspect ratios
+        _basic_cursor.SetAspectRatio( _window.GetAspectRatio() );
+        for( IOverlayCursor* cursor : _cursors )
+            if( cursor != nullptr )
+                cursor->SetAspectRatio( _window.GetAspectRatio() );
+
+        // update text popup aspect ratio
+        _text_popup.SetAspectRatio( _window.GetAspectRatio() );
+    }
+
+    void Overlay::_OnFrameEventMessage( const String& message )
+    {
+        RECT rect;
+
+        // get window bounds
+        if( GetWindowRect( _hover_hwnd, &rect ) )
+        {
+            Vector2f wsize = _window.GetSize().Cast<Float>();
+
+            // center of window in screen coordinates
+            Vector2f position(rect.left + (rect.right - rect.left) * 0.5f, rect.top + (rect.bottom - rect.top) * 0.5f);
+
+            // calculate center of window in NDS coordinates
+            position = (position - wsize / 2.0f) / wsize.y;
+
+            // determine timeout based on text length
+            ULong timeout = message.GetCount() * MESSAGE_TIMEOUT_PER_CHARACTER + 1000;
+
+            // set text popup message, position, and timeout
+            _text_popup.SetText( message, position, timeout);
         }
     }
 
@@ -377,6 +436,18 @@ namespace Yolomouse
 
         // notify
         events.Notify( {OverlayEvent::WINDOW_HOVER, _hover_hwnd } );
+    }
+
+    Bool Overlay::_UpdateTextPopup()
+    {
+        // draw text popup if active
+        if( _text_popup.IsActive() )
+        {
+            _text_popup.Draw();
+            return true;
+        }
+
+        return false;
     }
 
     //-------------------------------------------------------------------------

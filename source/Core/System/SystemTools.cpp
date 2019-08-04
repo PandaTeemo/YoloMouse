@@ -49,6 +49,11 @@ namespace Core
         return true;
     }
 
+    ULong SystemTools::GetTimeMs()
+    {
+        return GetTickCount();
+    }
+
     UHuge SystemTools::GetTickTime()
     {
         UHuge counter = 0;
@@ -61,6 +66,14 @@ namespace Core
         UHuge frequency = 0;
         QueryPerformanceFrequency((LARGE_INTEGER*)&frequency);
         return frequency;
+    }
+
+    Float SystemTools::GetTicksToSeconds( UHuge ticks )
+    {
+        static UHuge frequency = SystemTools::GetTickFrequency();
+
+        // calculate frame time
+        return static_cast<Float>((ticks * 1000000) / frequency) / 1000000.0f;
     }
 
     //-------------------------------------------------------------------------

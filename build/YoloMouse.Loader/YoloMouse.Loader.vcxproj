@@ -112,7 +112,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Gdiplus.lib;d3d11.lib;dxgi.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -130,7 +130,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Gdiplus.lib;d3d11.lib;dxgi.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -152,7 +152,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Gdiplus.lib;d3d11.lib;dxgi.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -174,7 +174,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d11.lib;dxgi.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Gdiplus.lib;d3d11.lib;dxgi.lib;dwmapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -190,8 +190,15 @@
     <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\OverlayCursorVault.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Mouse\MousePositionMonitor.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Overlay.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Assets\Mesh.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Assets\Texture.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\RenderContext.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Support\RenderTimingController.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Support\RenderTools.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Text\FontAtlas.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Text\FontMapBuilder.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Text\TextMesh.cpp" />
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Text\TextPopup.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Target\Support\CursorVisibilityHacker.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Target\Target.cpp" />
     <ClCompile Include="..\..\source\YoloMouse\Loader\Target\TargetController.cpp" />
@@ -211,12 +218,19 @@
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Cursor\OverlayCursorVault.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Mouse\MousePositionMonitor.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Overlay.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Assets\Mesh.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Assets\Texture.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\RenderContext.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\Default\PixelShader.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\Default\VertexShader.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Shaders\ShaderTypes.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Support\RenderTimingController.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Support\RenderTools.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Types.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Text\FontAtlas.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Text\FontMapBuilder.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Text\TextMesh.hpp" />
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Text\TextPopup.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Resource\resource.h" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Target\Support\CursorVisibilityHacker.hpp" />
     <ClInclude Include="..\..\source\YoloMouse\Loader\Target\Target.hpp" />

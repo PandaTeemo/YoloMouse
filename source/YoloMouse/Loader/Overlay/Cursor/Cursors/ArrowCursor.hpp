@@ -20,7 +20,7 @@ namespace Yolomouse
         void _OnShutdown();
 
         /**/
-        void _OnUpdate( UpdateDef2& def );
+        void _OnUpdate( UpdateDef& def );
 
     private:
         // fields: state

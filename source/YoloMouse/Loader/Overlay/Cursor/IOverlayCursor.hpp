@@ -9,25 +9,8 @@ namespace Yolomouse
     class IOverlayCursor
     {
     public:
-        // types
-        struct InitializeDef
-        {
-            RenderContext& render_context;
-            Float          aspect_ratio;
-        };
-
-        struct ResizeDef
-        {
-            Float aspect_ratio;
-        };
-
-        struct UpdateDef
-        {
-            const Vector2f cursor_position;
-        };
-
         /**/
-        virtual Bool Initialize( const InitializeDef& def ) = 0;
+        virtual Bool Initialize( RenderContext& render_context ) = 0;
         virtual void Shutdown() = 0;
 
         /**/
@@ -35,14 +18,9 @@ namespace Yolomouse
 
         /**/
         virtual Bool SetCursor( CursorId id, CursorVariation variation, CursorSize size ) = 0;
+        virtual void SetAspectRatio( Float aspect_ratio ) = 0;
 
         /**/
-        virtual void Update( const UpdateDef& def ) = 0;
-
-        /**/
-        virtual void Draw() const = 0;
-
-        /**/
-        virtual void OnResize( const ResizeDef& def ) = 0;
+        virtual void Draw( const Vector2f& position ) = 0;
     };
 }

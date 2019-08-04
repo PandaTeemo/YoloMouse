@@ -12,6 +12,7 @@
 #include <YoloMouse/Loader/Overlay/Cursor/IOverlayCursor.hpp>
 #include <YoloMouse/Loader/Overlay/Mouse/MousePositionMonitor.hpp>
 #include <YoloMouse/Loader/Overlay/Rendering/RenderContext.hpp>
+#include <YoloMouse/Loader/Overlay/Text/TextPopup.hpp>
 #include <YoloMouse/Share/Constants.hpp>
 #include <YoloMouse/Share/Enums.hpp>
 
@@ -44,6 +45,8 @@ namespace Yolomouse
         Bool SetCursor( const CursorInfo& info );
         Bool SetCursorIterated( CursorInfo& info );
         void SetCursorHidden();
+        void SetMessage( const String& message );
+        void SetReduceLatency( Bool enable );
 
         /**/
         Bool InstallCursor( CursorId id, IOverlayCursor& cursor );
@@ -66,7 +69,8 @@ namespace Yolomouse
         enum: Bits
         {
             IN_FRAME_EVENT_SET_CURSOR =     BIT(0),
-            IN_FRAME_EVENT_HIDE_CURSOR =    BIT(1)
+            IN_FRAME_EVENT_HIDE_CURSOR =    BIT(1),
+            IN_FRAME_EVENT_SET_MESSAGE =    BIT(2)
         };
         typedef Bits InFrameEvents;
 
@@ -89,13 +93,17 @@ namespace Yolomouse
         void _ShutdownThread();
 
         /**/
+        void _FrameLoop();
         void _ProcessPreFrameEvents();
         void _ProcessInFrameEvents();
-        void _FrameResize( const Vector2l& size );
-        void _FrameLoop();
+
+        /**/
+        void _OnFrameEventResize( const Vector2l& size );
+        void _OnFrameEventMessage( const String& message );
 
         /**/
         void _UpdateHoverState( const Vector2l& cursor_position );
+        Bool _UpdateTextPopup();
 
         /**/
         IOverlayCursor* _LoadCursor( const CursorInfo& info );
@@ -112,19 +120,22 @@ namespace Yolomouse
         CursorTable                 _cursors;
         IOverlayCursor*             _active_cursor;
         // fields: state
-        Window                      _window;
-        MousePositionMonitor        _mouse;
-        HANDLE                      _thread;
         Bool                        _initialized;
         Bool                        _started;
         Bool                        _active;
-        BasicCursor                 _basic_cursor;
         HWND                        _hover_hwnd;
-        RenderContext               _render_context;
-        // fields: local events
+        // fields: events
         PreFrameEvents              _pre_frame_events;
         InFrameEvents               _in_frame_events;
         Vector2l                    _resize_event;
         IOverlayCursor*             _cursor_event;
+        SimpleString                _message_event;
+        // fields: objects
+        Window                      _window;
+        MousePositionMonitor        _mouse;
+        RenderContext               _render_context;
+        HANDLE                      _thread;
+        BasicCursor                 _basic_cursor;
+        TextPopup                   _text_popup;
     };
 }

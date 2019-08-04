@@ -36,7 +36,7 @@ namespace Core
         const KeyValueCollection& GetCollection() const;
 
         /**/
-        void Set( Id id, String value );
+        void Set( Id id, const String& value );
         void SetBoolean( Id id, Bool boolean );
         void SetNumber( Id id, Long number );
 

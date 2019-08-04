@@ -11,13 +11,13 @@ namespace Yolomouse
     // public
     //-------------------------------------------------------------------------
     Target::Target():
-        _process_id     (INVALID_ID),
-        _initialized    (false),
-        _started        (false),
-        _hover_hwnd     (NULL),
-        _showing        (true),
-        _process        (NULL),
-        _wait_handle    (NULL)
+        _process_id (INVALID_ID),
+        _initialized(false),
+        _started    (false),
+        _hover_hwnd (NULL),
+        _showing    (true),
+        _process    (NULL),
+        _wait_handle(NULL)
     {
         _bindings_path.Zero();
     }
@@ -65,8 +65,9 @@ namespace Yolomouse
                 // activate with default
                 _BuildDefaultCursor(_active_cursor);
             }
+
             // update binding
-            else if( !_UpdateRestrictedBinding( updates, flags ) )
+            if( !_SetRestrictedBinding( updates, flags ) )
                 return false;
 
             // update cursor
@@ -98,8 +99,8 @@ namespace Yolomouse
         // if restricted state
         if( IsRestricted() )
         {
-            // reset cursor
-            _active_cursor = CursorInfo();
+            // reset binding
+            _ResetRestrictedBinding();
 
             // update cursor
             _UpdateCursor();
@@ -155,7 +156,7 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    Bool Target::Start()
+    Bool Target::Start( Bool allow_restricted_mode )
     {
         ASSERT( !IsStarted() );
 
@@ -174,6 +175,10 @@ namespace Yolomouse
         // if restricted state (inject session failed)
         if( IsRestricted() )
         {
+            // fail if not allowed
+            if( !allow_restricted_mode )
+                return false;
+
             //TODO2: also notify user via overlay that this happened
             LOG( "Target.Start: Entering Restricted Mode" );
 
@@ -292,7 +297,7 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    Bool Target::_UpdateRestrictedBinding( const CursorInfo& updates, CursorUpdateFlags flags )
+    Bool Target::_SetRestrictedBinding( const CursorInfo& updates, CursorUpdateFlags flags )
     {
         CursorInfo cursor = _active_cursor;
 
@@ -303,7 +308,7 @@ namespace Yolomouse
         if( !_IsValidCursor(cursor) )
             return false;
 
-        // update cursor
+        // update active cursor
          _active_cursor = cursor;
 
         // update default restricted binding
@@ -313,6 +318,18 @@ namespace Yolomouse
         CursorBindingsSerializer::Save( _restricted_bindings, _bindings_path );
 
         return true;
+    }
+
+    void Target::_ResetRestrictedBinding()
+    {
+        // reset active cursor
+        _active_cursor = CursorInfo();
+
+        // update default restricted binding
+        _restricted_bindings.GetDefaultBinding() = _active_cursor;
+
+        // save cursor bindings (can fail)
+        CursorBindingsSerializer::Save( _restricted_bindings, _bindings_path );
     }
 
     void Target::_UpdateCursor()
@@ -354,30 +371,6 @@ namespace Yolomouse
         // else ensure overlay cursor hidden (this should happen first before new target gets hover control)
         else
             overlay.SetCursorHidden();
-
-        
-        
-/*
-        // if hovering, showing, and binding is overlay type, update overlay cursor
-        if( _hover_hwnd != NULL && _showing && _binding.type == CURSOR_TYPE_OVERLAY )
-        {
-            // show overlay cursor
-            overlay.SetCursorIterated( _binding );
-
-            // if restricted state, hack hide application cursor
-            if( IsRestricted() )
-                CursorVisibilityHacker::Instance().Hide(_hover_hwnd, HACK_VISIBILITY_TIMEOUT);
-        }
-        else
-        {
-            // hide overlay cursor
-            overlay.SetCursorHidden();
-
-            // if hovering and restricted state, hack show application cursor
-            if( _hover_hwnd != NULL && IsRestricted() )
-                CursorVisibilityHacker::Instance().Show(_hover_hwnd, HACK_VISIBILITY_TIMEOUT);
-        }
-*/
     }
 
     //-------------------------------------------------------------------------

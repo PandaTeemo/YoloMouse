@@ -72,7 +72,7 @@ namespace Yolomouse
         ASSERT( IsInitialized() );
 
         // open process with necessary privileges required by the tools that will use it
-        HANDLE process = OpenProcess(PROCESS_VM_OPERATION|PROCESS_CREATE_THREAD|PROCESS_VM_WRITE, FALSE, _process_id);
+        HANDLE process = OpenProcess(PROCESS_VM_OPERATION|PROCESS_CREATE_THREAD|PROCESS_VM_WRITE|PROCESS_QUERY_INFORMATION, FALSE, _process_id);
         if( process != NULL )
         {
             // choose inject dll

@@ -44,7 +44,10 @@ namespace Yolomouse
         Bool IsInitialized() const;
 
         /**/
-        Bool GetCursorPosition( Vector2l& windows_position, Vector2l& adjusted_position, Vector2f& nds_position );
+        Bool GetCursorPosition( Vector2l& windows_position, Vector2f& nds_position );
+
+        /**/
+        void SetImprovedPrecision( Bool enabled );
 
     private:
         // constants
@@ -61,6 +64,7 @@ namespace Yolomouse
 
         // fields: parameters
         Window*         _window;
+        Bool            _option_improved_precision;
         // fields: state
         Bool            _initialized;
         Float           _mickey_multiplier;

@@ -20,11 +20,11 @@ namespace Yolomouse
         void _OnShutdown();
 
         /**/
-        void _OnUpdate( UpdateDef2& def );
+        void _OnUpdate( UpdateDef& def );
 
     private:
         /**/
-        Bool _InitializeGeometry();
+        Bool _InitializeMesh();
 
         // fields: state
         Float _rotater;

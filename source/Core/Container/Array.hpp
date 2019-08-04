@@ -424,6 +424,115 @@ namespace Core
         }
     };
 
+    /*
+        memory: allocated
+        count:  variable
+        limit:  =count
+    */
+    template<typename TYPE>
+    class SimpleArray:
+        public Array<TYPE>
+    {
+    public:
+        /**/
+        SimpleArray() = default;
+
+        SimpleArray( ULong count )
+        {
+            _Construct(count);
+        }
+
+        SimpleArray( const std::initializer_list<TYPE>& ilist )
+        {
+            _Copy(ilist.begin(), static_cast<ULong>(ilist.size()));
+        }
+
+        SimpleArray( const SimpleArray& other )
+        {
+            _Copy(other.GetMemory(), other.GetCount());
+        }
+
+        template<class ARRAY>
+        SimpleArray( const ARRAY& other )
+        {
+            _Copy(other.GetMemory(), other.GetCount());
+        }
+
+        ~SimpleArray()
+        {
+            if( _memory != nullptr )
+                _Destruct();
+        }
+
+        /**/
+        void operator=( const SimpleArray& other )
+        {
+            Copy( other );
+        }
+        template<class ARRAY>
+        void operator=( const ARRAY& other )
+        {
+            Copy( other );
+        }
+
+        /**/
+        void Empty()
+        {
+            // if not already empty
+            if( _memory != nullptr )
+            {
+                _Destruct();
+                _count = 0;
+                _memory = nullptr;
+            }
+        }
+
+        /**/
+        void SetCount( ULong count )
+        {
+            if( _memory != nullptr )
+                _Destruct();
+            _Construct(count);
+        }
+
+        /**/
+        void Copy( const TYPE* data, ULong count )
+        {
+            if( _memory != nullptr )
+                _Destruct();
+            _Copy( data, count );
+        }
+        template<class ARRAY>
+        void Copy( const ARRAY& other )
+        {
+            Copy(other.GetMemory(), other.GetCount());
+        }
+
+    protected:
+        /**/
+        inline void _Construct( ULong count )
+        {
+            // allocate and construct data
+            _memory = new TYPE[count];
+
+            // set count
+            _count = count;
+        }
+
+        inline void _Destruct()
+        {
+            // destruct and free data
+            delete[] _memory;
+        }
+
+        /**/
+        void _Copy( const TYPE* data, ULong count )
+        {
+            _Construct(count);
+            BaseArray::Copy(data, count);
+        }
+    };
+
     /**/
     typedef Array<Byte>         ByteArray;
     typedef BufferArray<Byte>   ByteBufferArray;

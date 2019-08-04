@@ -10,7 +10,7 @@ namespace Yolomouse
     {
         // constants
         //---------------------------------------------------------------------
-        const Float     ROTATION_SPEED = 0.13f;   // rotations/sec
+        const Float     ROTATION_SPEED = 0.2f;   // rotations/sec
         const Vector3f  LIGHT_VECTOR = Vector3f(0,-1,0).Normal();
 
         // vertices
@@ -62,12 +62,8 @@ namespace Yolomouse
         // calculate face normals
         _CalculateFaceNormals( VERTICES, INDICES );
 
-        // initialize blending
-        if( !_InitializeBlending({D3D11_BLEND_SRC_ALPHA, D3D11_BLEND_INV_SRC_ALPHA}) )
-            return false;
-
-        // initialize geometry
-        if( !_InitializeGeometry({VERTICES, INDICES}) )
+        // initialize mesh
+        if( !BaseCursor::_mesh.Initialize({*_render_context,INDICES,VERTICES}) )
             return false;
 
         return true;
@@ -77,14 +73,11 @@ namespace Yolomouse
     {
         ASSERT( IsInitialized() );
 
-        // shutdown geometry
-        _ShutdownGeometry();
-
-        // shutdown blending
-        _ShutdownBlending();
+        // shutdown mesh
+        _mesh.Shutdown();
     }
 
-    void ArrowCursor::_OnUpdate( UpdateDef2& def )
+    void ArrowCursor::_OnUpdate( UpdateDef& def )
     {
         // update light vector
         def.light_vector = LIGHT_VECTOR;

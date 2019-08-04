@@ -148,6 +148,39 @@ namespace Core
     };
 
     /**/
+    class SimpleString:
+        public BaseString<SimpleArray<Char>>
+    {
+    public:
+        /**/
+        SimpleString() = default;
+        SimpleString( const Char* cstring );
+        template<class STRING>
+        SimpleString( const STRING& other )
+        {
+            _Construct(other.GetCount());
+            Copy(other);
+        }
+
+        /**/
+        operator String() const
+        {
+            return String(_memory, _count);
+        }
+
+        /**/
+        void operator=( const SimpleArray& other )
+        {
+            SimpleArray::Copy( other );
+        }
+        template<class STRING>
+        void operator=( const STRING& other )
+        {
+            SimpleArray::Copy( other );
+        }
+    };
+
+    /**/
     typedef FixedString<DynamicFlatArray<Char, STRING_SHORT_SIZE>>    ShortString;
     typedef FixedString<DynamicFlatArray<Char, STRING_MEDIUM_SIZE>>   MediumString;
     typedef FixedString<DynamicFlatArray<Char, STRING_MAX_SIZE>>      MaxString;

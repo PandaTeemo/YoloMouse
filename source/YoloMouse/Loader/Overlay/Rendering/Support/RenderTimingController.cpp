@@ -4,12 +4,24 @@
 
 namespace Yolomouse
 {
+    // local
+    //-------------------------------------------------------------------------
+    namespace
+    {
+        // constants
+        //---------------------------------------------------------------------
+        static constexpr Float DEFAULT_REFRESH_RATE =   59.94f;     // hz
+        static constexpr Float RENDER_TIME_INITIAL =    0.002f;     // sec. initial render time
+        static constexpr Float RENDER_TIME_INCREMENT =  0.0012f;    // sec. time to increase render time by during detected lag
+        static constexpr Float RENDER_TIME_RECOVER =    0.000001f;  // sec. time to decrease render time by each frame.
+        static constexpr Float RENDER_TIME_LIMIT =      0.5f;       // as factor of refresh rate
+    }
+
     // public
     //-------------------------------------------------------------------------
     RenderTimingController::RenderTimingController():
         _dxgi_output        (nullptr),
-        _resolution         (0, 0),
-        _tick_frequency     (0),
+        _option_fill_time   (false),
         _refresh_time       (0),
         _render_time        (RENDER_TIME_INITIAL),
         _frameskip_threshold(0),
@@ -25,18 +37,15 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    void RenderTimingController::Initialize( IDXGIOutput& dxgi_output )
+    void RenderTimingController::Initialize( IDXGIOutput& dxgi_output, const Vector2l& resolution )
     {
         ASSERT( !IsInitialized() );
 
         // set fields
         _dxgi_output = &dxgi_output;
 
-        // get tick frequency
-        _tick_frequency = SystemTools::GetTickFrequency();
-
         // calculate refresh rate
-        _CalculateRefreshRate();
+        _CalculateRefreshRate(resolution);
 
         // update fill time
         _UpdateFillTime();
@@ -66,9 +75,9 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    void RenderTimingController::SetResolution( const Vector2l& resolution )
+    void RenderTimingController::SetFillTime( Bool enabled )
     {
-        _resolution = resolution;
+        _option_fill_time = enabled;
     }
 
     //-------------------------------------------------------------------------
@@ -76,8 +85,12 @@ namespace Yolomouse
     {
         ASSERT( IsInitialized() );
 
-        // sleep fill time (estimated render time - refresh time)
-        Sleep( _fill_time );
+        // if fill time option enabled
+        if( _option_fill_time )
+        {
+            // sleep fill time (estimated render time - refresh time)
+            Sleep( _fill_time );
+        }
     }
 
     void RenderTimingController::End()
@@ -88,20 +101,24 @@ namespace Yolomouse
         UHuge current_ticks = SystemTools::GetTickTime();
 
         // calculate frame time
-        _frame_time = _TicksToSeconds(current_ticks - _begin_ticks);
+        _frame_time = SystemTools::GetTicksToSeconds(current_ticks - _begin_ticks);
 
         // update begin ticks
         _begin_ticks = current_ticks;
 
-        // if we're skipping frames, increase render time estimate. limit to half refresh time
-        if( _frame_time > _frameskip_threshold )
-            _render_time = Tools::Min( _render_time + RENDER_TIME_INCREMENT, _refresh_time * 0.5f );
-        // else decrease render time estimate a little. limit to initial render time
-        else
-            _render_time = Tools::Max( _render_time - RENDER_TIME_RECOVER, RENDER_TIME_INITIAL );
+        // if fill time option enabled
+        if( _option_fill_time )
+        {
+            // if we're skipping frames, increase render time estimate. limit to half refresh time
+            if( _frame_time > _frameskip_threshold )
+                _render_time = Tools::Min( _render_time + RENDER_TIME_INCREMENT, _refresh_time * RENDER_TIME_LIMIT );
+            // else decrease render time estimate a little. limit to initial render time
+            else
+                _render_time = Tools::Max( _render_time - RENDER_TIME_RECOVER, RENDER_TIME_INITIAL );
 
-        // update fill time
-        _UpdateFillTime();
+            // update fill time
+            _UpdateFillTime();
+        }
 
         // log
         LOG3( "RenderTimingController.FrameTime FRAME:%f FILL:%u", _frame_time, _fill_time );
@@ -114,7 +131,7 @@ namespace Yolomouse
         _fill_time = static_cast<ULong>((_refresh_time - _render_time) * 1000.0f);
     }
 
-    void RenderTimingController::_CalculateRefreshRate()
+    void RenderTimingController::_CalculateRefreshRate( const Vector2l& resolution )
     {
         UINT num_modes = 0;
 
@@ -139,8 +156,8 @@ namespace Yolomouse
 
                     // calculate resolution nearness score
                     ULong score = Math<Long>::Absolute(
-                        (static_cast<Long>(mode.Width) - _resolution.x) +
-                        (static_cast<Long>(mode.Height) - _resolution.y));
+                        (static_cast<Long>(mode.Width) - resolution.x) +
+                        (static_cast<Long>(mode.Height) - resolution.y));
 
                     // if better than best, update best score and mode
                     if( score < best_score )
@@ -161,11 +178,5 @@ namespace Yolomouse
 
         // update frameskip threshold
         _frameskip_threshold = _refresh_time * 1.5f;
-    }
-
-    Float RenderTimingController::_TicksToSeconds( UHuge ticks )
-    {
-        // calculate frame time
-        return static_cast<Float>((ticks * 1000000) / _tick_frequency) / 1000000.0f;
     }
 }

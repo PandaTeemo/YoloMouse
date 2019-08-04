@@ -24,7 +24,7 @@ namespace Yolomouse
         void _OnShutdown();
 
         /**/
-        void _OnUpdate( UpdateDef2& def );
+        void _OnUpdate( UpdateDef& def );
 
         /**/
         Bool _InitializeGeometry( const Vector2f& hotspot, const Vector2f& size );

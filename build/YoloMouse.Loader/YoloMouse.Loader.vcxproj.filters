@@ -46,6 +46,12 @@
     <Filter Include="Overlay\Mouse">
       <UniqueIdentifier>{4938d3f7-9383-41fa-945a-a8fae4fcdbf1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Overlay\Text">
+      <UniqueIdentifier>{e937feb4-036c-4353-8d79-8d5d13542376}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Overlay\Rendering\Assets">
+      <UniqueIdentifier>{f2c36add-91f4-4ff5-a514-661cbc09eb51}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\YoloMouse\Loader\Main.cpp" />
@@ -96,6 +102,27 @@
     </ClCompile>
     <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Mouse\MousePositionMonitor.cpp">
       <Filter>Overlay\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Text\TextMesh.cpp">
+      <Filter>Overlay\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Support\RenderTools.cpp">
+      <Filter>Overlay\Rendering\Support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Text\FontAtlas.cpp">
+      <Filter>Overlay\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Text\FontMapBuilder.cpp">
+      <Filter>Overlay\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Text\TextPopup.cpp">
+      <Filter>Overlay\Text</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Assets\Mesh.cpp">
+      <Filter>Overlay\Rendering\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Assets\Texture.cpp">
+      <Filter>Overlay\Rendering\Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -170,6 +197,27 @@
     </ClInclude>
     <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Mouse\MousePositionMonitor.hpp">
       <Filter>Overlay\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Text\TextMesh.hpp">
+      <Filter>Overlay\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Support\RenderTools.hpp">
+      <Filter>Overlay\Rendering\Support</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Text\FontAtlas.hpp">
+      <Filter>Overlay\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Text\FontMapBuilder.hpp">
+      <Filter>Overlay\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Text\TextPopup.hpp">
+      <Filter>Overlay\Text</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Assets\Mesh.hpp">
+      <Filter>Overlay\Rendering\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\source\YoloMouse\Loader\Overlay\Rendering\Assets\Texture.hpp">
+      <Filter>Overlay\Rendering\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

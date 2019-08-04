@@ -59,6 +59,7 @@ namespace Core
 
     typedef bool                Bool;
     typedef char                Char;
+    typedef wchar_t             WChar;
     typedef unsigned char       Byte;
     typedef short               Short;
     typedef unsigned short      UShort;
@@ -86,12 +87,6 @@ namespace Core
     #else
         typedef Long            Native;
         typedef ULong           UNative;
-    #endif
-
-    #ifdef PRECISION_DOUBLE
-        typedef Double          Real;
-    #else
-        typedef Float           Real;
     #endif
 
 #if 0

@@ -10,7 +10,7 @@ namespace Yolomouse
     {
         // constants
         //---------------------------------------------------------------------
-        const Float ROTATION_SPEED =    0.04f;  // rotations/sec
+        const Float ROTATION_SPEED =    0.06f;  // rotations/sec
         const ULong SEGMENT_COUNT =     32;
         const Float RING_RADIUS0 =      1.10f;
         const Float RING_RADIUS1 =      1.30f;
@@ -37,12 +37,8 @@ namespace Yolomouse
     //-------------------------------------------------------------------------
     Bool CircleCursor::_OnInitialize()
     {
-        // initialize blending
-        if( !_InitializeBlending({D3D11_BLEND_SRC_ALPHA, D3D11_BLEND_INV_SRC_ALPHA}) )
-            return false;
-
-        // initialize geometry
-        if( !_InitializeGeometry() )
+        // initialize mesh
+        if( !_InitializeMesh() )
             return false;
 
         return true;
@@ -52,14 +48,11 @@ namespace Yolomouse
     {
         ASSERT( IsInitialized() );
 
-        // shutdown geometry
-        _ShutdownGeometry();
-
-        // shutdown blending
-        _ShutdownBlending();
+        // shutdown mesh
+        _mesh.Shutdown();
     }
 
-    void CircleCursor::_OnUpdate( UpdateDef2& def )
+    void CircleCursor::_OnUpdate( UpdateDef& def )
     {
         // calculate rotation
         Float ux = Math<Float>::Cos(_rotater);
@@ -76,7 +69,7 @@ namespace Yolomouse
 
     // private
     //-------------------------------------------------------------------------
-    Bool CircleCursor::_InitializeGeometry()
+    Bool CircleCursor::_InitializeMesh()
     {
         // constants
         static const ULong VINDEX_RING_ORIGIN =    SEGMENT_COUNT * 3;
@@ -91,8 +84,8 @@ namespace Yolomouse
         };
 
         // buffers
-        static ShaderVertex vertex_data[VERTEX_COUNT];
-        static Index3       index_data[INDEX_COUNT];
+        ShaderVertex vertex_data[VERTEX_COUNT];
+        Index3       index_data[INDEX_COUNT];
 
         // set ring origin vertex
         ShaderVertex& v_ring_origin = vertex_data[VINDEX_RING_ORIGIN];
@@ -127,17 +120,17 @@ namespace Yolomouse
             v1.normal = v0b.normal;
 
             // create polys
-            i0.a = VINDEX_RING_ORIGIN;
-            i0.b = vi;
-            i0.c = i == (SEGMENT_COUNT - 1) ? 0 : vi + 3;
+            i0.x = VINDEX_RING_ORIGIN;
+            i0.y = vi;
+            i0.z = i == (SEGMENT_COUNT - 1) ? 0 : vi + 3;
 
-            i1.a = vi + 1;
-            i1.b = vi + 2;
-            i1.c = i0.c + 2;
+            i1.x = vi + 1;
+            i1.y = vi + 2;
+            i1.z = i0.z + 2;
 
-            i2.a = vi + 1;
-            i2.b = i0.c + 2;
-            i2.c = i0.c + 1;
+            i2.x = vi + 1;
+            i2.y = i0.z + 2;
+            i2.z = i0.z + 1;
         }
 
         // for each center vertex
@@ -162,15 +155,16 @@ namespace Yolomouse
             v0.normal = v1.normal = v2.normal = Vector3f(off0.x * CENTER_HEIGHT, off0.y * CENTER_HEIGHT, CENTER_RADIUS).Normal();
 
             // create poly
-            i0.a = vi;
-            i0.b = vi + 1;
-            i0.c = vi + 2;
+            i0.x = vi;
+            i0.y = vi + 1;
+            i0.z = vi + 2;
         }
 
         // initialize geometry
-        return BaseCursor::_InitializeGeometry({
-            Array<ShaderVertex>(vertex_data, VERTEX_COUNT),
-            Array<Index3>      (index_data, INDEX_COUNT)
+        return BaseCursor::_mesh.Initialize({
+            *_render_context,
+            Array<Index3>      (index_data, INDEX_COUNT),
+            Array<ShaderVertex>(vertex_data, VERTEX_COUNT)
         });
     }
 }

@@ -32,7 +32,7 @@ namespace Yolomouse
         void SetGamesOnly( Bool enable );
 
         /**/
-        Bool AccessTarget( Target*& target );
+        Bool AccessTarget( Target*& target, Bool allow_restricted_mode );
 
     private:
         // impl
@@ -46,7 +46,7 @@ namespace Yolomouse
         void _ShutdownTargets();
 
         /**/
-        Target* _SpawnTarget( Id process_id, Bool require_configured );
+        Target* _SpawnTarget( Id process_id, Bool require_configured, Bool allow_restricted_mode );
 
         /**/
         void _OnWindowForeground( HWND hwnd );

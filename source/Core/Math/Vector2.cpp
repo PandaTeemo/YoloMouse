@@ -1,4 +1,5 @@
 #include <Core/Math/Vector2.hpp>
+#include <Core/Math/Number.hpp>
 
 namespace Core
 {
@@ -133,7 +134,7 @@ namespace Core
     template<typename TYPE>
     BaseVector2<TYPE> BaseVector2<TYPE>::operator - () const
     {
-        return BaseVector2(-x, -y);
+        return BaseVector2(-Number<TYPE>(x), -Number<TYPE>(y));
     }
 
     //-------------------------------------------------------------------------

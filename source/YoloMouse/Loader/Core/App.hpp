@@ -24,6 +24,7 @@ namespace Yolomouse
 
         /**/
         Bool IsInitialized() const;
+        Bool IsElevated() const;
 
         /**/
         Bool              GetElevate() const;
@@ -56,8 +57,8 @@ namespace Yolomouse
         /**/
         void _OptionAbout();
         void _OptionErrors();
-        void _OptionGamesOnly( Bool enable, Bool save );
         Bool _OptionAutoStart( Bool enable, Bool save );
+        void _OptionReduceOverlayLag( Bool enable, Bool save );
         Bool _OptionRunAsAdmin();
         void _OptionSettingsFolder();
 

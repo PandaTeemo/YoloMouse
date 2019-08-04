@@ -41,7 +41,7 @@ namespace Yolomouse
         void Shutdown();
 
         /**/
-        Bool Start();
+        Bool Start( Bool allow_restricted_mode );
         void Stop();
 
         /**/
@@ -60,7 +60,10 @@ namespace Yolomouse
         static Bool _IsValidCursor( const CursorInfo& properties );
 
         /**/
-        Bool _UpdateRestrictedBinding( const CursorInfo& updates, CursorUpdateFlags flags );
+        Bool _SetRestrictedBinding( const CursorInfo& updates, CursorUpdateFlags flags );
+        void _ResetRestrictedBinding();
+
+        /**/
         void _UpdateCursor();
 
         /**/

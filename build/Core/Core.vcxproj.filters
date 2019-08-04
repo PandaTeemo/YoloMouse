@@ -120,6 +120,9 @@
     <ClInclude Include="..\..\source\Core\Events\WindowEvent.hpp">
       <Filter>Events</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\source\Core\Math\Number.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\source\Core\Support\Settings.cpp">
@@ -173,6 +176,9 @@
     </ClCompile>
     <ClCompile Include="..\..\source\Core\UI\Window.cpp">
       <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\source\Core\Math\Number.cpp">
+      <Filter>Math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

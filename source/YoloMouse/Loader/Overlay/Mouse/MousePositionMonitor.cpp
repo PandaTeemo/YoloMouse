@@ -6,12 +6,13 @@ namespace Yolomouse
     //-------------------------------------------------------------------------
     MousePositionMonitor::MousePositionMonitor():
         // fields: parameters
-        _window                 (nullptr),
+        _window                     (nullptr),
+        _option_improved_precision  (false),
         // fields: state
-        _mickey_multiplier      (0),
-        _initialized            (false),
-        _cursor_position_delta  (0,0),
-        _hover_hwnd             (NULL)
+        _mickey_multiplier          (0),
+        _initialized                (false),
+        _cursor_position_delta      (0,0),
+        _hover_hwnd                 (NULL)
     {
     }
 
@@ -74,22 +75,28 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    Bool MousePositionMonitor::GetCursorPosition( Vector2l& windows_position, Vector2l& adjusted_position, Vector2f& nds_position )
+    Bool MousePositionMonitor::GetCursorPosition( Vector2l& windows_position, Vector2f& nds_position )
     {
-        POINT    point;
-        Vector2l size = _window->GetSize();
+        POINT       point;
+        Vector2l    adjusted_position;
+        Vector2l    size = _window->GetSize();
 
         // get cursor position (1 frame behind)
         if( !GetCursorPos( &point ) )
             return false;
 
         // convert point to windows position
-        windows_position.x = point.x;
-        windows_position.y = point.y;
+        windows_position.Set( point.x, point.y );
 
-        // adjust by cursor position delta from raw input adjusted by mickey multiplier (depends on windows mouse settings)
-        adjusted_position.x = windows_position.x + static_cast<Long>(static_cast<Float>(_cursor_position_delta.x) * _mickey_multiplier);
-        adjusted_position.y = windows_position.y + static_cast<Long>(static_cast<Float>(_cursor_position_delta.y) * _mickey_multiplier);
+        // if rawinput mickeys are to be included to improve precision
+        if( _option_improved_precision )
+        {
+            // adjust by cursor position delta from raw input adjusted by mickey multiplier (depends on windows mouse settings)
+            adjusted_position = windows_position + ( _cursor_position_delta.Cast<Float>() * _mickey_multiplier ).Cast<Long>();
+        }
+        // else use base window position
+        else
+            adjusted_position = windows_position;
 
         // convert to NDS coordinates given current resolution
         nds_position.x = (static_cast<Float>(adjusted_position.x) / static_cast<Float>(size.y)) - (_window->GetAspectRatio() * 0.5f);
@@ -99,6 +106,12 @@ namespace Yolomouse
         _cursor_position_delta.Set(0);
 
         return true;
+    }
+
+    //-------------------------------------------------------------------------
+    void MousePositionMonitor::SetImprovedPrecision( Bool enabled )
+    {
+        _option_improved_precision = enabled;
     }
 
     // private
@@ -156,9 +169,10 @@ namespace Yolomouse
             // if acceleration enabled
             if( mouse_settings[2] )
             {
-                //TODO4 acceleration more complicated, read following to improve
+                //TODO4 acceleration more complicated, read following to improve.
                 // https://www.esreality.com/index.php?a=post&id=1945096
-                _mickey_multiplier = entry.enhanced * MICKEY_MULTIPLIER_DAMPENER;
+                // for now increase dampening by 2x
+                _mickey_multiplier = entry.enhanced * MICKEY_MULTIPLIER_DAMPENER * 0.5f;
             }
             // else use normal factor
             else

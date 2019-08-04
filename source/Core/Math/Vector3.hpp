@@ -56,4 +56,5 @@ namespace Core
     // common typedefs
     //-------------------------------------------------------------------------
     typedef BaseVector3<Float> Vector3f;
+    typedef BaseVector3<ULong> Vector3u;
 }

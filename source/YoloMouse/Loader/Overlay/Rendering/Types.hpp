@@ -1,9 +1,9 @@
 #pragma once
 #include <YoloMouse/Share/Root.hpp>
-#include <Core/Type/Tuple.hpp>
+#include <Core/Math/Vector3.hpp>
 
 namespace Yolomouse
 {
     // types
-    typedef Tuple<Index, Index, Index> Index3;
+    typedef Vector3u Index3;
 }

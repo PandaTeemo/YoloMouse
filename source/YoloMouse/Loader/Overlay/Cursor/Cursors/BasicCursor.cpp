@@ -55,10 +55,6 @@ namespace Yolomouse
         // initialized cursor vault
         _cursor_vault.Initialize( App::Instance().GetHostPath() );
 
-        // initialize blending
-        if( !_InitializeBlending({D3D11_BLEND_SRC_ALPHA, D3D11_BLEND_INV_SRC_ALPHA}) )
-            return false;
-
         return true;
     }
 
@@ -67,21 +63,18 @@ namespace Yolomouse
         ASSERT( IsInitialized() );
 
         // shutdown texture
-        if( IsTextureInitialized() )
-            _ShutdownTexture();
+        if( _texture.IsInitialized() )
+            _texture.Shutdown();
 
-        // shutdown geometry
-        if( IsGeometryInitialized() )
-            _ShutdownGeometry();
-
-        // shutdown blending
-        _ShutdownBlending();
+        // shutdown mesh
+        if( _mesh.IsInitialized() )
+            _mesh.Shutdown();
 
         // shutdown cursor vault
         _cursor_vault.Shutdown();
     }
 
-    void BasicCursor::_OnUpdate( UpdateDef2& def )
+    void BasicCursor::_OnUpdate( UpdateDef& def )
     {
         // static position, no animation
     }
@@ -95,10 +88,10 @@ namespace Yolomouse
 
         // define vertices
         ShaderVertex VERTICES[] = {
-            { { tl.x, tl.y, 0 }, {1,0,0,1}, {0,0,1}, {0,0} },
-            { { br.x, tl.y, 0 }, {1,1,0,1}, {0,0,1}, {1,0} },
-            { { br.x, br.y, 0 }, {1,0,1,1}, {0,0,1}, {1,1} },
-            { { tl.x, br.y, 0 }, {0,1,1,1}, {0,0,1}, {0,1} },
+            { { tl.x, tl.y, 0 }, {1,1,1,1}, {0,0,1}, {0,0} },
+            { { br.x, tl.y, 0 }, {1,1,1,1}, {0,0,1}, {1,0} },
+            { { br.x, br.y, 0 }, {1,1,1,1}, {0,0,1}, {1,1} },
+            { { tl.x, br.y, 0 }, {1,1,1,1}, {0,0,1}, {0,1} },
         };
 
         // define indices
@@ -108,9 +101,10 @@ namespace Yolomouse
         };
 
         // initialize geometry
-        return BaseCursor::_InitializeGeometry({
-            Array<ShaderVertex>(VERTICES, COUNT(VERTICES)),
-            Array<Index3>      (INDICES, COUNT(INDICES))
+        return BaseCursor::_mesh.Initialize({
+            *_render_context,
+            Array<Index3>      (INDICES, COUNT(INDICES)),
+            Array<ShaderVertex>(VERTICES, COUNT(VERTICES))
         });
     }
 
@@ -165,14 +159,14 @@ namespace Yolomouse
                 Vector2f nds_size =    color_size.Cast<Float>() / resolution_y;
 
                 // shutdown previous
-                if( IsTextureInitialized() )
-                    _ShutdownTexture();
-                if( IsGeometryInitialized() )
-                    _ShutdownGeometry();
+                if( _texture.IsInitialized() )
+                    _texture.Shutdown();
+                if( _mesh.IsInitialized() )
+                    _mesh.Shutdown();
 
                 // initialize geometry and texture 
                 if (_InitializeGeometry( nds_hotspot, nds_size ) &&
-                    _InitializeTexture({ color_size, color_pixels }))
+                    _texture.Initialize({ *_render_context, color_pixels, color_size }))
                     status = true;
 
                 // cleanup

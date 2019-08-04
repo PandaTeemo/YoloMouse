@@ -4,6 +4,7 @@
 #include <YoloMouse/Loader/Inject/InjectEnvironment.hpp>
 #include <YoloMouse/Loader/Target/Support/CursorVisibilityHacker.hpp>
 #include <YoloMouse/Loader/Target/TargetController.hpp>
+#include <YoloMouse/Share/Constants.hpp>
 
 namespace Yolomouse
 {
@@ -79,7 +80,7 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    Bool TargetController::AccessTarget( Target*& target )
+    Bool TargetController::AccessTarget( Target*& target, Bool allow_restricted_mode )
     {
         ASSERT( IsInitialized() );
         DWORD process_id = 0;
@@ -102,9 +103,26 @@ namespace Yolomouse
         // find existing target entry
         target = _targets.Get( process_id );
 
-        // if not found, spawn new one
+        // if not found
         if( target == nullptr )
-            target = _SpawnTarget( process_id, false );
+        {
+            // spawn new target
+            target = _SpawnTarget( process_id, false, allow_restricted_mode );
+
+            // if failed
+            if( target == nullptr )
+            {
+                // if restricted mode not allowed, notify user to allow it
+                if( !allow_restricted_mode )
+                    Overlay::Instance().SetMessage( NOTIFY_REQUIRE_RESTRICTED_MODE );
+            }
+            else
+            {
+                // notify user if entered restricted mode
+                if( target->IsRestricted() )
+                    Overlay::Instance().SetMessage( NOTIFY_ENTERED_RESTRICTED_MODE );
+            }
+        }
 
         return target != nullptr;
     }
@@ -144,7 +162,7 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
-    Target* TargetController::_SpawnTarget( Id process_id, Bool require_configured )
+    Target* TargetController::_SpawnTarget( Id process_id, Bool require_configured, Bool allow_restricted_mode )
     {
         // add new target
         Target& target = _targets.Set( process_id );
@@ -153,7 +171,7 @@ namespace Yolomouse
         if( target.Initialize( process_id, require_configured, *this ) )
         {
             // start target
-            if( target.Start() )
+            if( target.Start(allow_restricted_mode) )
                 return &target;
 
             // if fail shutdown target
@@ -179,7 +197,7 @@ namespace Yolomouse
 
             // if not found, spawn target if installed
             if( target == nullptr )
-                _SpawnTarget( process_id, true );
+                _SpawnTarget( process_id, true, true );
         }
     }
 
@@ -204,7 +222,7 @@ namespace Yolomouse
                     _hover_target = _targets.Get( process_id );
                 }
             }
-            // else looup hover target
+            // else lookup hover target
             else
                 _hover_target = _targets.Get( process_id );
 

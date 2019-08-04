@@ -29,6 +29,7 @@
     <ClInclude Include="..\..\source\Core\Events\WindowEvent.hpp" />
     <ClInclude Include="..\..\source\Core\Math\Math.hpp" />
     <ClInclude Include="..\..\source\Core\Math\Matrix4.hpp" />
+    <ClInclude Include="..\..\source\Core\Math\Number.hpp" />
     <ClInclude Include="..\..\source\Core\Math\Quaternion.hpp" />
     <ClInclude Include="..\..\source\Core\Math\Transform3.hpp" />
     <ClInclude Include="..\..\source\Core\Math\Vector2.hpp" />
@@ -56,6 +57,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\source\Core\Math\Math.cpp" />
     <ClCompile Include="..\..\source\Core\Math\Matrix4.cpp" />
+    <ClCompile Include="..\..\source\Core\Math\Number.cpp" />
     <ClCompile Include="..\..\source\Core\Math\Quaternion.cpp" />
     <ClCompile Include="..\..\source\Core\Math\Transform3.cpp" />
     <ClCompile Include="..\..\source\Core\Math\Vector2.cpp" />

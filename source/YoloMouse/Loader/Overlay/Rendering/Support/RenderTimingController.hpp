@@ -19,7 +19,7 @@ namespace Yolomouse
         ~RenderTimingController();
 
         /**/
-        void Initialize( IDXGIOutput& dxgi_output );
+        void Initialize( IDXGIOutput& dxgi_output, const Vector2l& resolution );
         void Shutdown();
 
         /**/
@@ -29,29 +29,21 @@ namespace Yolomouse
         Float GetFrameTime() const; // sec
 
         /**/
-        void SetResolution( const Vector2l& resolution );
+        void SetFillTime( Bool enabled );
 
         /**/
         void Begin();
         void End();
 
     private:
-        // constants
-        static constexpr Float DEFAULT_REFRESH_RATE =   59.94f;     // hz
-        static constexpr Float RENDER_TIME_INITIAL =    0.002f;     // sec. initial render time
-        static constexpr Float RENDER_TIME_INCREMENT =  0.0012f;    // sec. time to increase render time by during detected lag
-        static constexpr Float RENDER_TIME_RECOVER =    0.000001f;  // sec. time to decrease render time by each frame.
-
         /**/
         void  _UpdateFillTime();
-        void  _CalculateRefreshRate();
-        Float _TicksToSeconds( UHuge ticks );
+        void  _CalculateRefreshRate( const Vector2l& resolution );
 
         // fields: parameters
         IDXGIOutput*    _dxgi_output;
-        Vector2l        _resolution;
+        Bool            _option_fill_time;
         // fields: info
-        UHuge           _tick_frequency;
         Float           _refresh_time;
         Float           _frameskip_threshold;
         // fields: state

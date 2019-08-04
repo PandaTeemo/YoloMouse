@@ -292,7 +292,9 @@ namespace Yolomouse
         // mark failed to avoid attempting again
         entry.state = RESOURCE_FAILED;
 
-        LOG("CursorVault.CacheInit.NotFound: %u", index);
+        // log
+        LOG1("CursorVault.CacheInit.NotFound: %u", index);
+
         return false;
     }
 

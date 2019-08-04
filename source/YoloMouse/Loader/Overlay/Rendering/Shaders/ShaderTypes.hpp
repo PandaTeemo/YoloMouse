@@ -7,6 +7,15 @@
 
 namespace Yolomouse
 {
+    // enum
+    // TODO3: convert to flags
+    enum PixelShaderType : Byte4
+    {
+        PIXELSHADERTYPE_UNLIT_BASIC =   0,
+        PIXELSHADERTYPE_LIT_BASIC =     1,
+        PIXELSHADERTYPE_UNLIT_TEXTURE = 2,
+    };
+
     // types
     struct ShaderVertex
     {
@@ -18,14 +27,14 @@ namespace Yolomouse
 
     struct VertexShaderConstantValue
     {
-        Matrix4f mvp =              Matrix4f::IDENTITY();
-        Matrix4f model =            Matrix4f::IDENTITY();
-        Vector4f variation_color =  Vector4f(1,1,1,1);
+        Matrix4f mvp;
+        Matrix4f model;
+        Vector4f variation_color;
     };
 
     struct PixelShaderConstantValue
     {
-        Vector3f light_vector =     Vector3f(0,0,1);
-        Byte4    texturing =        false;
+        Vector3f        light_vector;
+        PixelShaderType type;
     };
 }

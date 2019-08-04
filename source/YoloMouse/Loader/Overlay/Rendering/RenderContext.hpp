@@ -30,7 +30,10 @@ namespace Yolomouse
         const Vector2l&                 GetSize() const;
 
         /**/
-        Bool Resize(const Vector2l& size);
+        void SetReduceLatency( Bool enabled );
+
+        /**/
+        Bool Resize( const Vector2l& size );
 
         /**/
         void CommitShaderContants( const VertexShaderConstantValue& vs, const PixelShaderConstantValue& ps );
@@ -45,11 +48,13 @@ namespace Yolomouse
         Bool _InitializeD3dBuffer( ID3D11Buffer*& buffer, D3D11_USAGE usage, ULong size, UINT BindFlags );
         Bool _InitializeD3dDepthStencilView();
         Bool _InitializeD3dRenderTargetView();
+        Bool _InitializeBlending();
         void _InitializeView();
 
         /**/
         void _ShutdownD3d();
         void _ShutdownD3dDepthStencilView();
+        void _ShutdownBlending();
         void _ShutdownD3dRenderTargetView();
 
         /**/
@@ -71,6 +76,7 @@ namespace Yolomouse
         ID3D11DepthStencilState*    _depthstencil_state;
         ID3D11Texture2D*            _depthstencil_buffer;
         ID3D11DepthStencilView*     _depthstencil_view;
+        ID3D11BlendState*           _blend_state;
         ID3D11RenderTargetView*     _render_target_view;
         ID3D11VertexShader*         _vertex_shader;
         ID3D11PixelShader*          _pixel_shader;

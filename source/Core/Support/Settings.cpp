@@ -92,7 +92,7 @@ namespace Core
     }
 
     //-------------------------------------------------------------------------
-    void Settings::Set( Id id, String value )
+    void Settings::Set( Id id, const String& value )
     {
         return _keyvalues[id].value.CopyZ(value);
     }

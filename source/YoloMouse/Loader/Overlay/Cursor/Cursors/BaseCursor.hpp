@@ -2,7 +2,8 @@
 #include <Core/Math/Matrix4.hpp>
 #include <Core/Math/Quaternion.hpp>
 #include <YoloMouse/Loader/Overlay/Cursor/IOverlayCursor.hpp>
-#include <YoloMouse/Loader/Overlay/Rendering/Types.hpp>
+#include <YoloMouse/Loader/Overlay/Rendering/Assets/Mesh.hpp>
+#include <YoloMouse/Loader/Overlay/Rendering/Assets/Texture.hpp>
 
 namespace Yolomouse
 {
@@ -12,12 +13,6 @@ namespace Yolomouse
     {
     public:
         // types
-        struct BlendingDef
-        {
-            D3D11_BLEND src;
-            D3D11_BLEND dest;
-        };
-
         struct GeometryDef
         {
             Array<ShaderVertex> vertices;
@@ -30,7 +25,7 @@ namespace Yolomouse
             void*       pixels;
         };
 
-        struct UpdateDef2
+        struct UpdateDef
         {
             Float        frame_time;
             Vector3f&    light_vector;
@@ -47,15 +42,12 @@ namespace Yolomouse
         BaseCursor();
         ~BaseCursor();
 
-        // impl:IOverlayCursor
         /**/
-        Bool Initialize( const InitializeDef& def );
+        Bool Initialize( RenderContext& render_context );
         void Shutdown();
 
         /**/
         Bool IsInitialized() const;
-        Bool IsTextureInitialized() const;
-        Bool IsGeometryInitialized() const;
 
         /**/
         CursorId        GetId() const;
@@ -64,31 +56,16 @@ namespace Yolomouse
 
         /**/
         virtual Bool SetCursor( CursorId id, CursorVariation variation, CursorSize size );
+        void         SetAspectRatio( Float aspect_ratio );
 
         /**/
-        void Update( const UpdateDef& def );
-
-        /**/
-        void Draw() const;
-
-        /**/
-        void OnResize( const ResizeDef& def );
+        void Draw( const Vector2f& position );
 
     protected:
         /**/
         virtual Bool _OnInitialize() = 0;
-        Bool _InitializeBlending( const BlendingDef& def );
-        Bool _InitializeGeometry( const GeometryDef& def );
-        Bool _InitializeTexture( const TextureDef& def );
-
-        /**/
         virtual void _OnShutdown() = 0;
-        void _ShutdownBlending();
-        void _ShutdownGeometry();
-        void _ShutdownTexture();
-
-        /**/
-        virtual void _OnUpdate( UpdateDef2& def ) = 0;
+        virtual void _OnUpdate( UpdateDef& def ) = 0;
 
         /**/
         void _SetAutoScale( Bool enable );
@@ -96,34 +73,23 @@ namespace Yolomouse
         /**/
         void _CalculateFaceNormals( Array<ShaderVertex>& vertices, const Array<Index3>& indices );
 
+        // fields
+        Mesh            _mesh;
+        Texture         _texture;
+        RenderContext*  _render_context;
+ 
     private:
         // constants
         // SIZEID_TO_SCALE * SizeId = cursor size relative to resolution height
         static constexpr Float SIZEID_TO_SCALE = 0.0032f;
 
-        /**/
-        void _InitializeCamera();
-
-        /**/
-        void _CalculateOrthoProjection();
-
         // fields: parameters
-        RenderContext*              _render_context;
-        Float                       _aspect_ratio;
         CursorId                    _id;
         CursorVariation             _variation;
         CursorSize                  _size;
         Float                       _cursor_scale;
         Bool                        _auto_scale;
         // fields: state
-        ID3D11BlendState*           _blend_state;
-        Index                       _shape_index_count;
-        ID3D11Buffer*               _shape_index_buffer;
-        ID3D11Buffer*               _shape_vertex_buffer;
-        ID3D11Texture2D*            _texture;
-        ID3D11ShaderResourceView*   _texture_view;
         Matrix4f                    _projection_matrix;
-        VertexShaderConstantValue   _vs_constant_value;
-        PixelShaderConstantValue    _ps_constant_value;
    };
 }

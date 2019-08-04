@@ -11,7 +11,7 @@ namespace Yolomouse
     {
         // constants
         //---------------------------------------------------------------------
-        static const Float CLEAR_COLOR[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+        static const Float CLEAR_COLOR[4] = { 0, 0, 0, 0 };
     }
 
     // public
@@ -32,6 +32,7 @@ namespace Yolomouse
         _depthstencil_state     (nullptr),
         _depthstencil_buffer    (nullptr),
         _depthstencil_view      (nullptr),
+        _blend_state            (nullptr),
         _render_target_view     (nullptr),
         _vertex_shader          (nullptr),
         _pixel_shader           (nullptr),
@@ -60,12 +61,15 @@ namespace Yolomouse
         if( !_InitializeD3d(hwnd) )
             return false;
 
-        // initialize render timing controller
-        _render_timing_controller.SetResolution( _size );
-        _render_timing_controller.Initialize( *_swapchain_output );
+        // initialize blending
+        if( !_InitializeBlending() )
+            return false;
 
         // initialize view
         _InitializeView();
+
+        // initialize render timing controller
+        _render_timing_controller.Initialize( *_swapchain_output, _size );
 
         // set initialized
         _initialized = true;
@@ -81,6 +85,9 @@ namespace Yolomouse
         // shutdown render timing controller
         if( _render_timing_controller.IsInitialized() )
             _render_timing_controller.Shutdown();
+
+        // shutdown blending
+        _ShutdownBlending();
 
         // shutdown direct3d
         _ShutdownD3d();
@@ -124,6 +131,13 @@ namespace Yolomouse
     }
 
     //-------------------------------------------------------------------------
+    void RenderContext::SetReduceLatency( Bool enabled )
+    {
+        // set render timing controller fill time option
+        _render_timing_controller.SetFillTime( enabled );
+    }
+
+    //-------------------------------------------------------------------------
     Bool RenderContext::Resize( const Vector2l& size )
     {
         ASSERT( IsInitialized() );
@@ -132,8 +146,8 @@ namespace Yolomouse
         // set new size
         _size = size;
 
-        // update render timing controller
-        _render_timing_controller.SetResolution( size );
+        // shutdown render timing controller
+        _render_timing_controller.Shutdown();
 
         // shutdown render target view
         _ShutdownD3dRenderTargetView();
@@ -159,6 +173,9 @@ namespace Yolomouse
 
         // reinitialize view
         _InitializeView();
+
+        // reinitialize render timing controller
+        _render_timing_controller.Initialize( *_swapchain_output, _size );
 
         return true;
     }
@@ -186,6 +203,9 @@ namespace Yolomouse
 
         // begin render timing controller
         _render_timing_controller.Begin();
+
+        // set blend state
+        _device_context->OMSetBlendState(_blend_state, NULL, 0xffffffff);
     }
 
     void RenderContext::RenderComplete( Bool idle )
@@ -393,6 +413,7 @@ namespace Yolomouse
         // create sampler
         if( (hresult = _device->CreateSamplerState( &sampler_desc, &_sampler )) != S_OK )
             return false;
+        _device_context->PSSetSamplers(0, 1, &_sampler);
 
         // create vertex shader object constant buffer
         if( !_InitializeD3dBuffer( _vs_constant_buffer, D3D11_USAGE_DEFAULT, sizeof( VertexShaderConstantValue ), D3D11_BIND_CONSTANT_BUFFER ) )
@@ -454,8 +475,7 @@ namespace Yolomouse
 
         // describe depth stencil view
         depthstencil_view_desc.Format =             DXGI_FORMAT_D24_UNORM_S8_UINT;
-        //depthstencil_view_desc.ViewDimension =      D3D11_DSV_DIMENSION_TEXTURE2D;
-        depthstencil_view_desc.ViewDimension =      D3D11_DSV_DIMENSION_TEXTURE2DMS;
+        depthstencil_view_desc.ViewDimension =      D3D11_DSV_DIMENSION_TEXTURE2DMS; // to get antialiasing working
         depthstencil_view_desc.Texture2D.MipSlice = 0;
 
         // describe depth stencil texture
@@ -510,6 +530,31 @@ namespace Yolomouse
 
         // set render target
         _device_context->OMSetRenderTargets( 1, &_render_target_view, _depthstencil_view );
+
+        return true;
+    }
+
+    Bool RenderContext::_InitializeBlending()
+    {
+        D3D11_BLEND_DESC blend_desc = {};
+        HRESULT          hresult;
+
+        // describe blend state
+        blend_desc.RenderTarget[0].BlendEnable = TRUE;
+        blend_desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	    blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+	    blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+	    blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	    blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+	    blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	    blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_MAX;
+
+        // create blend state
+        if( (hresult = _device->CreateBlendState(&blend_desc, &_blend_state)) != S_OK )
+        {
+            LOG( "BaseCursor.InitializeBlending.CreateBlendState" );
+            return false;
+        }
 
         return true;
     }
@@ -645,6 +690,16 @@ namespace Yolomouse
         {
             _depthstencil_buffer->Release();
             _depthstencil_buffer = nullptr;
+        }
+    }
+
+    void RenderContext::_ShutdownBlending()
+    {
+        // shutdown blend state
+        if( _blend_state )
+        {
+            _blend_state->Release();
+            _blend_state = nullptr;
         }
     }
 

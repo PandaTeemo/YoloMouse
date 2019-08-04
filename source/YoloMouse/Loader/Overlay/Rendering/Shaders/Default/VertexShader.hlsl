@@ -30,7 +30,7 @@ VS_OUTPUT VS(const VS_INPUT input)
     output.uv = input.uv;
 
     if( input.color.r == 0 && input.color.g == 0 && input.color.b == 0 )
-        output.color = float4(variation_color.r, variation_color.g, variation_color.b, input.color.a);
+        output.color = float4(variation_color.r, variation_color.g, variation_color.b, input.color.a * variation_color.a);
     else
         output.color = input.color;
 
