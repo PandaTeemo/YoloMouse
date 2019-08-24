@@ -387,7 +387,7 @@ namespace Yolomouse
         _window.SetSize(size);
 
         // resize render context
-        _render_context.Resize(size);
+        _render_context.Resize(_window.GetSize());
 
         // update cursor aspect ratios
         _basic_cursor.SetAspectRatio( _window.GetAspectRatio() );

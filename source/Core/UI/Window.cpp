@@ -29,6 +29,7 @@ namespace Core
         _hinstance = def.hinstance;
         _class_name = def.class_name;
         _size = def.size;
+        _SizeTweak();
         _aspect_ratio = static_cast<Float>(_size.x) / static_cast<Float>(_size.y);
 
         // build window class
@@ -75,7 +76,6 @@ namespace Core
 	        SetWindowLongPtr(_hwnd, GWL_STYLE, WS_VISIBLE); // not quite same as ShowWindow
 	        SetWindowLongPtr(_hwnd, GWL_EXSTYLE, WS_EX_TOPMOST|WS_EX_LAYERED|WS_EX_TRANSPARENT|WS_EX_TOOLWINDOW|WS_EX_NOACTIVATE);
             DwmExtendFrameIntoClientArea(_hwnd, &frame_extend_margin );
-            ShowWindow(_hwnd, SW_MAXIMIZE);
 
             // set timer for topmost refresh
             SetTimer( _hwnd, 0, TOPMOST_REFRESH_TIMER, NULL );
@@ -110,7 +110,7 @@ namespace Core
         return _hwnd;
     }
 
-    const Vector2l& Window::GetSize() const
+    Vector2l Window::GetSize() const
     {
         return _size;
     }
@@ -125,6 +125,7 @@ namespace Core
     {
         // set new size
         _size = size;
+        _SizeTweak();
 
         // update aspect ratio
         _aspect_ratio = static_cast<Float>(_size.x) / static_cast<Float>(_size.y);
@@ -140,6 +141,13 @@ namespace Core
     {
         // update our topmost state (reposition Z order)
         SetWindowPos( _hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOCOPYBITS | SWP_NOACTIVATE | SWP_NOREDRAW );
+    }
+
+    //-------------------------------------------------------------------------
+    void Window::_SizeTweak()
+    {
+        // this is ghetto way to prevent taskbar hiding if topmost window. maybe windows thinks we're trying to be completely fullscreen?
+        _size -= 1;
     }
 
     //-------------------------------------------------------------------------

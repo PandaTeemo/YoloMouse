@@ -6,7 +6,7 @@ namespace Yolomouse
 {
     // numeric
     //-------------------------------------------------------------------------
-    static const ULong APP_VERSION[] =                      { 0, 11, 2 };
+    static const ULong APP_VERSION[] =                      { 0, 11, 3 };
     static const ULong CURSOR_CACHE_LIMIT =                 50;
 
     // strings

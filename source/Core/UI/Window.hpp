@@ -39,7 +39,7 @@ namespace Core
 
         /**/
         HWND            GetHandle() const;
-        const Vector2l& GetSize() const;
+        Vector2l GetSize() const;
         Float           GetAspectRatio() const;
 
         /**/
@@ -54,6 +54,9 @@ namespace Core
 
         /**/
         void _SetTop();
+
+        /**/
+        void _SizeTweak();
 
         /**/
         static LRESULT CALLBACK _WindowProcedure( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam );
