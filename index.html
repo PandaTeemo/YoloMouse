@@ -2,14 +2,21 @@
 <head>
     <title>YoloMouse</title>
     <link rel="stylesheet" type="text/css" href="style.css"/>
+    <link rel="shortcut icon" href="favicon.ico"/>
     <script src="jquery-2.2.2.min.js"></script>
+    <script>
+        function ToggleOldVersions()
+        {
+            $('#OldVersions').toggle();
+        }
+    </script>
 </head>
 <body>
     <!-- header -->
     <div class="TitlePanel">
         <div class="TitleHeader">
             <img src="Title.png"/>
-            <div class="TitleVersion">0.11.2 <b style="color:red">BETA</b></div>
+            <div class="TitleVersion">0.11.3 <b style="color:red">BETA</b></div>
         </div>
         <div class="TitleDescription">
             Game Cursor Changer
@@ -24,13 +31,13 @@
 
     <!-- download -->
     <div class="Panel" style="background-color:#f70; top:90px; left:660px;">
-        <a href="https://github.com/PandaTeemo/YoloMouse/releases/download/0.11.2/YoloMouse64.msi">
+        <a href="https://github.com/PandaTeemo/YoloMouse/releases/download/0.11.3/YoloMouse64.msi">
             <div class="Header" style="width:50%; background-color:#f40;">
                 download!
             </div>
         </a>
         <table>
-            <tr><td class="ListHeader"><a href="javascript:$('#OldVersions').toggle()">Old Versions</a></td><td class="ListContent">for old Windows versions</td></tr>
+            <tr><td class="ListHeader"><a href="javascript:ToggleOldVersions()">Old Versions</a></td><td class="ListContent">for old Windows versions</td></tr>
             <tr><td class="ListHeader"><a href="https://github.com/PandaTeemo/YoloMouse/">Source Code</a></td><td class="ListContent">for the code monkeys</td></tr>
         </table>
     </div>
