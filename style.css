@@ -6,7 +6,7 @@
     border: 0;
     position: relative;
     color: #fff;
-    font-family: Arial;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 body
@@ -32,11 +32,6 @@ a:link, a:visited
 {
     color: #fff;
     text-decoration: none;
-}
-
-a:hover
-{
-    background-color: rgba(0,0,0,.4);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -123,3 +118,39 @@ a:hover
     float: right;
     color: #889;
 }
+
+
+
+
+
+
+
+
+
+
+
+.GoldPanel
+{
+    width: 970px;
+    background-color: rgba(0,0,0,.3);
+    border: 1px solid #000;
+    padding: 20px;
+    font-size: 18px;
+}
+
+.GoldLarge
+{
+    font-size: 35px;
+}
+
+a.gold:link, a.gold:visited
+{
+    color: #f08;
+    text-decoration: none;
+}
+
+a.gold:hover
+{
+    color: #f6c;
+}
+
